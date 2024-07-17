@@ -1,0 +1,126 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Cargo {
+  ADMIN
+  USUARIO
+}
+
+model Perfil {
+  cod_perfil String    @id @default(uuid())
+  descricao  String    @db.VarChar(255)
+  cargo      Cargo     @default(USUARIO)
+  usuario    Usuario[]
+
+  @@map("perfil")
+}
+
+model Usuario {
+  // Fields
+  cod_usuario String @id @default(uuid())
+  nome        String @db.VarChar(150)
+  email       String @unique @db.VarChar(100)
+  senha       String
+  senhaSalt   String
+
+  // Timestamps
+  criadoEm     DateTime @default(now())
+  atualizadoEm DateTime @updatedAt
+
+  // 1:n Equipment
+  equipamento Equipamento[]
+
+  cod_perfil String
+  perfil     Perfil @relation(fields: [cod_perfil], references: [cod_perfil])
+
+  @@map("usuario")
+}
+
+model Concessionaria {
+  cod_concessionaria String        @id @default(uuid())
+  nome               String        @db.VarChar(150)
+  uf                 String        @db.VarChar(2)
+  cidade             String        @db.VarChar(100)
+  equipamento        Equipamento[]
+  tarifa             Tarifa[]
+
+  @@map("concessionaria")
+}
+
+model Tarifa {
+  cod_tarifa String   @id @default(uuid())
+  dt_tarifa  DateTime
+  valor      Decimal
+
+  cod_concessionaria String
+  concessionaria     Concessionaria @relation(fields: [cod_concessionaria], references: [cod_concessionaria])
+
+  @@map("tarifa")
+}
+
+model Equipamento {
+  // Fields
+  cod_equipamento String  @id @unique @default(uuid())
+  mac             String  @unique @db.VarChar(17)
+  nome            String  @db.VarChar(150)
+  descricao       String? @db.VarChar(255)
+
+  // Timestamps
+  criadoEm     DateTime @default(now())
+  atualizadoEm DateTime @updatedAt
+
+  // Relations
+  // 1:n User
+  cod_usuario  String
+  usuario      Usuario        @relation(fields: [cod_usuario], references: [cod_usuario], onDelete: Cascade)
+  // 1:1 Measurement
+  dados_sensor Dados_Sensor[]
+
+  cod_concessionaria String
+  concessionaria     Concessionaria @relation(fields: [cod_concessionaria], references: [cod_concessionaria])
+
+  @@map("equipamento")
+}
+
+model Dados_Sensor {
+  id                       String   @id @default(uuid())
+  iA                       Float?
+  iB                       Float?
+  iC                       Float?
+  vA                       Float?
+  vB                       Float?
+  vC                       Float?
+  FPA                      Float?
+  FPB                      Float?
+  FPC                      Float?
+  energiaAtivaExportada    Float?
+  energiaAtivaImportada    Float?
+  energiaReativaExportada  Float?
+  energiaReativaImportada  Float?
+  energiaAparenteExportada Float?
+  energiaAparenteImportada Float?
+  date                     DateTime
+
+  // Timestamps
+  criadoEm     DateTime @default(now())
+  atualizadoEm DateTime @updatedAt
+
+  // Relations
+  // 1:1 Equipment
+  cod_equipamento String
+  equipamento     Equipamento @relation(fields: [cod_equipamento], references: [cod_equipamento], onDelete: Cascade)
+
+  @@map("dados_sensor")
+}
