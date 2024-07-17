@@ -170,7 +170,22 @@ export class EquipmentsService {
     return new EquipmentEntity(equipment);
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} equipment`;
+  async remove(req: JWTType, id: string): Promise<EquipmentEntity> {
+    const equipment = await this.prismaService.equipamento.findUnique({
+      where: {
+        cod_equipamento: id,
+        cod_usuario: req.user.userId,
+      },
+    });
+
+    if (!equipment) throw new NotFoundException('Equipamento não encontrado');
+
+    await this.prismaService.equipamento.delete({
+      where: {
+        cod_equipamento: id,
+      },
+    });
+
+    return new EquipmentEntity(equipment);
   }
 }

@@ -197,7 +197,28 @@ export class EquipmentsController {
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.equipmentsService.remove(+id);
+  @ApiOkResponse({
+    status: HttpStatus.OK,
+    type: EquipmentEntity,
+  })
+  @ApiBearerAuth('token')
+  @ApiNotFoundResponse({
+    status: HttpStatus.NOT_FOUND,
+    schema: {
+      example: {
+        statusCode: HttpStatus.NOT_FOUND,
+        message: 'Equipamento não encontrado',
+      },
+    },
+  })
+  @ApiParam({
+    name: 'id',
+    type: String,
+  })
+  remove(
+    @Request() req: JWTType,
+    @Param('id', new ParseUUIDPipe()) id: string,
+  ) {
+    return this.equipmentsService.remove(req, id);
   }
 }
