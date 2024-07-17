@@ -1,0 +1,23 @@
+version: '3.9'
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    ports:
+      - 5432:5432
+    volumes:
+      - ~/apps/postgres:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_PASSWORD=amazontech
+      - POSTGRES_USER=amazontech
+      - POSTGRES_DB=amazontech_db
+
+  # backend:
+  #   image: amazontech-backend
+  #   build:
+  #     context: .
+  #     dockerfile: Dockerfile
+  #   ports:
+  #     - 3000:3000
+volumes:
+  postgres:
