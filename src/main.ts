@@ -1,10 +1,28 @@
-import { NestFactory } from '@nestjs/core';
+import { NestFactory, Reflector, HttpAdapterHost } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { ValidationPipe, ClassSerializerInterceptor } from '@nestjs/common';
+import { WinstonModule } from 'nest-winston';
+import { winstonConfig } from './config/winston.config';
+import * as csurf from 'csurf';
+import helmet from 'helmet';
+import { APIGuard } from './common/guards/api.guard';
+import * as cookieParser from 'cookie-parser';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const logger = WinstonModule.createLogger(winstonConfig);
+  const app = await NestFactory.create(AppModule, { logger });
   app.enableCors();
+  app.use(helmet());
+  app.use(cookieParser());
+  app.use(csurf());
+  app.useGlobalPipes(
+    new ValidationPipe({
+      whitelist: true,
+    }),
+  );
+  app.useGlobalGuards(new APIGuard());
+  app.useGlobalInterceptors(new ClassSerializerInterceptor(app.get(Reflector)));
 
   const config = new DocumentBuilder()
     .setTitle('Smart Click API Documentation')
@@ -23,6 +41,8 @@ async function bootstrap() {
 
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, document);
+
+  const { httpAdapter } = app.get(HttpAdapterHost);
 
   await app.listen(3000);
 }
