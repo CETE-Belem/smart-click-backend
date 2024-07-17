@@ -10,6 +10,8 @@ import {
   Request,
   HttpStatus,
   ParseUUIDPipe,
+  Query,
+  ParseIntPipe,
 } from '@nestjs/common';
 import { EquipmentsService } from './equipments.service';
 import { CreateEquipmentDto } from './dto/create-equipment.dto';
@@ -21,7 +23,9 @@ import {
   ApiNotFoundResponse,
   ApiOkResponse,
   ApiParam,
+  ApiQuery,
   ApiTags,
+  getSchemaPath,
 } from '@nestjs/swagger';
 import { AuthGuard } from 'src/common/guards/auth.guard';
 import { JWTType } from 'src/types/jwt.types';
@@ -66,8 +70,67 @@ export class EquipmentsController {
   }
 
   @Get()
-  findAll() {
-    return this.equipmentsService.findAll();
+  @ApiOkResponse({
+    status: HttpStatus.OK,
+    schema: {
+      properties: {
+        limit: {
+          type: 'number',
+        },
+        page: {
+          type: 'number',
+        },
+        totalPages: {
+          type: 'number',
+        },
+        equipments: {
+          type: 'array',
+          items: {
+            type: 'object',
+            $ref: getSchemaPath(EquipmentEntity),
+          },
+        },
+      },
+    },
+  })
+  @ApiBearerAuth('token')
+  @ApiQuery({
+    name: 'page',
+    description: 'Página atual',
+    required: true,
+    type: Number,
+  })
+  @ApiQuery({
+    name: 'limit',
+    description: 'Quantidade de registros por página',
+    required: true,
+    type: Number,
+  })
+  @ApiQuery({
+    name: 'mac',
+    description: 'Mac do equipamento',
+    required: false,
+    type: String,
+  })
+  @ApiQuery({
+    name: 'name',
+    description: 'Nome do equipamento',
+    required: false,
+    type: String,
+  })
+  findAll(
+    @Request() req: JWTType,
+    @Query('page', new ParseIntPipe()) page: number,
+    @Query('limit', new ParseIntPipe()) limit: number,
+    @Query('mac') mac: string,
+    @Query('name') name: string,
+  ) {
+    return this.equipmentsService.findAll(req, {
+      page,
+      limit,
+      mac,
+      name,
+    });
   }
 
   @Get(':id')

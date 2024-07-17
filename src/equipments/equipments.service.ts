@@ -60,8 +60,53 @@ export class EquipmentsService {
     return new EquipmentEntity(equipment);
   }
 
-  findAll() {
-    return `This action returns all equipments`;
+  async findAll(
+    req: JWTType,
+    options: {
+      page: number;
+      limit: number;
+      name: string;
+      mac: string;
+    },
+  ): Promise<{
+    limit: number;
+    page: number;
+    totalPages: number;
+    equipments: EquipmentEntity[];
+  }> {
+    const { limit, page, mac, name } = options;
+
+    const equipments = await this.prismaService.equipamento.findMany({
+      where: {
+        cod_usuario: req.user.userId,
+        nome: {
+          contains: name,
+        },
+        mac: {
+          contains: mac,
+        },
+      },
+      orderBy: {
+        criadoEm: 'asc',
+      },
+      skip: (page - 1) * limit,
+      take: limit,
+    });
+
+    const totalEquipments = await this.prismaService.equipamento.count({
+      where: {
+        cod_usuario: req.user.userId,
+      },
+    });
+
+    const totalPages = Math.ceil(totalEquipments / limit);
+
+    return {
+      limit,
+      page,
+      totalPages,
+      equipments: equipments.map((equipment) => new EquipmentEntity(equipment)),
+    };
   }
 
   findOne(id: number) {
