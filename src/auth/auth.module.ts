@@ -1,11 +1,13 @@
 import { Module } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { AuthController } from './auth.controller';
-import { JwtModule } from '@nestjs/jwt';
+import { JwtModule, JwtService } from '@nestjs/jwt';
+import { PrismaService } from 'src/prisma/prisma.service';
+import { TurnstileService } from 'src/services/turnstile/turnstile.service';
 
 @Module({
   controllers: [AuthController],
-  providers: [AuthService],
+  providers: [AuthService, PrismaService, TurnstileService, JwtService],
   imports: [
     JwtModule.register({
       global: true,

@@ -4,7 +4,6 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { ValidationPipe, ClassSerializerInterceptor } from '@nestjs/common';
 import { WinstonModule } from 'nest-winston';
 import { winstonConfig } from './config/winston.config';
-import * as csurf from 'csurf';
 import helmet from 'helmet';
 import { APIGuard } from './common/guards/api.guard';
 import * as cookieParser from 'cookie-parser';
@@ -15,7 +14,6 @@ async function bootstrap() {
   app.enableCors();
   app.use(helmet());
   app.use(cookieParser());
-  app.use(csurf());
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true,
