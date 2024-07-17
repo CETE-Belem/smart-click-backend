@@ -10,22 +10,26 @@ export class UserEntity implements Usuario {
 
   @ApiProperty({
     type: String,
+    nullable: false,
   })
   cod_perfil: string;
   @ApiProperty({
     type: String,
+    nullable: false,
   })
   cod_usuario: string;
   @ApiProperty({
     type: String,
     example: 'João da Silva',
     maxLength: maxNameLength,
+    nullable: false,
   })
   nome: string;
   @ApiProperty({
     type: String,
     example: 'john.doe@amazontech.com',
     maxLength: maxEmailLength,
+    nullable: false,
   })
   email: string;
   @Exclude()
@@ -36,11 +40,13 @@ export class UserEntity implements Usuario {
   @ApiProperty({
     type: Date,
     example: '2021-08-01T00:00:00.000Z',
+    nullable: false,
   })
   criadoEm: Date;
   @ApiProperty({
     type: Date,
     example: '2021-08-01T00:00:00.000Z',
+    nullable: false,
   })
   atualizadoEm: Date;
 }
