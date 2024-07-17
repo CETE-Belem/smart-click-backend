@@ -134,8 +134,29 @@ export class EquipmentsController {
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.equipmentsService.findOne(+id);
+  @ApiOkResponse({
+    status: HttpStatus.OK,
+    type: EquipmentEntity,
+  })
+  @ApiBearerAuth('token')
+  @ApiNotFoundResponse({
+    status: HttpStatus.NOT_FOUND,
+    schema: {
+      example: {
+        statusCode: HttpStatus.NOT_FOUND,
+        message: 'Concessionária não encontrada',
+      },
+    },
+  })
+  @ApiParam({
+    name: 'id',
+    type: String,
+  })
+  findOne(
+    @Request() req: JWTType,
+    @Param('id', new ParseUUIDPipe()) id: string,
+  ) {
+    return this.equipmentsService.findOne(req, id);
   }
 
   @Patch(':id')

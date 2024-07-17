@@ -109,8 +109,17 @@ export class EquipmentsService {
     };
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} equipment`;
+  async findOne(req: JWTType, id: string): Promise<EquipmentEntity> {
+    const equipment = await this.prismaService.equipamento.findUnique({
+      where: {
+        cod_equipamento: id,
+        cod_usuario: req.user.userId,
+      },
+    });
+
+    if (!equipment) throw new NotFoundException('Equipamento não encontrado');
+
+    return new EquipmentEntity(equipment);
   }
 
   async update(
