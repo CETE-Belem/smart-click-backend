@@ -9,6 +9,7 @@ import {
   UseGuards,
   Request,
   HttpStatus,
+  ParseUUIDPipe,
 } from '@nestjs/common';
 import { EquipmentsService } from './equipments.service';
 import { CreateEquipmentDto } from './dto/create-equipment.dto';
@@ -19,6 +20,7 @@ import {
   ApiConflictResponse,
   ApiNotFoundResponse,
   ApiOkResponse,
+  ApiParam,
   ApiTags,
 } from '@nestjs/swagger';
 import { AuthGuard } from 'src/common/guards/auth.guard';
@@ -74,11 +76,40 @@ export class EquipmentsController {
   }
 
   @Patch(':id')
+  @ApiOkResponse({
+    status: HttpStatus.OK,
+    type: EquipmentEntity,
+  })
+  @ApiBody({ type: UpdateEquipmentDto })
+  @ApiBearerAuth('token')
+  @ApiNotFoundResponse({
+    status: HttpStatus.NOT_FOUND,
+    schema: {
+      example: {
+        statusCode: HttpStatus.NOT_FOUND,
+        message: 'Concessionária não encontrada',
+      },
+    },
+  })
+  @ApiNotFoundResponse({
+    status: HttpStatus.NOT_FOUND,
+    schema: {
+      example: {
+        statusCode: HttpStatus.NOT_FOUND,
+        message: 'Equipamento não encontrado',
+      },
+    },
+  })
+  @ApiParam({
+    name: 'id',
+    type: String,
+  })
   update(
-    @Param('id') id: string,
+    @Request() req: JWTType,
+    @Param('id', new ParseUUIDPipe()) id: string,
     @Body() updateEquipmentDto: UpdateEquipmentDto,
   ) {
-    return this.equipmentsService.update(+id, updateEquipmentDto);
+    return this.equipmentsService.update(req, id, updateEquipmentDto);
   }
 
   @Delete(':id')

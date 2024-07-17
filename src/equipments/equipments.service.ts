@@ -68,8 +68,52 @@ export class EquipmentsService {
     return `This action returns a #${id} equipment`;
   }
 
-  update(id: number, updateEquipmentDto: UpdateEquipmentDto) {
-    return `This action updates a #${id} equipment`;
+  async update(
+    req: JWTType,
+    id: string,
+    updateEquipmentDto: UpdateEquipmentDto,
+  ): Promise<EquipmentEntity> {
+    const { codConcessionaria, description, mac, name } = updateEquipmentDto;
+
+    await this.prismaService.concessionaria
+      .findFirstOrThrow({
+        where: {
+          cod_concessionaria: codConcessionaria,
+        },
+      })
+      .catch(() => {
+        throw new NotFoundException('Concessionária não encontrada');
+      });
+
+    await this.prismaService.equipamento
+      .findUniqueOrThrow({
+        where: {
+          cod_equipamento: id,
+          mac,
+        },
+      })
+      .catch(() => {
+        throw new NotFoundException('Equipamento não encontrado');
+      });
+
+    const equipment = await this.prismaService.equipamento.update({
+      where: {
+        cod_equipamento: id,
+        mac,
+      },
+      data: {
+        mac,
+        nome: name,
+        descricao: description,
+        concessionaria: {
+          connect: {
+            cod_concessionaria: codConcessionaria,
+          },
+        },
+      },
+    });
+
+    return new EquipmentEntity(equipment);
   }
 
   remove(id: number) {
