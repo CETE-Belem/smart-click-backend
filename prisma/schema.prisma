@@ -21,7 +21,7 @@ enum Cargo {
 model Perfil {
   cod_perfil String    @id @default(uuid())
   descricao  String    @db.VarChar(255)
-  cargo      Cargo     @default(USUARIO)
+  cargo      Cargo     @unique @default(USUARIO)
   usuario    Usuario[]
 
   @@map("perfil")
