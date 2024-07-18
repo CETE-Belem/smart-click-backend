@@ -29,11 +29,12 @@ model Perfil {
 
 model Usuario {
   // Fields
-  cod_usuario String @id @default(uuid())
-  nome        String @db.VarChar(150)
-  email       String @unique @db.VarChar(100)
-  senha       String
-  senhaSalt   String
+  cod_usuario     String   @id @default(uuid())
+  nome            String   @db.VarChar(150)
+  email           String   @unique @db.VarChar(100)
+  senha           String
+  senhaSalt       String
+  contaConfirmada Boolean? @default(false)
 
   // Timestamps
   criadoEm     DateTime @default(now())
@@ -44,6 +45,9 @@ model Usuario {
 
   cod_perfil String
   perfil     Perfil @relation(fields: [cod_perfil], references: [cod_perfil])
+
+  // 1:1 Codigo_Confirmacao
+  cod_confirmacao Codigo_Confirmacao?
 
   @@map("usuario")
 }
@@ -123,4 +127,16 @@ model Dados_Sensor {
   equipamento     Equipamento @relation(fields: [cod_equipamento], references: [cod_equipamento], onDelete: Cascade)
 
   @@map("dados_sensor")
+}
+
+model Codigo_Confirmacao {
+  cod_codigo  String   @id @default(uuid())
+  codigo      String   @db.VarChar(6)
+  expiraEm    DateTime
+  usuario     Usuario  @relation(fields: [cod_usuario], references: [cod_usuario])
+  cod_usuario String   @unique
+
+  // Timestamps
+  criadoEm     DateTime @default(now())
+  atualizadoEm DateTime @updatedAt
 }

@@ -5,6 +5,9 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UserEntity } from './entities/user.entity';
 import { generateSalt, hashPassword } from 'src/services/libs/bcrypt';
 import { TurnstileService } from 'src/services/turnstile/turnstile.service';
+import { generateConfirmationCode } from 'src/services/utils/confirmation-code.utils';
+import ConfirmationCode from 'emails/confirmation-code';
+import { MailService } from 'src/mail/mail.service';
 
 @Injectable()
 export class UsersService {
@@ -12,6 +15,7 @@ export class UsersService {
     private readonly prismaService: PrismaService,
     private readonly authService: AuthService,
     private readonly turnstileService: TurnstileService,
+    private readonly mailService: MailService,
   ) {}
 
   async create(
@@ -51,6 +55,32 @@ export class UsersService {
         },
       },
     });
+
+    const confirmationCode = generateConfirmationCode();
+
+    await this.prismaService.codigo_Confirmacao.create({
+      data: {
+        codigo: confirmationCode,
+        expiraEm: new Date(Date.now() + 15 * 60 * 1000), //15 minutes
+        usuario: {
+          connect: {
+            cod_usuario: user.cod_usuario,
+          },
+        },
+      },
+    });
+
+    this.mailService
+      .sendMail({
+        email: user.email,
+        subject: 'Código de confirmação de conta',
+        template: ConfirmationCode({ confirmationCode }),
+      })
+      .then(() => {
+        console.log(
+          `Email de código de confirmação de conta enviado para ${user.email}`,
+        );
+      });
 
     const accessToken = await this.authService.createAccessToken(
       user.cod_usuario,

@@ -20,7 +20,13 @@ export class AuthService {
   ) {}
 
   public async createAccessToken(userId: string, role: Cargo): Promise<string> {
-    return await this.jwtService.signAsync({ userId, role });
+    return await this.jwtService.signAsync(
+      { userId, role },
+      {
+        privateKey: process.env.JWT_PRIVATE_KEY,
+        algorithm: 'RS256',
+      },
+    );
   }
 
   /**
@@ -34,7 +40,7 @@ export class AuthService {
     userPassword: string,
     password: string,
   ): Promise<void> {
-    const matches = await bcrypt.compare(userPassword, password);
+    const matches = await bcrypt.compare(password, userPassword);
 
     if (!matches) throw new UnauthorizedException('Credenciais inválidas');
   }
