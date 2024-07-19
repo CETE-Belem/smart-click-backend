@@ -155,7 +155,23 @@ export class ConcessionaireService {
     return new ConcessionaireEntity(updatedConcessionaire);
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} concessionaire`;
+  async remove(req: JWTType, id: string): Promise<ConcessionaireEntity> {
+    await this.prismaService.concessionaria
+      .findUniqueOrThrow({
+        where: {
+          cod_concessionaria: id,
+        },
+      })
+      .catch(() => {
+        throw new NotFoundException('Concessionária não encontrada');
+      });
+
+    const concessionaire = await this.prismaService.concessionaria.delete({
+      where: {
+        cod_concessionaria: id,
+      },
+    });
+
+    return new ConcessionaireEntity(concessionaire);
   }
 }

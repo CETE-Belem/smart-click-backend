@@ -158,7 +158,28 @@ export class ConcessionaireController {
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.concessionaireService.remove(+id);
+  @UseGuards(AuthGuard, RolesGuard)
+  @Roles('ADMIN')
+  @ApiUnauthorizedResponse({
+    description: 'Usuário não autorizado',
+  })
+  @ApiNotFoundResponse({
+    description: 'Concessionária não encontrada',
+  })
+  @ApiBearerAuth('token')
+  @ApiOkResponse({
+    description: 'Concessionária removida com sucesso',
+    type: ConcessionaireEntity,
+  })
+  @ApiParam({
+    name: 'id',
+    type: String,
+    required: true,
+  })
+  remove(
+    @Request() req: JWTType,
+    @Param('id', new ParseUUIDPipe()) id: string,
+  ) {
+    return this.concessionaireService.remove(req, id);
   }
 }
