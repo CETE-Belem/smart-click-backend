@@ -174,6 +174,32 @@ export class UsersController {
     });
   }
 
+  @Get('/:id')
+  @UseGuards(AuthGuard)
+  @ApiBearerAuth('token')
+  @ApiOkResponse({
+    status: HttpStatus.OK,
+    description: 'Usuário encontrado',
+    type: UserEntity,
+  })
+  @ApiNotFoundResponse({
+    status: HttpStatus.NOT_FOUND,
+    description: 'Usuário não encontrado',
+    schema: {
+      example: {
+        statusCode: HttpStatus.NOT_FOUND,
+        message: 'Usuário não encontrado',
+      },
+    },
+  })
+  @ApiParam({ name: 'id', type: 'string' })
+  findOne(
+    @Request() req: JWTType,
+    @Param('id', new ParseUUIDPipe()) id: string,
+  ) {
+    return this.usersService.findOne(req, id);
+  }
+
   @Get('/me')
   @UseGuards(AuthGuard)
   @ApiOkResponse({

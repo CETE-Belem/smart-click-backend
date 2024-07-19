@@ -181,6 +181,20 @@ export class UsersService {
     };
   }
 
+  async findOne(req: JWTType, id: string): Promise<UserEntity> {
+    const user = await this.prismaService.usuario
+      .findUniqueOrThrow({
+        where: {
+          cod_usuario: id,
+        },
+      })
+      .catch(() => {
+        throw new NotFoundException('Usuário não encontrado');
+      });
+
+    return new UserEntity(user);
+  }
+
   async adminUpdateUser(
     req: JWTType,
     id: string,
