@@ -22,6 +22,7 @@ import {
   ApiOkResponse,
   ApiParam,
   ApiTags,
+  ApiUnauthorizedResponse,
   getSchemaPath,
 } from '@nestjs/swagger';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -31,6 +32,9 @@ import { AuthGuard } from 'src/common/guards/auth.guard';
 import { JWTType } from 'src/types/jwt.types';
 import { UpdateUserDto } from './dto/udpate-user.dto';
 import { RecoverPasswordDto } from './dto/recover-password.dto';
+import { RolesGuard } from 'src/common/guards/roles.guard';
+import { Roles } from 'src/common/decorators/roles.decorator';
+import { AdminUpdateUserDto } from './dto/admin-update-user.dto';
 
 @ApiTags('users')
 @Controller('users')
@@ -81,6 +85,47 @@ export class UsersController {
   })
   update(@Request() req: JWTType, @Body() udpateUserDto: UpdateUserDto) {
     return this.usersService.update(req, udpateUserDto);
+  }
+
+  @Patch('/:id/')
+  @UseGuards(AuthGuard, RolesGuard)
+  @Roles('ADMIN')
+  @ApiBearerAuth('token')
+  @ApiOkResponse({
+    status: HttpStatus.OK,
+    description: 'Usuário atualizado',
+    type: UserEntity,
+  })
+  @ApiNotFoundResponse({
+    status: HttpStatus.NOT_FOUND,
+    description: 'Usuário não encontrado',
+    schema: {
+      example: {
+        statusCode: HttpStatus.NOT_FOUND,
+        message: 'Usuário não encontrado',
+      },
+    },
+  })
+  @ApiUnauthorizedResponse({
+    status: HttpStatus.UNAUTHORIZED,
+    description: 'Usuário não autorizado',
+    schema: {
+      example: {
+        statusCode: HttpStatus.UNAUTHORIZED,
+        message: 'Usuário não autorizado',
+      },
+    },
+  })
+  @ApiBody({
+    type: AdminUpdateUserDto,
+  })
+  @ApiParam({ name: 'id', type: 'string' })
+  adminUpdate(
+    @Request() req: JWTType,
+    @Param('id', new ParseUUIDPipe()) id: string,
+    @Body() adminUpdateUserDto: AdminUpdateUserDto,
+  ) {
+    return this.usersService.adminUpdateUser(req, id, adminUpdateUserDto);
   }
 
   @Get('/me')

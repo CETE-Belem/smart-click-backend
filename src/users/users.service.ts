@@ -21,6 +21,7 @@ import { ConfirmCodeDto } from './dto/confirm-code.dto';
 import { JWTType } from 'src/types/jwt.types';
 import { UpdateUserDto } from './dto/udpate-user.dto';
 import { RecoverPasswordDto } from './dto/recover-password.dto';
+import { AdminUpdateUserDto } from './dto/admin-update-user.dto';
 
 @Injectable()
 export class UsersService {
@@ -94,15 +95,6 @@ export class UsersService {
         );
       });
 
-    // const accessToken = await this.authService.createAccessToken(
-    //   user.cod_usuario,
-    //   userProfile.cargo,
-    // );
-
-    // return {
-    //   accessToken,
-    //   user: new UserEntity(user),
-    // };
     return new UserEntity(user);
   }
 
@@ -125,6 +117,47 @@ export class UsersService {
         nome: name,
         senha: hashedPassword,
         senhaSalt: passwordSalt,
+      },
+    });
+
+    return new UserEntity(updatedUser);
+  }
+
+  async adminUpdateUser(
+    req: JWTType,
+    id: string,
+    adminUpdateUserDto: AdminUpdateUserDto,
+  ): Promise<UserEntity> {
+    const { name, email, role } = adminUpdateUserDto;
+
+    await this.prismaService.usuario
+      .findUniqueOrThrow({
+        where: {
+          cod_usuario: id,
+        },
+      })
+      .catch(() => {
+        throw new NotFoundException('Usuário não encontrado');
+      });
+
+    const profile = await this.prismaService.perfil.findFirst({
+      where: {
+        cargo: role,
+      },
+    });
+
+    const updatedUser = await this.prismaService.usuario.update({
+      where: {
+        cod_usuario: id,
+      },
+      data: {
+        nome: name,
+        email,
+        perfil: {
+          connect: {
+            cod_perfil: profile.cod_perfil,
+          },
+        },
       },
     });
 
