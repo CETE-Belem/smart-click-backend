@@ -1,5 +1,8 @@
 import {
   ConflictException,
+  ForbiddenException,
+  forwardRef,
+  Inject,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
@@ -12,11 +15,13 @@ import { TurnstileService } from 'src/services/turnstile/turnstile.service';
 import { generateConfirmationCode } from 'src/services/utils/confirmation-code.utils';
 import ConfirmationCode from 'emails/confirmation-code';
 import { MailService } from 'src/mail/mail.service';
+import { ConfirmCodeDto } from './dto/confirm-code.dto';
 
 @Injectable()
 export class UsersService {
   constructor(
     private readonly prismaService: PrismaService,
+    @Inject(forwardRef(() => AuthService))
     private readonly authService: AuthService,
     private readonly turnstileService: TurnstileService,
     private readonly mailService: MailService,
@@ -137,5 +142,70 @@ export class UsersService {
           `Email de código de confirmação de conta reenviado para ${user.email}`,
         );
       });
+  }
+
+  async confirmCode(
+    id: string,
+    confirmCodeDto: ConfirmCodeDto,
+  ): Promise<{ accessToken: string; user: UserEntity }> {
+    const { code } = confirmCodeDto;
+    const user = await this.prismaService.usuario.findUnique({
+      where: {
+        cod_usuario: id,
+      },
+    });
+
+    if (!user) throw new NotFoundException('Usuário não encontrado');
+
+    const confirmationCode =
+      await this.prismaService.codigo_Confirmacao.findFirst({
+        where: {
+          cod_usuario: user.cod_usuario,
+        },
+      });
+
+    if (!confirmationCode)
+      throw new NotFoundException('Código de confirmação não encontrado');
+
+    if (confirmationCode.codigo !== code)
+      throw new ForbiddenException('Código de confirmação inválido');
+
+    if (
+      confirmationCode.expiraEm.getTime() <
+      new Date().getTime() + 15 * 60 * 1000
+    ) {
+      throw new ConflictException('Código de confirmação expirado');
+    }
+
+    await this.prismaService.codigo_Confirmacao.delete({
+      where: {
+        cod_usuario: user.cod_usuario,
+      },
+    });
+
+    const userProfile = await this.prismaService.perfil.findFirst({
+      where: {
+        cod_perfil: user.cod_perfil,
+      },
+    });
+
+    const updatedUser = await this.prismaService.usuario.update({
+      where: {
+        cod_usuario: user.cod_usuario,
+      },
+      data: {
+        contaConfirmada: true,
+      },
+    });
+
+    const accessToken = await this.authService.createAccessToken(
+      user.cod_usuario,
+      userProfile.cargo,
+    );
+
+    return {
+      accessToken,
+      user: new UserEntity(updatedUser),
+    };
   }
 }

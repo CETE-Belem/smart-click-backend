@@ -38,6 +38,14 @@ export class UserEntity implements Usuario {
   senhaSalt: string;
 
   @ApiProperty({
+    type: Boolean,
+    default: false,
+    example: false,
+    nullable: false,
+  })
+  contaConfirmada: boolean;
+
+  @ApiProperty({
     type: Date,
     example: '2021-08-01T00:00:00.000Z',
     nullable: false,

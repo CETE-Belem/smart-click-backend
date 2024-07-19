@@ -18,9 +18,11 @@ import {
   ApiOkResponse,
   ApiParam,
   ApiTags,
+  getSchemaPath,
 } from '@nestjs/swagger';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UserEntity } from './entities/user.entity';
+import { ConfirmCodeDto } from './dto/confirm-code.dto';
 
 @ApiTags('users')
 @Controller('users')
@@ -79,8 +81,92 @@ export class UsersController {
       },
     },
   })
+  @ApiNotFoundResponse({
+    status: HttpStatus.NOT_FOUND,
+    description: 'Código de confirmação não encontrado',
+    schema: {
+      example: {
+        statusCode: HttpStatus.NOT_FOUND,
+        message: 'Código de confirmação não encontrado',
+      },
+    },
+  })
+  @ApiConflictResponse({
+    status: HttpStatus.CONFLICT,
+    description: 'Código de confirmação expirado',
+    schema: {
+      example: {
+        statusCode: HttpStatus.CONFLICT,
+        message: 'Código de confirmação expirado',
+      },
+    },
+  })
   @ApiParam({ name: 'id', type: 'string' })
   resendConfirmationCode(@Param('id', new ParseUUIDPipe()) id: string) {
     return this.usersService.resendConfirmationCode(id);
+  }
+
+  @Patch('/:id/confirm-code')
+  @ApiOkResponse({
+    status: HttpStatus.OK,
+    description: 'Código de confirmação confirmado',
+    schema: {
+      type: 'object',
+      properties: {
+        accessToken: { type: 'string' },
+        user: {
+          type: 'object',
+          $ref: getSchemaPath(UserEntity),
+        },
+      },
+    },
+  })
+  @ApiForbiddenResponse({
+    status: HttpStatus.FORBIDDEN,
+    description: 'Código de confirmação inválido',
+    schema: {
+      example: {
+        statusCode: HttpStatus.FORBIDDEN,
+        message: 'Código de confirmação inválido',
+      },
+    },
+  })
+  @ApiNotFoundResponse({
+    status: HttpStatus.NOT_FOUND,
+    description: 'Usuário não encontrado',
+    schema: {
+      example: {
+        statusCode: HttpStatus.NOT_FOUND,
+        message: 'Usuário não encontrado',
+      },
+    },
+  })
+  @ApiNotFoundResponse({
+    status: HttpStatus.NOT_FOUND,
+    description: 'Código de confirmação não encontrado',
+    schema: {
+      example: {
+        statusCode: HttpStatus.NOT_FOUND,
+        message: 'Código de confirmação não encontrado',
+      },
+    },
+  })
+  @ApiConflictResponse({
+    status: HttpStatus.CONFLICT,
+    description: 'Código de confirmação expirado',
+    schema: {
+      example: {
+        statusCode: HttpStatus.CONFLICT,
+        message: 'Código de confirmação expirado',
+      },
+    },
+  })
+  @ApiParam({ name: 'id', type: 'string' })
+  @ApiBody({ type: ConfirmCodeDto })
+  confirmCode(
+    @Param('id', new ParseUUIDPipe()) id: string,
+    @Body() confirmCodeDto: ConfirmCodeDto,
+  ) {
+    return this.usersService.confirmCode(id, confirmCodeDto);
   }
 }

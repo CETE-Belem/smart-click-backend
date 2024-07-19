@@ -2,6 +2,8 @@ import {
   Injectable,
   UnauthorizedException,
   MethodNotAllowedException,
+  Inject,
+  forwardRef,
 } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { LoginDto } from './dto/login-dto';
@@ -18,6 +20,7 @@ export class AuthService {
     private readonly prismaService: PrismaService,
     private readonly turnstileService: TurnstileService,
     private readonly jwtService: JwtService,
+    @Inject(forwardRef(() => UsersService))
     private readonly usersService: UsersService,
   ) {}
 

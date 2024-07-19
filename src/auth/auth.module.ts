@@ -1,13 +1,23 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { AuthController } from './auth.controller';
 import { JwtModule, JwtService } from '@nestjs/jwt';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { TurnstileService } from 'src/services/turnstile/turnstile.service';
+import { UsersService } from 'src/users/users.service';
+import { UsersModule } from 'src/users/users.module';
+import { MailService } from 'src/mail/mail.service';
 
 @Module({
   controllers: [AuthController],
-  providers: [AuthService, PrismaService, TurnstileService, JwtService],
+  providers: [
+    AuthService,
+    PrismaService,
+    TurnstileService,
+    JwtService,
+    UsersService,
+    MailService,
+  ],
   imports: [
     JwtModule.register({
       global: true,
@@ -19,6 +29,8 @@ import { TurnstileService } from 'src/services/turnstile/turnstile.service';
         algorithm: 'RS256',
       },
     }),
+    forwardRef(() => UsersModule),
   ],
+  exports: [AuthService],
 })
 export class AuthModule {}
