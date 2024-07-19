@@ -57,8 +57,35 @@ export class ConcessionaireService {
     return `This action returns a #${id} concessionaire`;
   }
 
-  update(id: number, updateConcessionaireDto: UpdateConcessionaireDto) {
-    return `This action updates a #${id} concessionaire`;
+  async update(
+    id: string,
+    updateConcessionaireDto: UpdateConcessionaireDto,
+  ): Promise<ConcessionaireEntity> {
+    const { city, name, uf } = updateConcessionaireDto;
+
+    await this.prismaService.concessionaria
+      .findUniqueOrThrow({
+        where: {
+          cod_concessionaria: id,
+        },
+      })
+      .catch(() => {
+        throw new NotFoundException('Concessionária não encontrada');
+      });
+
+    const updatedConcessionaire =
+      await this.prismaService.concessionaria.update({
+        where: {
+          cod_concessionaria: id,
+        },
+        data: {
+          nome: name,
+          cidade: city,
+          uf,
+        },
+      });
+
+    return new ConcessionaireEntity(updatedConcessionaire);
   }
 
   remove(id: number) {

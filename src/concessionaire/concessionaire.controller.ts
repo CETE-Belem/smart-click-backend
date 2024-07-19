@@ -14,8 +14,11 @@ import { CreateConcessionaireDto } from './dto/create-concessionaire.dto';
 import { UpdateConcessionaireDto } from './dto/update-concessionaire.dto';
 import {
   ApiBearerAuth,
+  ApiBody,
   ApiConflictResponse,
   ApiCreatedResponse,
+  ApiNotFoundResponse,
+  ApiOkResponse,
   ApiTags,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
@@ -35,6 +38,9 @@ export class ConcessionaireController {
   @Roles('ADMIN')
   @ApiCreatedResponse({
     type: ConcessionaireEntity,
+  })
+  @ApiBody({
+    type: CreateConcessionaireDto,
   })
   @ApiConflictResponse({
     description: 'Concessionária já cadastrada',
@@ -61,11 +67,27 @@ export class ConcessionaireController {
   }
 
   @Patch(':id')
+  @UseGuards(AuthGuard, RolesGuard)
+  @Roles('ADMIN')
+  @ApiUnauthorizedResponse({
+    description: 'Usuário não autorizado',
+  })
+  @ApiNotFoundResponse({
+    description: 'Concessionária não encontrada',
+  })
+  @ApiOkResponse({
+    type: ConcessionaireEntity,
+  })
+  @ApiBearerAuth('token')
+  @ApiBody({
+    type: UpdateConcessionaireDto,
+  })
   update(
+    @Request() req: JWTType,
     @Param('id') id: string,
     @Body() updateConcessionaireDto: UpdateConcessionaireDto,
   ) {
-    return this.concessionaireService.update(+id, updateConcessionaireDto);
+    return this.concessionaireService.update(id, updateConcessionaireDto);
   }
 
   @Delete(':id')
