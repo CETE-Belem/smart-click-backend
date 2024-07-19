@@ -6,9 +6,12 @@ import {
   ParseUUIDPipe,
   Param,
   Patch,
+  UseGuards,
+  Request,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import {
+  ApiBearerAuth,
   ApiBody,
   ApiConflictResponse,
   ApiCreatedResponse,
@@ -23,6 +26,9 @@ import {
 import { CreateUserDto } from './dto/create-user.dto';
 import { UserEntity } from './entities/user.entity';
 import { ConfirmCodeDto } from './dto/confirm-code.dto';
+import { AuthGuard } from 'src/common/guards/auth.guard';
+import { JWTType } from 'src/types/jwt.types';
+import { UpdateUserDto } from './dto/udpate-user.dto';
 
 @ApiTags('users')
 @Controller('users')
@@ -58,6 +64,21 @@ export class UsersController {
   @ApiBody({ type: CreateUserDto })
   create(@Body() createUserDto: CreateUserDto) {
     return this.usersService.create(createUserDto);
+  }
+
+  @Patch()
+  @UseGuards(AuthGuard)
+  @ApiBearerAuth('token')
+  @ApiOkResponse({
+    status: HttpStatus.OK,
+    description: 'Usuário atualizado',
+    type: UserEntity,
+  })
+  @ApiBody({
+    type: UpdateUserDto,
+  })
+  update(@Request() req: JWTType, @Body() udpateUserDto: UpdateUserDto) {
+    return this.usersService.update(req, udpateUserDto);
   }
 
   @Patch('/:id/resend-confirmation-code')

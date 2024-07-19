@@ -16,6 +16,8 @@ import { generateConfirmationCode } from 'src/services/utils/confirmation-code.u
 import ConfirmationCode from 'emails/confirmation-code';
 import { MailService } from 'src/mail/mail.service';
 import { ConfirmCodeDto } from './dto/confirm-code.dto';
+import { JWTType } from 'src/types/jwt.types';
+import { UpdateUserDto } from './dto/udpate-user.dto';
 
 @Injectable()
 export class UsersService {
@@ -99,6 +101,31 @@ export class UsersService {
     //   user: new UserEntity(user),
     // };
     return new UserEntity(user);
+  }
+
+  async update(
+    req: JWTType,
+    updateUserDto: UpdateUserDto,
+  ): Promise<UserEntity> {
+    const { userId } = req.user;
+    const { email, name, password } = updateUserDto;
+
+    const passwordSalt = await generateSalt();
+    const hashedPassword = await hashPassword(password, passwordSalt);
+
+    const updatedUser = await this.prismaService.usuario.update({
+      where: {
+        cod_usuario: userId,
+      },
+      data: {
+        email,
+        nome: name,
+        senha: hashedPassword,
+        senhaSalt: passwordSalt,
+      },
+    });
+
+    return new UserEntity(updatedUser);
   }
 
   async resendConfirmationCode(id: string): Promise<void> {
