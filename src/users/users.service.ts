@@ -128,6 +128,18 @@ export class UsersService {
     return new UserEntity(updatedUser);
   }
 
+  async getMe(req: JWTType): Promise<UserEntity> {
+    const { userId } = req.user;
+
+    const user = await this.prismaService.usuario.findUnique({
+      where: {
+        cod_usuario: userId,
+      },
+    });
+
+    return new UserEntity(user);
+  }
+
   async resendConfirmationCode(id: string): Promise<void> {
     const user = await this.prismaService.usuario.findUnique({
       where: {

@@ -8,6 +8,7 @@ import {
   Patch,
   UseGuards,
   Request,
+  Get,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import {
@@ -79,6 +80,18 @@ export class UsersController {
   })
   update(@Request() req: JWTType, @Body() udpateUserDto: UpdateUserDto) {
     return this.usersService.update(req, udpateUserDto);
+  }
+
+  @Get('/me')
+  @UseGuards(AuthGuard)
+  @ApiOkResponse({
+    status: HttpStatus.OK,
+    description: 'Usuário logado',
+    type: UserEntity,
+  })
+  @ApiBearerAuth('token')
+  getMe(@Request() req: JWTType) {
+    return this.usersService.getMe(req);
   }
 
   @Patch('/:id/resend-confirmation-code')
