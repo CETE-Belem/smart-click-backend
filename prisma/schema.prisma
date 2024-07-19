@@ -49,6 +49,9 @@ model Usuario {
   // 1:1 Codigo_Confirmacao
   cod_confirmacao Codigo_Confirmacao?
 
+  // 1:1 Codigo_Recuperacao
+  cod_recuperacao Codigo_Recuperacao?
+
   @@map("usuario")
 }
 
@@ -139,4 +142,20 @@ model Codigo_Confirmacao {
   // Timestamps
   criadoEm     DateTime @default(now())
   atualizadoEm DateTime @updatedAt
+
+  @@map("codigo_confirmacao")
+}
+
+model Codigo_Recuperacao {
+  cod_codigo  String   @id @default(uuid())
+  codigo      String   @db.VarChar(6)
+  expiraEm    DateTime
+  usuario     Usuario  @relation(fields: [cod_usuario], references: [cod_usuario])
+  cod_usuario String   @unique
+
+  // Timestamps
+  criadoEm     DateTime @default(now())
+  atualizadoEm DateTime @updatedAt
+
+  @@map("codigo_recuperacao")
 }

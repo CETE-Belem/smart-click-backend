@@ -140,6 +140,36 @@ export class UsersController {
     return this.usersService.resendConfirmationCode(id);
   }
 
+  @Patch('/:email/send-recover-code')
+  @ApiOkResponse({
+    status: HttpStatus.OK,
+    description: 'Código de recuperação enviado',
+    schema: {
+      example: {
+        statusCode: HttpStatus.OK,
+        message: 'Código de recuperação enviado',
+      },
+    },
+  })
+  @ApiNotFoundResponse({
+    status: HttpStatus.NOT_FOUND,
+    description: 'Usuário não encontrado',
+    schema: {
+      example: {
+        statusCode: HttpStatus.NOT_FOUND,
+        message: 'Usuário não encontrado',
+      },
+    },
+  })
+  @ApiParam({
+    name: 'email',
+    type: 'string',
+    description: 'Email do usuário',
+  })
+  sendRecoverCode(@Param('email') email: string) {
+    return this.usersService.sendRecoverCode(email);
+  }
+
   @Patch('/:id/confirm-code')
   @ApiOkResponse({
     status: HttpStatus.OK,

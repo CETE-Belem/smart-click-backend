@@ -13,7 +13,9 @@ import { UserEntity } from './entities/user.entity';
 import { generateSalt, hashPassword } from 'src/services/libs/bcrypt';
 import { TurnstileService } from 'src/services/turnstile/turnstile.service';
 import { generateConfirmationCode } from 'src/services/utils/confirmation-code.utils';
+import { generateRecoverCode } from 'src/services/utils/recover-code.utils';
 import ConfirmationCode from 'emails/confirmation-code';
+import RecoverCode from 'emails/recover-code';
 import { MailService } from 'src/mail/mail.service';
 import { ConfirmCodeDto } from './dto/confirm-code.dto';
 import { JWTType } from 'src/types/jwt.types';
@@ -138,6 +140,51 @@ export class UsersService {
     });
 
     return new UserEntity(user);
+  }
+
+  async sendRecoverCode(email: string): Promise<void> {
+    const user = await this.prismaService.usuario
+      .findUniqueOrThrow({
+        where: {
+          email,
+        },
+      })
+      .catch(() => {
+        throw new NotFoundException('Usuário não encontrado');
+      });
+
+    const recoverCode = generateRecoverCode();
+
+    await this.prismaService.codigo_Recuperacao.upsert({
+      where: {
+        cod_usuario: user.cod_usuario,
+      },
+      update: {
+        codigo: recoverCode,
+        expiraEm: new Date(Date.now() + 15 * 60 * 1000), //15 minutes
+      },
+      create: {
+        codigo: recoverCode,
+        expiraEm: new Date(Date.now() + 15 * 60 * 1000), //15 minutes
+        usuario: {
+          connect: {
+            cod_usuario: user.cod_usuario,
+          },
+        },
+      },
+    });
+
+    this.mailService
+      .sendMail({
+        email: user.email,
+        subject: 'Código de recuperação de senha',
+        template: RecoverCode({ recoverCode }),
+      })
+      .then(() => {
+        console.log(
+          `Email de código de recuperação de senha enviado para ${user.email}`,
+        );
+      });
   }
 
   async resendConfirmationCode(id: string): Promise<void> {
