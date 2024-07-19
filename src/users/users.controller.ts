@@ -30,6 +30,7 @@ import { ConfirmCodeDto } from './dto/confirm-code.dto';
 import { AuthGuard } from 'src/common/guards/auth.guard';
 import { JWTType } from 'src/types/jwt.types';
 import { UpdateUserDto } from './dto/udpate-user.dto';
+import { RecoverPasswordDto } from './dto/recover-password.dto';
 
 @ApiTags('users')
 @Controller('users')
@@ -168,6 +169,60 @@ export class UsersController {
   })
   sendRecoverCode(@Param('email') email: string) {
     return this.usersService.sendRecoverCode(email);
+  }
+
+  @Patch('/:email/recover-password')
+  @ApiOkResponse({
+    status: HttpStatus.OK,
+    description: 'Senha recuperada',
+    schema: {
+      example: {
+        statusCode: HttpStatus.OK,
+        message: 'Senha recuperada',
+      },
+    },
+  })
+  @ApiNotFoundResponse({
+    status: HttpStatus.NOT_FOUND,
+    description: 'Usuário não encontrado',
+    schema: {
+      example: {
+        statusCode: HttpStatus.NOT_FOUND,
+        message: 'Usuário não encontrado',
+      },
+    },
+  })
+  @ApiNotFoundResponse({
+    status: HttpStatus.NOT_FOUND,
+    description: 'Código de recuperação não encontrado',
+    schema: {
+      example: {
+        statusCode: HttpStatus.NOT_FOUND,
+        message: 'Código de recuperação não encontrado',
+      },
+    },
+  })
+  @ApiConflictResponse({
+    status: HttpStatus.CONFLICT,
+    description: 'Código de recuperação expirado',
+    schema: {
+      example: {
+        statusCode: HttpStatus.CONFLICT,
+        message: 'Código de recuperação expirado',
+      },
+    },
+  })
+  @ApiParam({
+    name: 'email',
+    type: 'string',
+    description: 'Email do usuário',
+  })
+  @ApiBody({ type: ConfirmCodeDto })
+  recoverPassword(
+    @Param('email') email: string,
+    @Body() recoverPasswordDto: RecoverPasswordDto,
+  ) {
+    return this.usersService.recoverPassword(email, recoverPasswordDto);
   }
 
   @Patch('/:id/confirm-code')

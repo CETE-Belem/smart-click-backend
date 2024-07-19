@@ -20,6 +20,7 @@ import { MailService } from 'src/mail/mail.service';
 import { ConfirmCodeDto } from './dto/confirm-code.dto';
 import { JWTType } from 'src/types/jwt.types';
 import { UpdateUserDto } from './dto/udpate-user.dto';
+import { RecoverPasswordDto } from './dto/recover-password.dto';
 
 @Injectable()
 export class UsersService {
@@ -185,6 +186,61 @@ export class UsersService {
           `Email de código de recuperação de senha enviado para ${user.email}`,
         );
       });
+  }
+
+  async recoverPassword(
+    email: string,
+    recoverPasswordDto: RecoverPasswordDto,
+  ): Promise<void> {
+    const { code, password } = recoverPasswordDto;
+
+    const user = await this.prismaService.usuario
+      .findUniqueOrThrow({
+        where: {
+          email,
+        },
+      })
+      .catch(() => {
+        throw new NotFoundException('Usuário não encontrado');
+      });
+
+    const recoverCode = await this.prismaService.codigo_Recuperacao.findFirst({
+      where: {
+        cod_usuario: user.cod_usuario,
+      },
+    });
+
+    if (!recoverCode)
+      throw new NotFoundException('Código de recuperação não encontrado');
+
+    if (recoverCode.codigo !== code)
+      throw new ForbiddenException('Código de recuperação inválido');
+
+    if (
+      recoverCode.expiraEm.getTime() <
+      new Date().getTime() + 15 * 60 * 1000
+    ) {
+      throw new ConflictException('Código de recuperação expirado');
+    }
+
+    const passwordSalt = await generateSalt();
+    const hashedPassword = await hashPassword(password, passwordSalt);
+
+    await this.prismaService.codigo_Recuperacao.delete({
+      where: {
+        cod_usuario: user.cod_usuario,
+      },
+    });
+
+    await this.prismaService.usuario.update({
+      where: {
+        cod_usuario: user.cod_usuario,
+      },
+      data: {
+        senha: hashedPassword,
+        senhaSalt: passwordSalt,
+      },
+    });
   }
 
   async resendConfirmationCode(id: string): Promise<void> {
