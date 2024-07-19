@@ -20,6 +20,7 @@ import {
   ApiBearerAuth,
   ApiBody,
   ApiConflictResponse,
+  ApiCreatedResponse,
   ApiNotFoundResponse,
   ApiOkResponse,
   ApiParam,
@@ -38,8 +39,8 @@ export class EquipmentsController {
   constructor(private readonly equipmentsService: EquipmentsService) {}
 
   @Post()
-  @ApiOkResponse({
-    status: HttpStatus.OK,
+  @ApiCreatedResponse({
+    status: HttpStatus.CREATED,
     type: EquipmentEntity,
   })
   @ApiBody({ type: CreateEquipmentDto })

@@ -1,7 +1,7 @@
 import {
   Injectable,
-  NotFoundException,
   UnauthorizedException,
+  MethodNotAllowedException,
 } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { LoginDto } from './dto/login-dto';
@@ -10,6 +10,7 @@ import { TurnstileService } from 'src/services/turnstile/turnstile.service';
 import { JwtService } from '@nestjs/jwt';
 import { UserEntity } from 'src/users/entities/user.entity';
 import { Cargo } from '@prisma/client';
+import { UsersService } from 'src/users/users.service';
 
 @Injectable()
 export class AuthService {
@@ -17,6 +18,7 @@ export class AuthService {
     private readonly prismaService: PrismaService,
     private readonly turnstileService: TurnstileService,
     private readonly jwtService: JwtService,
+    private readonly usersService: UsersService,
   ) {}
 
   public async createAccessToken(userId: string, role: Cargo): Promise<string> {
@@ -56,8 +58,13 @@ export class AuthService {
         },
       })
       .catch(() => {
-        throw new NotFoundException('Usuário não encontrado');
+        throw new UnauthorizedException('Usuário não encontrado');
       });
+
+    if (!user.contaConfirmada) {
+      await this.usersService.resendConfirmationCode(user.cod_usuario);
+      throw new MethodNotAllowedException('Conta não confirmada');
+    }
 
     const profile = await this.prismaService.perfil.findUnique({
       where: {

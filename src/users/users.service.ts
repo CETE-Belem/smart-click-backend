@@ -1,4 +1,8 @@
-import { ConflictException, Injectable } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { AuthService } from 'src/auth/auth.service';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -18,9 +22,7 @@ export class UsersService {
     private readonly mailService: MailService,
   ) {}
 
-  async create(
-    createUserDto: CreateUserDto,
-  ): Promise<{ accessToken: string; user: UserEntity }> {
+  async create(createUserDto: CreateUserDto): Promise<UserEntity> {
     const { captcha, email, name, password } = createUserDto;
 
     const existingUser = await this.prismaService.usuario.findFirst({
@@ -82,14 +84,58 @@ export class UsersService {
         );
       });
 
-    const accessToken = await this.authService.createAccessToken(
-      user.cod_usuario,
-      userProfile.cargo,
-    );
+    // const accessToken = await this.authService.createAccessToken(
+    //   user.cod_usuario,
+    //   userProfile.cargo,
+    // );
 
-    return {
-      accessToken,
-      user: new UserEntity(user),
-    };
+    // return {
+    //   accessToken,
+    //   user: new UserEntity(user),
+    // };
+    return new UserEntity(user);
+  }
+
+  async resendConfirmationCode(id: string): Promise<void> {
+    const user = await this.prismaService.usuario.findUnique({
+      where: {
+        cod_usuario: id,
+      },
+    });
+
+    if (!user) throw new NotFoundException('Usuário não encontrado');
+
+    const confirmationCode = generateConfirmationCode();
+
+    await this.prismaService.codigo_Confirmacao.upsert({
+      where: {
+        cod_usuario: user.cod_usuario,
+      },
+      update: {
+        codigo: confirmationCode,
+        expiraEm: new Date(Date.now() + 15 * 60 * 1000), //15 minutes
+      },
+      create: {
+        codigo: confirmationCode,
+        expiraEm: new Date(Date.now() + 15 * 60 * 1000), //15 minutes
+        usuario: {
+          connect: {
+            cod_usuario: user.cod_usuario,
+          },
+        },
+      },
+    });
+
+    this.mailService
+      .sendMail({
+        email: user.email,
+        subject: 'Código de confirmação de conta',
+        template: ConfirmationCode({ confirmationCode }),
+      })
+      .then(() => {
+        console.log(
+          `Email de código de confirmação de conta reenviado para ${user.email}`,
+        );
+      });
   }
 }

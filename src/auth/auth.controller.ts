@@ -2,8 +2,10 @@ import { Body, Controller, HttpStatus, Post } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import {
   ApiBody,
+  ApiCreatedResponse,
   ApiExtraModels,
   ApiForbiddenResponse,
+  ApiMethodNotAllowedResponse,
   ApiNotFoundResponse,
   ApiOkResponse,
   ApiTags,
@@ -20,8 +22,8 @@ export class AuthController {
 
   @Post('login')
   @ApiExtraModels(UserEntity)
-  @ApiOkResponse({
-    status: HttpStatus.OK,
+  @ApiCreatedResponse({
+    status: HttpStatus.CREATED,
     schema: {
       type: 'object',
       properties: {
@@ -60,6 +62,16 @@ export class AuthController {
       example: {
         statusCode: HttpStatus.UNAUTHORIZED,
         message: 'Credenciais inválidas',
+      },
+    },
+  })
+  @ApiMethodNotAllowedResponse({
+    status: HttpStatus.METHOD_NOT_ALLOWED,
+    description: 'Conta não confirmada',
+    schema: {
+      example: {
+        statusCode: HttpStatus.METHOD_NOT_ALLOWED,
+        message: 'Conta não confirmada',
       },
     },
   })
