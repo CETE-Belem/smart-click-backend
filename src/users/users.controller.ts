@@ -9,6 +9,8 @@ import {
   UseGuards,
   Request,
   Get,
+  ParseIntPipe,
+  Query,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import {
@@ -35,6 +37,7 @@ import { RecoverPasswordDto } from './dto/recover-password.dto';
 import { RolesGuard } from 'src/common/guards/roles.guard';
 import { Roles } from 'src/common/decorators/roles.decorator';
 import { AdminUpdateUserDto } from './dto/admin-update-user.dto';
+import { Cargo } from '@prisma/client';
 
 @ApiTags('users')
 @Controller('users')
@@ -126,6 +129,49 @@ export class UsersController {
     @Body() adminUpdateUserDto: AdminUpdateUserDto,
   ) {
     return this.usersService.adminUpdateUser(req, id, adminUpdateUserDto);
+  }
+
+  @Get()
+  @UseGuards(AuthGuard, RolesGuard)
+  @Roles('ADMIN')
+  @ApiBearerAuth('token')
+  @ApiOkResponse({
+    status: HttpStatus.OK,
+    description: 'Lista de usuários',
+    schema: {
+      properties: {
+        users: {
+          type: 'array',
+          items: {
+            $ref: getSchemaPath(UserEntity),
+          },
+        },
+        totalPages: { type: 'number' },
+        page: { type: 'number' },
+        limit: { type: 'number' },
+      },
+    },
+  })
+  @ApiParam({ name: 'name', type: 'string', required: false })
+  @ApiParam({ name: 'email', type: 'string', required: false })
+  @ApiParam({ name: 'role', type: 'string', required: false })
+  @ApiParam({ name: 'page', type: 'number', required: true })
+  @ApiParam({ name: 'limit', type: 'number', required: true })
+  findAll(
+    @Request() req: JWTType,
+    @Query('name') name: string,
+    @Query('email') email: string,
+    @Query('role') role: Cargo,
+    @Query('page', new ParseIntPipe()) page: number,
+    @Query('limit', new ParseIntPipe()) limit: number,
+  ) {
+    return this.usersService.findAll(req, {
+      name,
+      email,
+      role,
+      page,
+      limit,
+    });
   }
 
   @Get('/me')

@@ -22,6 +22,7 @@ import { JWTType } from 'src/types/jwt.types';
 import { UpdateUserDto } from './dto/udpate-user.dto';
 import { RecoverPasswordDto } from './dto/recover-password.dto';
 import { AdminUpdateUserDto } from './dto/admin-update-user.dto';
+import { Cargo } from '@prisma/client';
 
 @Injectable()
 export class UsersService {
@@ -121,6 +122,63 @@ export class UsersService {
     });
 
     return new UserEntity(updatedUser);
+  }
+
+  async findAll(
+    req: JWTType,
+    options: {
+      page: number;
+      limit: number;
+      name: string;
+      email: string;
+      role: Cargo;
+    },
+  ): Promise<{
+    limit: number;
+    page: number;
+    totalPages: number;
+    users: UserEntity[];
+  }> {
+    const { email, limit, name, page, role } = options;
+
+    const users = await this.prismaService.usuario.findMany({
+      where: {
+        email: {
+          contains: email,
+        },
+        nome: {
+          contains: name,
+        },
+        perfil: {
+          cargo: role,
+        },
+      },
+      skip: (page - 1) * limit,
+      take: limit,
+    });
+
+    const totalUsers = await this.prismaService.usuario.count({
+      where: {
+        email: {
+          contains: email,
+        },
+        nome: {
+          contains: name,
+        },
+        perfil: {
+          cargo: role,
+        },
+      },
+    });
+
+    const totalPages = Math.ceil(totalUsers / limit);
+
+    return {
+      limit,
+      page,
+      totalPages,
+      users: users.map((user) => new UserEntity(user)),
+    };
   }
 
   async adminUpdateUser(

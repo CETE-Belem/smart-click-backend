@@ -11,6 +11,7 @@ import {
   ParseUUIDPipe,
   Query,
   ParseIntPipe,
+  HttpStatus,
 } from '@nestjs/common';
 import { ConcessionaireService } from './concessionaire.service';
 import { CreateConcessionaireDto } from './dto/create-concessionaire.dto';
@@ -26,6 +27,7 @@ import {
   ApiQuery,
   ApiTags,
   ApiUnauthorizedResponse,
+  getSchemaPath,
 } from '@nestjs/swagger';
 import { AuthGuard } from 'src/common/guards/auth.guard';
 import { RolesGuard } from 'src/common/guards/roles.guard';
@@ -64,7 +66,22 @@ export class ConcessionaireController {
   @Get()
   @UseGuards(AuthGuard)
   @ApiOkResponse({
+    status: HttpStatus.OK,
     type: [ConcessionaireEntity],
+    schema: {
+      type: 'object',
+      properties: {
+        limit: { type: 'number' },
+        page: { type: 'number' },
+        totalPages: { type: 'number' },
+        concessionaires: {
+          type: 'array',
+          items: {
+            $ref: getSchemaPath(ConcessionaireEntity),
+          },
+        },
+      },
+    },
   })
   @ApiQuery({
     name: 'name',
