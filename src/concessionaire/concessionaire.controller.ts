@@ -22,6 +22,7 @@ import {
   ApiCreatedResponse,
   ApiNotFoundResponse,
   ApiOkResponse,
+  ApiParam,
   ApiQuery,
   ApiTags,
   ApiUnauthorizedResponse,
@@ -108,8 +109,28 @@ export class ConcessionaireController {
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.concessionaireService.findOne(+id);
+  @UseGuards(AuthGuard, RolesGuard)
+  @Roles('ADMIN')
+  @ApiBearerAuth('token')
+  @ApiOkResponse({
+    type: ConcessionaireEntity,
+  })
+  @ApiUnauthorizedResponse({
+    description: 'Usuário não autorizado',
+  })
+  @ApiNotFoundResponse({
+    description: 'Concessionária não encontrada',
+  })
+  @ApiParam({
+    name: 'id',
+    type: String,
+    required: true,
+  })
+  findOne(
+    @Request() req: JWTType,
+    @Param('id', new ParseUUIDPipe()) id: string,
+  ) {
+    return this.concessionaireService.findOne(req, id);
   }
 
   @Patch(':id')

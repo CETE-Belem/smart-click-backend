@@ -110,8 +110,18 @@ export class ConcessionaireService {
     };
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} concessionaire`;
+  async findOne(req: JWTType, id: string): Promise<ConcessionaireEntity> {
+    const concessionaire = await this.prismaService.concessionaria
+      .findUniqueOrThrow({
+        where: {
+          cod_concessionaria: id,
+        },
+      })
+      .catch(() => {
+        throw new NotFoundException('Concessionária não encontrada');
+      });
+
+    return new ConcessionaireEntity(concessionaire);
   }
 
   async update(
