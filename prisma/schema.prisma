@@ -46,6 +46,9 @@ model Usuario {
   cod_perfil String
   perfil     Perfil @relation(fields: [cod_perfil], references: [cod_perfil])
 
+  // 1:n Concessionária
+  concessionaria Concessionaria[]
+
   // 1:1 Codigo_Confirmacao
   cod_confirmacao Codigo_Confirmacao?
 
@@ -62,6 +65,12 @@ model Concessionaria {
   cidade             String        @db.VarChar(100)
   equipamento        Equipamento[]
   tarifa             Tarifa[]
+
+  criador Usuario @relation(fields: [cod_criador], references: [cod_usuario])
+  cod_criador   String
+
+  criadoEm     DateTime @default(now())
+  atualizadoEm DateTime @updatedAt
 
   @@map("concessionaria")
 }
