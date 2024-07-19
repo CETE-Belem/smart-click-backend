@@ -8,6 +8,9 @@ import {
   Delete,
   UseGuards,
   Request,
+  ParseUUIDPipe,
+  Query,
+  ParseIntPipe,
 } from '@nestjs/common';
 import { ConcessionaireService } from './concessionaire.service';
 import { CreateConcessionaireDto } from './dto/create-concessionaire.dto';
@@ -19,6 +22,7 @@ import {
   ApiCreatedResponse,
   ApiNotFoundResponse,
   ApiOkResponse,
+  ApiQuery,
   ApiTags,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
@@ -57,8 +61,50 @@ export class ConcessionaireController {
   }
 
   @Get()
-  findAll() {
-    return this.concessionaireService.findAll();
+  @UseGuards(AuthGuard)
+  @ApiOkResponse({
+    type: [ConcessionaireEntity],
+  })
+  @ApiQuery({
+    name: 'name',
+    required: false,
+    type: String,
+  })
+  @ApiQuery({
+    name: 'uf',
+    required: false,
+    type: String,
+  })
+  @ApiQuery({
+    name: 'city',
+    required: false,
+    type: String,
+  })
+  @ApiQuery({
+    name: 'page',
+    required: true,
+    type: Number,
+  })
+  @ApiQuery({
+    name: 'limit',
+    required: true,
+    type: Number,
+  })
+  findAll(
+    @Request() req: JWTType,
+    @Query('name') name: string,
+    @Query('uf') uf: string,
+    @Query('city') city: string,
+    @Query('page', new ParseIntPipe()) page: number,
+    @Query('limit', new ParseIntPipe()) limit: number,
+  ) {
+    return this.concessionaireService.findAll(req, {
+      name,
+      uf,
+      city,
+      page,
+      limit,
+    });
   }
 
   @Get(':id')
@@ -84,7 +130,7 @@ export class ConcessionaireController {
   })
   update(
     @Request() req: JWTType,
-    @Param('id') id: string,
+    @Param('id', new ParseUUIDPipe()) id: string,
     @Body() updateConcessionaireDto: UpdateConcessionaireDto,
   ) {
     return this.concessionaireService.update(id, updateConcessionaireDto);

@@ -96,6 +96,12 @@ export class EquipmentsService {
     const totalEquipments = await this.prismaService.equipamento.count({
       where: {
         cod_usuario: req.user.userId,
+        nome: {
+          contains: name,
+        },
+        mac: {
+          contains: mac,
+        },
       },
     });
 

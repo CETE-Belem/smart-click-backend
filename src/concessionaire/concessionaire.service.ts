@@ -49,8 +49,65 @@ export class ConcessionaireService {
     return new ConcessionaireEntity(concessionaire);
   }
 
-  findAll() {
-    return `This action returns all concessionaire`;
+  async findAll(
+    req: JWTType,
+    options: {
+      page: number;
+      limit: number;
+      name: string;
+      uf: string;
+      city: string;
+    },
+  ): Promise<{
+    limit: number;
+    page: number;
+    totalPages: number;
+    concessionaires: ConcessionaireEntity[];
+  }> {
+    const { city, limit, name, page, uf } = options;
+    const concessionaires = await this.prismaService.concessionaria.findMany({
+      where: {
+        cidade: {
+          contains: city,
+        },
+        nome: {
+          contains: name,
+        },
+        uf: {
+          contains: uf,
+        },
+      },
+      orderBy: {
+        criadoEm: 'asc',
+      },
+      take: limit,
+      skip: (page - 1) * limit,
+    });
+
+    const totalConcessionaires = await this.prismaService.concessionaria.count({
+      where: {
+        cidade: {
+          contains: city,
+        },
+        nome: {
+          contains: name,
+        },
+        uf: {
+          contains: uf,
+        },
+      },
+    });
+
+    const totalPages = Math.ceil(totalConcessionaires / limit);
+
+    return {
+      limit,
+      page,
+      totalPages,
+      concessionaires: concessionaires.map(
+        (concessionaire) => new ConcessionaireEntity(concessionaire),
+      ),
+    };
   }
 
   findOne(id: number) {
