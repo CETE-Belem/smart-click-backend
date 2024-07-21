@@ -83,6 +83,16 @@ export class UsersController {
     description: 'Usuário atualizado',
     type: UserEntity,
   })
+  @ApiConflictResponse({
+    status: HttpStatus.CONFLICT,
+    description: 'Usuário já cadastrado',
+    schema: {
+      example: {
+        statusCode: HttpStatus.CONFLICT,
+        message: 'Usuário já cadastrado',
+      },
+    },
+  })
   @ApiBody({
     type: UpdateUserDto,
   })
@@ -90,7 +100,7 @@ export class UsersController {
     return this.usersService.update(req, udpateUserDto);
   }
 
-  @Patch('/:id/')
+  @Patch('/:id')
   @UseGuards(AuthGuard, RolesGuard)
   @Roles('ADMIN')
   @ApiBearerAuth('token')
@@ -174,6 +184,18 @@ export class UsersController {
     });
   }
 
+  @Get('/me')
+  @UseGuards(AuthGuard)
+  @ApiOkResponse({
+    status: HttpStatus.OK,
+    description: 'Usuário logado',
+    type: UserEntity,
+  })
+  @ApiBearerAuth('token')
+  getMe(@Request() req: JWTType) {
+    return this.usersService.getMe(req);
+  }
+
   @Get('/:id')
   @UseGuards(AuthGuard)
   @ApiBearerAuth('token')
@@ -200,19 +222,7 @@ export class UsersController {
     return this.usersService.findOne(req, id);
   }
 
-  @Get('/me')
-  @UseGuards(AuthGuard)
-  @ApiOkResponse({
-    status: HttpStatus.OK,
-    description: 'Usuário logado',
-    type: UserEntity,
-  })
-  @ApiBearerAuth('token')
-  getMe(@Request() req: JWTType) {
-    return this.usersService.getMe(req);
-  }
-
-  @Patch('/:id/resend-confirmation-code')
+  @Patch('/:email/resend-confirmation-code')
   @ApiOkResponse({
     status: HttpStatus.OK,
     description: 'Código de confirmação reenviado',
@@ -253,9 +263,9 @@ export class UsersController {
       },
     },
   })
-  @ApiParam({ name: 'id', type: 'string' })
-  resendConfirmationCode(@Param('id', new ParseUUIDPipe()) id: string) {
-    return this.usersService.resendConfirmationCode(id);
+  @ApiParam({ name: 'email', type: 'string' })
+  resendConfirmationCode(@Param('email') email: string) {
+    return this.usersService.resendConfirmationCode(email);
   }
 
   @Patch('/:email/send-recover-code')
@@ -334,7 +344,7 @@ export class UsersController {
     type: 'string',
     description: 'Email do usuário',
   })
-  @ApiBody({ type: ConfirmCodeDto })
+  @ApiBody({ type: RecoverPasswordDto })
   recoverPassword(
     @Param('email') email: string,
     @Body() recoverPasswordDto: RecoverPasswordDto,
@@ -342,7 +352,7 @@ export class UsersController {
     return this.usersService.recoverPassword(email, recoverPasswordDto);
   }
 
-  @Patch('/:id/confirm-code')
+  @Patch('/:email/confirm-code')
   @ApiOkResponse({
     status: HttpStatus.OK,
     description: 'Código de confirmação confirmado',
@@ -397,12 +407,12 @@ export class UsersController {
       },
     },
   })
-  @ApiParam({ name: 'id', type: 'string' })
+  @ApiParam({ name: 'email', type: 'string' })
   @ApiBody({ type: ConfirmCodeDto })
   confirmCode(
-    @Param('id', new ParseUUIDPipe()) id: string,
+    @Param('email') email: string,
     @Body() confirmCodeDto: ConfirmCodeDto,
   ) {
-    return this.usersService.confirmCode(id, confirmCodeDto);
+    return this.usersService.confirmCode(email, confirmCodeDto);
   }
 }

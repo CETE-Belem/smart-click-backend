@@ -49,6 +49,7 @@ async function main() {
         nome: 'Rian Ernesto',
         senha: password,
         senhaSalt: passwordSalt,
+        contaConfirmada: true,
         perfil: {
           connect: {
             cod_perfil: adminProfile.cod_perfil,

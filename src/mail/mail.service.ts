@@ -30,7 +30,7 @@ export class MailService {
       {
         from: {
           name: 'Omnia',
-          address: 'omina@zenithinova.com.br',
+          address: 'omnia@zenithinova.com.br',
         },
         sender: {
           name: 'Omnia',

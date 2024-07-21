@@ -64,7 +64,6 @@ export class ConcessionaireController {
   }
 
   @Get()
-  @UseGuards(AuthGuard)
   @ApiOkResponse({
     status: HttpStatus.OK,
     type: [ConcessionaireEntity],

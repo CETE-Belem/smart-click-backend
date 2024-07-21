@@ -6,6 +6,7 @@ import {
   Matches,
   MaxLength,
   MinLength,
+  IsOptional,
 } from 'class-validator';
 import {
   maxEmailLength,
@@ -59,6 +60,9 @@ export class UpdateUserDto {
     example: '@Abc1234',
     maxLength: maxPasswordLength,
     minLength: minPasswordLength,
+  })
+  @IsOptional({
+    always: true,
   })
   @MinLength(minPasswordLength, {
     message: `A senha deve ter pelo menos ${minPasswordLength} caracteres`,

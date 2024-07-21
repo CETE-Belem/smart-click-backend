@@ -106,8 +106,19 @@ export class UsersService {
     const { userId } = req.user;
     const { email, name, password } = updateUserDto;
 
-    const passwordSalt = await generateSalt();
-    const hashedPassword = await hashPassword(password, passwordSalt);
+    const user = await this.prismaService.usuario.findUnique({
+      where: {
+        cod_usuario: userId,
+        email,
+      },
+    });
+
+    if (!user) throw new ConflictException('Usuário já cadastrado');
+
+    const passwordSalt = password ? await generateSalt() : null;
+    const hashedPassword = password
+      ? await hashPassword(password, passwordSalt)
+      : null;
 
     const updatedUser = await this.prismaService.usuario.update({
       where: {
@@ -116,8 +127,8 @@ export class UsersService {
       data: {
         email,
         nome: name,
-        senha: hashedPassword,
-        senhaSalt: passwordSalt,
+        senha: hashedPassword ?? user.senha,
+        senhaSalt: passwordSalt ?? user.senhaSalt,
       },
     });
 
@@ -141,18 +152,26 @@ export class UsersService {
   }> {
     const { email, limit, name, page, role } = options;
 
-    const users = await this.prismaService.usuario.findMany({
-      where: {
-        email: {
-          contains: email,
-        },
-        nome: {
-          contains: name,
-        },
-        perfil: {
-          cargo: role,
-        },
+    const whereCondition: any = {
+      email: {
+        contains: email,
       },
+      nome: {
+        contains: name,
+      },
+    };
+
+    // Add conditional filtering for perfil and cargo
+    if (!!role) {
+      whereCondition.perfil = {
+        cargo: {
+          equals: role,
+        },
+      };
+    }
+
+    const users = await this.prismaService.usuario.findMany({
+      where: whereCondition,
       skip: (page - 1) * limit,
       take: limit,
     });
@@ -322,8 +341,8 @@ export class UsersService {
       throw new ForbiddenException('Código de recuperação inválido');
 
     if (
-      recoverCode.expiraEm.getTime() <
-      new Date().getTime() + 15 * 60 * 1000
+      new Date().getTime() >
+      recoverCode.expiraEm.getTime() + 15 * 60 * 1000
     ) {
       throw new ConflictException('Código de recuperação expirado');
     }
@@ -348,14 +367,16 @@ export class UsersService {
     });
   }
 
-  async resendConfirmationCode(id: string): Promise<void> {
-    const user = await this.prismaService.usuario.findUnique({
-      where: {
-        cod_usuario: id,
-      },
-    });
-
-    if (!user) throw new NotFoundException('Usuário não encontrado');
+  async resendConfirmationCode(email: string): Promise<void> {
+    const user = await this.prismaService.usuario
+      .findUniqueOrThrow({
+        where: {
+          email,
+        },
+      })
+      .catch(() => {
+        throw new NotFoundException('Usuário não encontrado');
+      });
 
     const confirmationCode = generateConfirmationCode();
 
@@ -392,17 +413,19 @@ export class UsersService {
   }
 
   async confirmCode(
-    id: string,
+    email: string,
     confirmCodeDto: ConfirmCodeDto,
   ): Promise<{ accessToken: string; user: UserEntity }> {
     const { code } = confirmCodeDto;
-    const user = await this.prismaService.usuario.findUnique({
-      where: {
-        cod_usuario: id,
-      },
-    });
-
-    if (!user) throw new NotFoundException('Usuário não encontrado');
+    const user = await this.prismaService.usuario
+      .findUniqueOrThrow({
+        where: {
+          email,
+        },
+      })
+      .catch(() => {
+        throw new NotFoundException('Usuário não encontrado');
+      });
 
     const confirmationCode =
       await this.prismaService.codigo_Confirmacao.findFirst({
@@ -418,8 +441,8 @@ export class UsersService {
       throw new ForbiddenException('Código de confirmação inválido');
 
     if (
-      confirmationCode.expiraEm.getTime() <
-      new Date().getTime() + 15 * 60 * 1000
+      new Date().getTime() >
+      confirmationCode.expiraEm.getTime() + 15 * 60 * 1000
     ) {
       throw new ConflictException('Código de confirmação expirado');
     }
