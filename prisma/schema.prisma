@@ -19,13 +19,16 @@ enum Cargo {
 }
 
 enum Tipo_Tarifa {
-  BRANCA
-  CONSTANTE
+  INTERMEDIARIA
+  FORA_DE_PONTA
+  PONTA
 }
 
-// enum Fases {
-
-// }
+enum Fases {
+  MONOFASE
+  BIFASE
+  TRIFASE
+}
 
 model Usuario {
   // Fields
@@ -120,8 +123,8 @@ model Equipamento {
   cidade String @db.VarChar(255)
   uf     String @db.VarChar(2)
 
-  tensao_nominal Decimal
-  //fases_monitoradas Fases
+  tensao_nominal    Decimal
+  fases_monitoradas Fases
 
   // Relations
   // 1:n User

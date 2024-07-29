@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { Prisma } from '@prisma/client';
+import { Fases, Prisma } from '@prisma/client';
 import {
   IsMACAddress,
   IsString,
@@ -131,4 +131,11 @@ export class CreateEquipmentDto {
   })
   @IsDecimal()
   tensaoNominal: Prisma.Decimal;
+
+  @ApiProperty({
+    description: 'Fases monitoradas do equipamento',
+    type: String,
+    nullable: false,
+  })
+  fases_monitoradas: Fases;
 }

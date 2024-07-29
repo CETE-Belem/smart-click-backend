@@ -27,6 +27,7 @@ export class EquipmentsService {
       subgrupo,
       tensaoNominal,
       uf,
+      fases_monitoradas,
     } = createEquipmentDto;
 
     await this.prismaService.concessionaria
@@ -55,6 +56,7 @@ export class EquipmentsService {
         cidade,
         uf,
         tensao_nominal: tensaoNominal,
+        fases_monitoradas,
         subgrupo,
         nome: name,
         descricao: description,
