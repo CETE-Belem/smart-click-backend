@@ -50,23 +50,13 @@ export class UsersService {
     const salt = await generateSalt();
     const hashedPassword = await hashPassword(password, salt);
 
-    const userProfile = await this.prismaService.perfil.findFirst({
-      where: {
-        cargo: 'USUARIO',
-      },
-    });
-
     const user = await this.prismaService.usuario.create({
       data: {
         email,
         senha: hashedPassword,
         senhaSalt: salt,
         nome: name,
-        perfil: {
-          connect: {
-            cod_perfil: userProfile.cod_perfil,
-          },
-        },
+        perfil: Cargo.USUARIO,
       },
     });
 
@@ -184,9 +174,7 @@ export class UsersService {
         nome: {
           contains: name,
         },
-        perfil: {
-          cargo: role,
-        },
+        perfil: role,
       },
     });
 
@@ -231,12 +219,6 @@ export class UsersService {
         throw new NotFoundException('Usuário não encontrado');
       });
 
-    const profile = await this.prismaService.perfil.findFirst({
-      where: {
-        cargo: role,
-      },
-    });
-
     const updatedUser = await this.prismaService.usuario.update({
       where: {
         cod_usuario: id,
@@ -244,11 +226,7 @@ export class UsersService {
       data: {
         nome: name,
         email,
-        perfil: {
-          connect: {
-            cod_perfil: profile.cod_perfil,
-          },
-        },
+        perfil: role,
       },
     });
 
@@ -453,12 +431,6 @@ export class UsersService {
       },
     });
 
-    const userProfile = await this.prismaService.perfil.findFirst({
-      where: {
-        cod_perfil: user.cod_perfil,
-      },
-    });
-
     const updatedUser = await this.prismaService.usuario.update({
       where: {
         cod_usuario: user.cod_usuario,
@@ -470,7 +442,7 @@ export class UsersService {
 
     const accessToken = await this.authService.createAccessToken(
       user.cod_usuario,
-      userProfile.cargo,
+      Cargo.USUARIO,
     );
 
     return {

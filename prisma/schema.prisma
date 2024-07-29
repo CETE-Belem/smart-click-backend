@@ -18,20 +18,21 @@ enum Cargo {
   USUARIO
 }
 
-model Perfil {
-  cod_perfil String    @id @default(uuid())
-  descricao  String    @db.VarChar(255)
-  cargo      Cargo     @unique @default(USUARIO)
-  usuario    Usuario[]
-
-  @@map("perfil")
+enum Tipo_Tarifa {
+  BRANCA
+  CONSTANTE
 }
+
+// enum Fases {
+
+// }
 
 model Usuario {
   // Fields
   cod_usuario     String   @id @default(uuid())
   nome            String   @db.VarChar(150)
   email           String   @unique @db.VarChar(100)
+  perfil          Cargo
   senha           String
   senhaSalt       String
   contaConfirmada Boolean? @default(false)
@@ -41,13 +42,13 @@ model Usuario {
   atualizadoEm DateTime @updatedAt
 
   // 1:n Equipment
-  equipamento Equipamento[]
-
-  cod_perfil String
-  perfil     Perfil @relation(fields: [cod_perfil], references: [cod_perfil])
+  equipamentos Equipamento[]
 
   // 1:n Concessionária
-  concessionaria Concessionaria[]
+  concessionarias Concessionaria[]
+
+  // 1:1 Unidade_Consumidora
+  unidades_consumidoras Unidade_Consumidora[]
 
   // 1:1 Codigo_Confirmacao
   cod_confirmacao Codigo_Confirmacao?
@@ -59,15 +60,16 @@ model Usuario {
 }
 
 model Concessionaria {
-  cod_concessionaria String        @id @default(uuid())
-  nome               String        @db.VarChar(150)
-  uf                 String        @db.VarChar(2)
-  cidade             String        @db.VarChar(100)
-  equipamento        Equipamento[]
-  tarifa             Tarifa[]
+  cod_concessionaria    String                @id @default(uuid())
+  nome                  String                @db.VarChar(150)
+  uf                    String                @db.VarChar(2)
+  cidade                String                @db.VarChar(100)
+  equipamentos          Equipamento[]
+  tarifas               Tarifa[]
+  unidades_consumidoras Unidade_Consumidora[]
 
-  criador Usuario @relation(fields: [cod_criador], references: [cod_usuario])
-  cod_criador   String
+  cod_criador String
+  criador     Usuario @relation(fields: [cod_criador], references: [cod_usuario])
 
   criadoEm     DateTime @default(now())
   atualizadoEm DateTime @updatedAt
@@ -79,11 +81,27 @@ model Tarifa {
   cod_tarifa String   @id @default(uuid())
   dt_tarifa  DateTime
   valor      Decimal
+  subgrupo   String   @db.VarChar(255)
 
   cod_concessionaria String
   concessionaria     Concessionaria @relation(fields: [cod_concessionaria], references: [cod_concessionaria])
 
+  intervalos_tarifas Intervalo_Tarifa[]
+
   @@map("tarifa")
+}
+
+model Intervalo_Tarifa {
+  cod_intervalo_tarifa String      @id @default(uuid())
+  de                   Int
+  ate                  Int
+  valor                Decimal
+  tipo                 Tipo_Tarifa
+
+  cod_tarifa String
+  tarifa     Tarifa @relation(fields: [cod_tarifa], references: [cod_tarifa])
+
+  @@map("intervalo_tarifa")
 }
 
 model Equipamento {
@@ -97,20 +115,31 @@ model Equipamento {
   criadoEm     DateTime @default(now())
   atualizadoEm DateTime @updatedAt
 
+  subgrupo String @db.VarChar(255)
+
+  cidade String @db.VarChar(255)
+  uf     String @db.VarChar(2)
+
+  tensao_nominal Decimal
+  //fases_monitoradas Fases
+
   // Relations
   // 1:n User
   cod_usuario  String
-  usuario      Usuario        @relation(fields: [cod_usuario], references: [cod_usuario], onDelete: Cascade)
+  usuario      Usuario       @relation(fields: [cod_usuario], references: [cod_usuario], onDelete: Cascade)
   // 1:1 Measurement
-  dados_sensor Dados_Sensor[]
+  dados_sensor Dado_Sensor[]
 
   cod_concessionaria String
   concessionaria     Concessionaria @relation(fields: [cod_concessionaria], references: [cod_concessionaria])
 
+  cod_unidade_consumidora String
+  unidade_consumidora     Unidade_Consumidora @relation(fields: [cod_unidade_consumidora], references: [cod_unidade_consumidora])
+
   @@map("equipamento")
 }
 
-model Dados_Sensor {
+model Dado_Sensor {
   id                       String   @id @default(uuid())
   iA                       Float?
   iB                       Float?
@@ -127,7 +156,7 @@ model Dados_Sensor {
   energiaReativaImportada  Float?
   energiaAparenteExportada Float?
   energiaAparenteImportada Float?
-  date                     DateTime
+  data                     DateTime
 
   // Timestamps
   criadoEm     DateTime @default(now())
@@ -167,4 +196,18 @@ model Codigo_Recuperacao {
   atualizadoEm DateTime @updatedAt
 
   @@map("codigo_recuperacao")
+}
+
+model Unidade_Consumidora {
+  cod_unidade_consumidora String @id @default(uuid())
+  cidade                  String @db.VarChar(200)
+  uf                      String @db.VarChar(2)
+
+  equipamentos Equipamento[]
+
+  cod_concessionaria String
+  concessionaria     Concessionaria @relation(fields: [cod_concessionaria], references: [cod_concessionaria])
+
+  cod_usuario String
+  usuario     Usuario @relation(fields: [cod_usuario], references: [cod_usuario])
 }

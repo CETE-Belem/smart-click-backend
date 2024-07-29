@@ -5,38 +5,6 @@ import { fakerPT_BR } from '@faker-js/faker';
 const prisma = new PrismaClient();
 
 async function main() {
-  const adminProfile = await prisma.perfil
-    .upsert({
-      where: {
-        cargo: 'ADMIN',
-      },
-      update: {},
-      create: {
-        cargo: 'ADMIN',
-        descricao: 'Administrador do sistema',
-      },
-    })
-    .then((response) => {
-      console.log(`Perfil ${response.cargo} criado`);
-      return response;
-    });
-
-  const userProfile = await prisma.perfil
-    .upsert({
-      where: {
-        cargo: 'USUARIO',
-      },
-      update: {},
-      create: {
-        cargo: 'USUARIO',
-        descricao: 'Usuário comum do sistema',
-      },
-    })
-    .then((response) => {
-      console.log(`Perfil ${response.cargo} criado`);
-      return response;
-    });
-
   const passwordSalt = await generateSalt();
   const password = await hashPassword('@Abc1234', passwordSalt);
 
@@ -50,11 +18,7 @@ async function main() {
         senha: password,
         senhaSalt: passwordSalt,
         contaConfirmada: true,
-        perfil: {
-          connect: {
-            cod_perfil: adminProfile.cod_perfil,
-          },
-        },
+        perfil: 'ADMIN',
       },
     })
     .then((response) => {
@@ -73,11 +37,7 @@ async function main() {
           nome: fakerPT_BR.person.fullName(),
           senha: password,
           senhaSalt: passwordSalt,
-          perfil: {
-            connect: {
-              cod_perfil: userProfile.cod_perfil,
-            },
-          },
+          perfil: 'USUARIO',
         },
       })
       .then((response) => {

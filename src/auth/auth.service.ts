@@ -69,19 +69,13 @@ export class AuthService {
       throw new MethodNotAllowedException('Conta não confirmada');
     }
 
-    const profile = await this.prismaService.perfil.findUnique({
-      where: {
-        cod_perfil: user.cod_perfil,
-      },
-    });
-
     await this.checkPassword(user.senha, password);
 
     await this.turnstileService.validateToken(captcha);
 
     const accessToken = await this.createAccessToken(
       user.cod_usuario,
-      profile.cargo,
+      user.perfil,
     );
 
     return {

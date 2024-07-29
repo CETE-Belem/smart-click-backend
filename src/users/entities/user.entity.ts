@@ -1,4 +1,4 @@
-import { Usuario } from '@prisma/client';
+import { Cargo, Usuario } from '@prisma/client';
 import { Exclude } from 'class-transformer';
 import { ApiProperty } from '@nestjs/swagger';
 import { maxEmailLength, maxNameLength } from 'src/constants/user-fields';
@@ -12,7 +12,7 @@ export class UserEntity implements Usuario {
     type: String,
     nullable: false,
   })
-  cod_perfil: string;
+  perfil: Cargo;
   @ApiProperty({
     type: String,
     nullable: false,

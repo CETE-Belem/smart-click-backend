@@ -17,7 +17,17 @@ export class EquipmentsService {
     req: JWTType,
     createEquipmentDto: CreateEquipmentDto,
   ): Promise<EquipmentEntity> {
-    const { mac, name, description, codConcessionaria } = createEquipmentDto;
+    const {
+      mac,
+      name,
+      description,
+      codConcessionaria,
+      codUnidadeConsumidora,
+      cidade,
+      subgrupo,
+      tensaoNominal,
+      uf,
+    } = createEquipmentDto;
 
     await this.prismaService.concessionaria
       .findFirstOrThrow({
@@ -42,6 +52,10 @@ export class EquipmentsService {
     const equipment = await this.prismaService.equipamento.create({
       data: {
         mac,
+        cidade,
+        uf,
+        tensao_nominal: tensaoNominal,
+        subgrupo,
         nome: name,
         descricao: description,
         concessionaria: {
@@ -52,6 +66,11 @@ export class EquipmentsService {
         usuario: {
           connect: {
             cod_usuario: req.user.userId,
+          },
+        },
+        unidade_consumidora: {
+          connect: {
+            cod_unidade_consumidora: codUnidadeConsumidora,
           },
         },
       },

@@ -1,4 +1,4 @@
-import { Equipamento } from '@prisma/client';
+import { Equipamento, Prisma } from '@prisma/client';
 import { ApiProperty } from '@nestjs/swagger';
 import {
   maxNameLength,
@@ -23,6 +23,12 @@ export class EquipmentEntity implements Equipamento {
     nullable: false,
   })
   cod_equipamento: string;
+  @ApiProperty({
+    description: 'O UUID da Unidade Consumidora',
+    type: String,
+    nullable: false,
+  })
+  cod_unidade_consumidora: string;
   @ApiProperty({
     description: 'O UUID do Usuário',
     type: String,
@@ -64,4 +70,36 @@ export class EquipmentEntity implements Equipamento {
     example: '2021-08-01T00:00:00.000Z',
   })
   atualizadoEm: Date;
+
+  @ApiProperty({
+    description: 'A Data de Atualização do Equipamento',
+    type: Number,
+    nullable: false,
+    example: '220',
+  })
+  tensao_nominal: Prisma.Decimal;
+
+  @ApiProperty({
+    description: 'UF do Equipamento',
+    type: String,
+    nullable: false,
+    example: 'PA',
+  })
+  uf: string;
+
+  @ApiProperty({
+    description: 'Cidade do Equipamento',
+    type: String,
+    nullable: false,
+    example: 'Belém',
+  })
+  cidade: string;
+
+  @ApiProperty({
+    description: 'Subgrupo do Equipamento',
+    type: String,
+    nullable: false,
+    example: 'A1',
+  })
+  subgrupo: string;
 }

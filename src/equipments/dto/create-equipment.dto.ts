@@ -1,10 +1,12 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { Prisma } from '@prisma/client';
 import {
   IsMACAddress,
   IsString,
   MaxLength,
   Length,
   MinLength,
+  IsDecimal,
 } from 'class-validator';
 import {
   maxNameLength,
@@ -72,4 +74,61 @@ export class CreateEquipmentDto {
     message: 'O código da concessionária do equipamento deve ser uma string',
   })
   codConcessionaria: string;
+
+  @ApiProperty({
+    description: 'O código da unidade consumidora do equipamento',
+    type: String,
+    nullable: false,
+  })
+  @IsString({
+    message: 'O código da unidade consumidora deve ser uma string',
+  })
+  codUnidadeConsumidora: string;
+
+  @ApiProperty({
+    description: 'UF do equipamento',
+    type: String,
+    nullable: false,
+  })
+  @IsString({
+    message: 'UF do equipamento deve ser uma string',
+  })
+  @MaxLength(2, {
+    message: 'UF do equipamento deve ter no máximo 2 caracteres',
+  })
+  uf: string;
+
+  @ApiProperty({
+    description: 'Cidade do equipamento',
+    type: String,
+    nullable: false,
+  })
+  @IsString({
+    message: 'Cidade do equipamento deve ser uma string',
+  })
+  @MaxLength(255, {
+    message: 'UF do equipamento deve ter no máximo 255 caracteres',
+  })
+  cidade: string;
+
+  @ApiProperty({
+    description: 'Subgrupo do equipamento',
+    type: String,
+    nullable: false,
+  })
+  @IsString({
+    message: 'Subgrupo do equipamento deve ser uma string',
+  })
+  @MaxLength(255, {
+    message: 'Subgrupo do equipamento deve ter no máximo 255 caracteres',
+  })
+  subgrupo: string;
+
+  @ApiProperty({
+    description: 'Tensão nominal do equipamento',
+    type: Number,
+    nullable: false,
+  })
+  @IsDecimal()
+  tensaoNominal: Prisma.Decimal;
 }
