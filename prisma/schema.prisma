@@ -206,11 +206,14 @@ model Unidade_Consumidora {
   cidade                  String @db.VarChar(200)
   uf                      String @db.VarChar(2)
 
+  criadoEm     DateTime @default(now())
+  atualizadoEm DateTime @updatedAt
+
   equipamentos Equipamento[]
 
   cod_concessionaria String
   concessionaria     Concessionaria @relation(fields: [cod_concessionaria], references: [cod_concessionaria])
 
   cod_usuario String
-  usuario     Usuario @relation(fields: [cod_usuario], references: [cod_usuario])
+  criador     Usuario @relation(fields: [cod_usuario], references: [cod_usuario])
 }

@@ -9,6 +9,7 @@ import { AuthModule } from './auth/auth.module';
 import { EquipmentsModule } from './equipments/equipments.module';
 import { MailModule } from './mail/mail.module';
 import { ConcessionaireModule } from './concessionaire/concessionaire.module';
+import { ConsumerUnitModule } from './consumer-unit/consumer-unit.module';
 
 @Module({
   imports: [
@@ -24,6 +25,7 @@ import { ConcessionaireModule } from './concessionaire/concessionaire.module';
     EquipmentsModule,
     MailModule,
     ConcessionaireModule,
+    ConsumerUnitModule,
   ],
   controllers: [AppController],
   providers: [
