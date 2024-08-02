@@ -1,7 +1,31 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsString, IsUUID, MaxLength, MinLength } from 'class-validator';
+import {
+  IsString,
+  IsUUID,
+  MaxLength,
+  MinLength,
+  Length,
+  IsNotEmpty,
+} from 'class-validator';
 
 export class CreateConsumerUnitDto {
+  @ApiProperty({
+    description: 'Número da unidade consumidora',
+    type: String,
+    nullable: false,
+    example: '12345678',
+  })
+  @IsString({
+    message: 'O número deve ser uma string',
+  })
+  @Length(8, 8, {
+    message: 'O número deve ter 8 caracteres',
+  })
+  @IsNotEmpty({
+    message: 'O número não pode ser vazio',
+  })
+  numero: string;
+
   @ApiProperty({
     description: 'Cidade da unidade consumidora',
     type: String,

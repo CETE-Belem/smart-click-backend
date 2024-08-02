@@ -29,22 +29,21 @@ export class ConsumerUnitService {
     }
 
     const existingConsumerUnit =
-      await this.prismaService.unidade_Consumidora.findMany({
+      await this.prismaService.unidade_Consumidora.findFirst({
         where: {
-          uf: createConsumerUnitDto.uf,
-          cidade: createConsumerUnitDto.cidade,
-          cod_concessionaria: createConsumerUnitDto.cod_concessionaria,
+          numero: createConsumerUnitDto.numero,
         },
       });
 
     if (existingConsumerUnit) {
-      throw new ConflictException('Unidade consumidora já existente');
+      throw new ConflictException('Unidade consumidora já existe');
     }
 
     const consumerUnit = await this.prismaService.unidade_Consumidora.create({
       data: {
         cidade: createConsumerUnitDto.cidade,
         uf: createConsumerUnitDto.uf,
+        numero: createConsumerUnitDto.numero,
         concessionaria: {
           connect: {
             cod_concessionaria: createConsumerUnitDto.cod_concessionaria,
@@ -74,19 +73,6 @@ export class ConsumerUnitService {
 
     if (!concessionaire) {
       throw new NotFoundException('Concessionária não encontrada');
-    }
-
-    const existingConsumerUnit =
-      await this.prismaService.unidade_Consumidora.findFirst({
-        where: {
-          uf: updateConsumerUnitDto.uf,
-          cidade: updateConsumerUnitDto.cidade,
-          cod_concessionaria: updateConsumerUnitDto.cod_concessionaria,
-        },
-      });
-
-    if (existingConsumerUnit) {
-      throw new ConflictException('Unidade consumidora já existente');
     }
 
     const consumerUnit = await this.prismaService.unidade_Consumidora.findFirst(

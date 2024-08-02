@@ -205,6 +205,7 @@ model Unidade_Consumidora {
   cod_unidade_consumidora String @id @default(uuid())
   cidade                  String @db.VarChar(200)
   uf                      String @db.VarChar(2)
+  numero                  String @unique @db.VarChar(8)
 
   criadoEm     DateTime @default(now())
   atualizadoEm DateTime @updatedAt

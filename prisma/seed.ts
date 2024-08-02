@@ -55,7 +55,7 @@ async function main() {
         data: {
           nome: fakerPT_BR.company.name(),
           cidade: fakerPT_BR.location.city(),
-          uf: fakerPT_BR.address.stateAbbr(),
+          uf: fakerPT_BR.location.state({ abbreviated: true }),
           criador: {
             connect: {
               cod_usuario: adm.cod_usuario,
@@ -75,7 +75,8 @@ async function main() {
       .create({
         data: {
           cidade: fakerPT_BR.location.city(),
-          uf: fakerPT_BR.address.stateAbbr(),
+          uf: fakerPT_BR.location.state({ abbreviated: true }),
+          numero: fakerPT_BR.helpers.fromRegExp(/[0-9]{8}/),
           criador: {
             connect: {
               cod_usuario: adm.cod_usuario,

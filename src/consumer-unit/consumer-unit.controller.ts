@@ -179,16 +179,6 @@ export class ConsumerUnitController {
   @ApiBody({
     type: UpdateConsumerUnitDto,
   })
-  @ApiConflictResponse({
-    description: 'Unidade consumidora já cadastrada',
-    schema: {
-      example: {
-        statusCode: HttpStatus.CONFLICT,
-        message: 'Unidade consumidora já existente',
-        error: 'Conflict',
-      },
-    },
-  })
   @ApiUnauthorizedResponse({
     description: 'Usuário não autorizado',
   })

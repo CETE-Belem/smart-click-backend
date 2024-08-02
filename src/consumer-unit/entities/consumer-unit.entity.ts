@@ -21,11 +21,21 @@ export class ConsumerUnitEntity implements Unidade_Consumidora {
     description: 'Sigla do estado',
   })
   uf: string;
+
   @ApiProperty({
     example: '80db693e-2831-4bbd-b322-1143c4ee603a',
     description: 'Código da concessionaria',
   })
   cod_concessionaria: string;
+
+  @ApiProperty({
+    example: '12345678',
+    description: 'Código do criador',
+    maxLength: 8,
+    minLength: 8,
+    nullable: false,
+  })
+  numero: string;
 
   @ApiProperty({
     example: '80db693e-2831-4bbd-b322-1143c4ee603a',
