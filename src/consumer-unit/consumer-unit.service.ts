@@ -203,18 +203,19 @@ export class ConsumerUnitService {
     return new ConsumerUnitEntity(consumerUnit);
   }
 
-  async deleteConsumerUnit(consumerUnitId: string, userId: string) {
-    const consumerUnit = await this.prismaService.unidade_Consumidora.findFirst(
-      {
+  async deleteConsumerUnit(
+    consumerUnitId: string,
+    userId: string,
+  ): Promise<ConsumerUnitEntity> {
+    const consumerUnit = await this.prismaService.unidade_Consumidora
+      .findFirstOrThrow({
         where: {
           cod_unidade_consumidora: consumerUnitId,
         },
-      },
-    );
-
-    if (!consumerUnit) {
-      throw new NotFoundException('Unidade consumidora não encontrada');
-    }
+      })
+      .catch(() => {
+        throw new NotFoundException('Unidade consumidora não encontrada');
+      });
 
     if (consumerUnit.cod_usuario !== userId) {
       throw new UnauthorizedException(
@@ -228,6 +229,6 @@ export class ConsumerUnitService {
       },
     });
 
-    return;
+    return consumerUnit;
   }
 }

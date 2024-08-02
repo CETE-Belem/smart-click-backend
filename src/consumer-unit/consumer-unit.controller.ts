@@ -209,9 +209,11 @@ export class ConsumerUnitController {
   @Delete('/:id')
   @UseGuards(AuthGuard, RolesGuard)
   @Roles('ADMIN')
+  @ApiBearerAuth('token')
   @ApiOkResponse({
     status: HttpStatus.OK,
     description: 'Unidade consumidora deletada',
+    type: ConsumerUnitEntity,
   })
   @ApiNotFoundResponse({
     status: HttpStatus.NOT_FOUND,
@@ -221,6 +223,19 @@ export class ConsumerUnitController {
         statusCode: HttpStatus.NOT_FOUND,
         message: 'Unidade consumidora não encontrada',
         error: 'Not Found',
+      },
+    },
+  })
+  @ApiUnauthorizedResponse({
+    status: HttpStatus.UNAUTHORIZED,
+    description:
+      'Somente o usuário que criou a unidade consumidora pode deletá-la',
+    schema: {
+      example: {
+        statusCode: HttpStatus.UNAUTHORIZED,
+        message:
+          'Somente o usuário que criou a unidade consumidora pode deletá-la',
+        error: 'Unauthorized',
       },
     },
   })
