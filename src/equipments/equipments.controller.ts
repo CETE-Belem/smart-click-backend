@@ -31,6 +31,8 @@ import {
 import { AuthGuard } from 'src/common/guards/auth.guard';
 import { JWTType } from 'src/types/jwt.types';
 import { EquipmentEntity } from './entities/equipment.entity';
+import { ParseFaseMonitoradaPipe } from 'src/common/pipes/ParseFaseMonitoradaPipe.pipe';
+import { Fases, Subgrupo } from '@prisma/client';
 
 @ApiTags('equipments')
 @UseGuards(AuthGuard)
@@ -119,18 +121,50 @@ export class EquipmentsController {
     required: false,
     type: String,
   })
+  @ApiQuery({
+    name: 'cidade',
+    description: 'Cidade do equipamento',
+    required: false,
+    type: String,
+  })
+  @ApiQuery({
+    name: 'uf',
+    description: 'UF do equipamento',
+    required: false,
+    type: String,
+  })
+  @ApiQuery({
+    name: 'fase_monitorada',
+    description: 'Fase monitorada',
+    required: false,
+    type: String,
+  })
+  @ApiQuery({
+    name: 'subgrupo',
+    description: 'Subgrupo',
+    required: false,
+    type: String,
+  })
   findAll(
     @Request() req: JWTType,
     @Query('page', new ParseIntPipe()) page: number,
     @Query('limit', new ParseIntPipe()) limit: number,
     @Query('mac') mac: string,
     @Query('name') name: string,
+    @Query('cidade') cidade: string,
+    @Query('uf') uf: string,
+    @Query('fase_monitorada', ParseFaseMonitoradaPipe) fase_monitorada: Fases,
+    @Query('subgrupo') subgrupo: Subgrupo,
   ) {
     return this.equipmentsService.findAll(req, {
       page,
       limit,
       mac,
       name,
+      cidade,
+      uf,
+      fase_monitorada,
+      subgrupo,
     });
   }
 

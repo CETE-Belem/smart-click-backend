@@ -8,6 +8,7 @@ import { UpdateEquipmentDto } from './dto/update-equipment.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { EquipmentEntity } from './entities/equipment.entity';
 import { JWTType } from 'src/types/jwt.types';
+import { Fases, Subgrupo } from '@prisma/client';
 
 @Injectable()
 export class EquipmentsService {
@@ -98,6 +99,10 @@ export class EquipmentsService {
       limit: number;
       name: string;
       mac: string;
+      subgrupo: Subgrupo;
+      cidade: string;
+      uf: string;
+      fase_monitorada: Fases;
     },
   ): Promise<{
     limit: number;
@@ -105,7 +110,8 @@ export class EquipmentsService {
     totalPages: number;
     equipments: EquipmentEntity[];
   }> {
-    const { limit, page, mac, name } = options;
+    const { limit, page, mac, name, cidade, fase_monitorada, subgrupo, uf } =
+      options;
 
     const equipments = await this.prismaService.equipamento.findMany({
       where: {
@@ -116,6 +122,12 @@ export class EquipmentsService {
         mac: {
           contains: mac,
         },
+        cidade: {
+          contains: cidade,
+        },
+        uf,
+        fases_monitoradas: fase_monitorada,
+        subgrupo,
       },
       orderBy: {
         criadoEm: 'asc',
@@ -133,6 +145,12 @@ export class EquipmentsService {
         mac: {
           contains: mac,
         },
+        cidade: {
+          contains: cidade,
+        },
+        uf,
+        fases_monitoradas: fase_monitorada,
+        subgrupo,
       },
     });
 
