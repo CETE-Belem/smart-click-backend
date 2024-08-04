@@ -30,6 +30,15 @@ enum Fases {
   TRIFASE
 }
 
+enum Subgrupo {
+  A1
+  A2
+  A3
+  A4
+  A3a
+  AS
+}
+
 model Usuario {
   // Fields
   cod_usuario     String   @id @default(uuid())
@@ -87,7 +96,7 @@ model Tarifa {
   cod_tarifa String   @id @default(uuid())
   dt_tarifa  DateTime
   valor      Decimal
-  subgrupo   String   @db.VarChar(255)
+  subgrupo   Subgrupo
 
   cod_concessionaria String
   concessionaria     Concessionaria @relation(fields: [cod_concessionaria], references: [cod_concessionaria])
@@ -121,7 +130,7 @@ model Equipamento {
   criadoEm     DateTime @default(now())
   atualizadoEm DateTime @updatedAt
 
-  subgrupo String @db.VarChar(255)
+  subgrupo Subgrupo 
 
   cidade String @db.VarChar(255)
   uf     String @db.VarChar(2)

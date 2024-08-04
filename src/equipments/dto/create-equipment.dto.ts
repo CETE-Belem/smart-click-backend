@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { Fases, Prisma } from '@prisma/client';
+import { Fases, Prisma, Subgrupo } from '@prisma/client';
 import {
   IsMACAddress,
   IsString,
@@ -7,6 +7,7 @@ import {
   Length,
   MinLength,
   IsDecimal,
+  IsEnum,
 } from 'class-validator';
 import {
   maxNameLength,
@@ -122,7 +123,10 @@ export class CreateEquipmentDto {
   @MaxLength(255, {
     message: 'Subgrupo do equipamento deve ter no máximo 255 caracteres',
   })
-  subgrupo: string;
+  @IsEnum(Subgrupo, {
+    message: 'Subgrupo do equipamento deve ser um subgrupo',
+  })
+  subgrupo: Subgrupo;
 
   @ApiProperty({
     description: 'Tensão nominal do equipamento',
