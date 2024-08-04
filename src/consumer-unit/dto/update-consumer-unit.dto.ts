@@ -4,6 +4,7 @@ import {
   IsString,
   IsUUID,
   Length,
+  Matches,
   MaxLength,
   MinLength,
 } from 'class-validator';
@@ -23,6 +24,9 @@ export class UpdateConsumerUnitDto {
   })
   @IsNotEmpty({
     message: 'O número não pode ser vazio',
+  })
+  @Matches(/^[0-9]+$/, {
+    message: 'O número de unidade consumidora deve conter apenas números',
   })
   numero: string;
 

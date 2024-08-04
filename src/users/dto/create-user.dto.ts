@@ -6,6 +6,7 @@ import {
   Matches,
   MaxLength,
   MinLength,
+  Length,
 } from 'class-validator';
 import {
   minPasswordLength,
@@ -35,6 +36,25 @@ export class CreateUserDto {
     message: `O email deve ter no máximo ${maxEmailLength} caracteres`,
   })
   email: string;
+
+  @ApiProperty({
+    description: 'Número de unidade consumidora',
+    type: String,
+    example: '12345678',
+  })
+  @IsNotEmpty({
+    message: 'O número de unidade consumidora é obrigatório',
+  })
+  @IsString({
+    message: 'O número de unidade consumidora deve ser uma string',
+  })
+  @Length(8, 8, {
+    message: 'O número de unidade consumidora deve ter 8 caracteres',
+  })
+  @Matches(/^[0-9]+$/, {
+    message: 'O número de unidade consumidora deve conter apenas números',
+  })
+  consumerUnityNumber: string;
 
   @ApiProperty({
     description: 'Senha do usuário',

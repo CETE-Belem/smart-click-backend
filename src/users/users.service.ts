@@ -37,6 +37,16 @@ export class UsersService {
   async create(createUserDto: CreateUserDto): Promise<UserEntity> {
     const { captcha, email, name, password } = createUserDto;
 
+    const existingConsumerUnity = await this.prismaService.unidade_Consumidora
+      .findFirstOrThrow({
+        where: {
+          numero: createUserDto.consumerUnityNumber,
+        },
+      })
+      .catch(() => {
+        throw new NotFoundException('Unidade consumidora inválida');
+      });
+
     const existingUser = await this.prismaService.usuario.findFirst({
       where: {
         email,
@@ -57,6 +67,23 @@ export class UsersService {
         senhaSalt: salt,
         nome: name,
         perfil: Cargo.USUARIO,
+      },
+    });
+
+    // Connect Consumer Unity to User by intermediary table
+    await this.prismaService.unidade_Consumidora_Usuario.create({
+      data: {
+        unidade_consumidora: {
+          connect: {
+            cod_unidade_consumidora:
+              existingConsumerUnity.cod_unidade_consumidora,
+          },
+        },
+        usuario: {
+          connect: {
+            cod_usuario: user.cod_usuario,
+          },
+        },
       },
     });
 

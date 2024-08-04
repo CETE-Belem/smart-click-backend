@@ -6,6 +6,7 @@ import {
   MinLength,
   Length,
   IsNotEmpty,
+  Matches,
 } from 'class-validator';
 
 export class CreateConsumerUnitDto {
@@ -23,6 +24,9 @@ export class CreateConsumerUnitDto {
   })
   @IsNotEmpty({
     message: 'O número não pode ser vazio',
+  })
+  @Matches(/^[0-9]+$/, {
+    message: 'O número de unidade consumidora deve conter apenas números',
   })
   numero: string;
 
