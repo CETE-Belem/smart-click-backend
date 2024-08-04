@@ -40,6 +40,16 @@ export class EquipmentsService {
         throw new NotFoundException('Concessionária não encontrada');
       });
 
+    await this.prismaService.unidade_Consumidora
+      .findFirstOrThrow({
+        where: {
+          cod_unidade_consumidora: codUnidadeConsumidora,
+        },
+      })
+      .catch(() => {
+        throw new NotFoundException('Unidade consumidora não encontrada');
+      });
+
     const existingEquipment = await this.prismaService.equipamento.findFirst({
       where: {
         mac,
@@ -154,7 +164,18 @@ export class EquipmentsService {
     id: string,
     updateEquipmentDto: UpdateEquipmentDto,
   ): Promise<EquipmentEntity> {
-    const { codConcessionaria, description, mac, name } = updateEquipmentDto;
+    const {
+      codConcessionaria,
+      description,
+      mac,
+      name,
+      codUnidadeConsumidora,
+      cidade,
+      fases_monitoradas,
+      subgrupo,
+      tensaoNominal,
+      uf,
+    } = updateEquipmentDto;
 
     await this.prismaService.concessionaria
       .findFirstOrThrow({
@@ -164,6 +185,16 @@ export class EquipmentsService {
       })
       .catch(() => {
         throw new NotFoundException('Concessionária não encontrada');
+      });
+
+    await this.prismaService.unidade_Consumidora
+      .findFirstOrThrow({
+        where: {
+          cod_unidade_consumidora: codUnidadeConsumidora,
+        },
+      })
+      .catch(() => {
+        throw new NotFoundException('Unidade consumidora não encontrada');
       });
 
     await this.prismaService.equipamento
@@ -186,6 +217,16 @@ export class EquipmentsService {
         mac,
         nome: name,
         descricao: description,
+        cidade,
+        uf,
+        fases_monitoradas,
+        subgrupo,
+        tensao_nominal: tensaoNominal,
+        unidade_consumidora: {
+          connect: {
+            cod_unidade_consumidora: codUnidadeConsumidora,
+          },
+        },
         concessionaria: {
           connect: {
             cod_concessionaria: codConcessionaria,
