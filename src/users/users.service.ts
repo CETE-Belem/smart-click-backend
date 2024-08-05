@@ -71,14 +71,11 @@ export class UsersService {
     });
 
     // Connect Consumer Unity to User by intermediary table
-    await this.prismaService.unidade_Consumidora_Usuario.create({
+    await this.prismaService.unidade_Consumidora.update({
+      where: {
+        cod_unidade_consumidora: existingConsumerUnity.cod_unidade_consumidora,
+      },
       data: {
-        unidade_consumidora: {
-          connect: {
-            cod_unidade_consumidora:
-              existingConsumerUnity.cod_unidade_consumidora,
-          },
-        },
         usuario: {
           connect: {
             cod_usuario: user.cod_usuario,
