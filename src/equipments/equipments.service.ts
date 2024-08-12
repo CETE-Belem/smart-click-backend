@@ -108,12 +108,14 @@ export class EquipmentsService {
         cod_usuario: req.user.userId,
         nome: {
           contains: name,
+          mode: 'insensitive',
         },
         mac: {
           contains: mac,
         },
         cidade: {
           contains: cidade,
+          mode: 'insensitive',
         },
         uf,
         fases_monitoradas: fase_monitorada,
@@ -255,5 +257,21 @@ export class EquipmentsService {
     });
 
     return new EquipmentEntity(equipment);
+  }
+
+  async removeMany(req: JWTType, equipments: string[]): Promise<void> {
+    const deletedEquipments = await this.prismaService.equipamento.deleteMany({
+      where: {
+        cod_equipamento: {
+          in: equipments,
+        },
+        cod_usuario: req.user.userId,
+      },
+    });
+
+    if (deletedEquipments.count !== equipments.length)
+      throw new NotFoundException('Alguns equipamentos não foram encontrados');
+
+    return;
   }
 }

@@ -37,6 +37,10 @@ enum Subgrupo {
   A4
   A3a
   AS
+  B1
+  B2
+  B3
+  B4
 }
 
 model Usuario {

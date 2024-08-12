@@ -10,9 +10,12 @@ import { EquipmentsModule } from './equipments/equipments.module';
 import { MailModule } from './mail/mail.module';
 import { ConcessionaireModule } from './concessionaire/concessionaire.module';
 import { ConsumerUnitModule } from './consumer-unit/consumer-unit.module';
+import { WinstonModule } from 'nest-winston';
+import { winstonConfig } from './config/winston.config';
 
 @Module({
   imports: [
+    WinstonModule.forRoot(winstonConfig),
     ThrottlerModule.forRoot([
       {
         ttl: 60000,
