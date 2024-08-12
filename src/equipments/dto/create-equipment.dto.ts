@@ -1,13 +1,15 @@
+import { BadRequestException } from '@nestjs/common';
 import { ApiProperty } from '@nestjs/swagger';
-import { Fases, Prisma, Subgrupo } from '@prisma/client';
+import { Fases, Subgrupo } from '@prisma/client';
+import { Transform } from 'class-transformer';
 import {
   IsMACAddress,
   IsString,
   MaxLength,
   Length,
   MinLength,
-  IsDecimal,
   IsEnum,
+  IsNumber,
 } from 'class-validator';
 import {
   maxNameLength,
@@ -67,24 +69,14 @@ export class CreateEquipmentDto {
   description?: string;
 
   @ApiProperty({
-    description: 'O código da concessionária do equipamento',
+    description: 'O número da unidade consumidora do equipamento',
     type: String,
     nullable: false,
   })
   @IsString({
-    message: 'O código da concessionária do equipamento deve ser uma string',
+    message: 'O número da unidade consumidora deve ser uma string',
   })
-  codConcessionaria: string;
-
-  @ApiProperty({
-    description: 'O código da unidade consumidora do equipamento',
-    type: String,
-    nullable: false,
-  })
-  @IsString({
-    message: 'O código da unidade consumidora deve ser uma string',
-  })
-  codUnidadeConsumidora: string;
+  numeroUnidadeConsumidora: string;
 
   @ApiProperty({
     description: 'UF do equipamento',
@@ -108,7 +100,7 @@ export class CreateEquipmentDto {
     message: 'Cidade do equipamento deve ser uma string',
   })
   @MaxLength(255, {
-    message: 'UF do equipamento deve ter no máximo 255 caracteres',
+    message: 'Cidade do equipamento deve ter no máximo 255 caracteres',
   })
   cidade: string;
 
@@ -133,13 +125,23 @@ export class CreateEquipmentDto {
     type: Number,
     nullable: false,
   })
-  @IsDecimal()
-  tensaoNominal: Prisma.Decimal;
+  @IsNumber(
+    {},
+    {
+      message: 'Tensão nominal do equipamento deve ser um número',
+    },
+  )
+  @Transform(({ value }) => parseFloat(value))
+  tensaoNominal: number;
 
   @ApiProperty({
     description: 'Fases monitoradas do equipamento',
     type: String,
     nullable: false,
+  })
+  @IsEnum(Fases, {
+    each: true,
+    message: 'Fases monitoradas do equipamento devem ser uma fase válida',
   })
   fases_monitoradas: Fases;
 }

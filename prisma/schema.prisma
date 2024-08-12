@@ -37,6 +37,10 @@ enum Subgrupo {
   A4
   A3a
   AS
+  B1
+  B2
+  B3
+  B4
 }
 
 model Usuario {
@@ -230,7 +234,7 @@ model Unidade_Consumidora {
   cod_criador String
   criador     Usuario @relation(name: "Criador", fields: [cod_criador], references: [cod_usuario])
 
-  cod_usuario String? @unique
+  cod_usuario String?  @unique
   usuario     Usuario? @relation(name: "Usuario", fields: [cod_usuario], references: [cod_usuario])
 
   @@map("unidade_consumidora")

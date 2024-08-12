@@ -33,6 +33,7 @@ import { JWTType } from 'src/types/jwt.types';
 import { EquipmentEntity } from './entities/equipment.entity';
 import { ParseFaseMonitoradaPipe } from 'src/common/pipes/ParseFaseMonitoradaPipe.pipe';
 import { Fases, Subgrupo } from '@prisma/client';
+import { DeleteManyEquipmentsDto } from './dto/delete-many-equipments';
 
 @ApiTags('equipments')
 @UseGuards(AuthGuard)
@@ -84,6 +85,9 @@ export class EquipmentsController {
           type: 'number',
         },
         totalPages: {
+          type: 'number',
+        },
+        totalEquipments: {
           type: 'number',
         },
         equipments: {
@@ -231,6 +235,30 @@ export class EquipmentsController {
     return this.equipmentsService.update(req, id, updateEquipmentDto);
   }
 
+  @Delete()
+  @ApiOkResponse({
+    status: HttpStatus.OK,
+  })
+  @ApiBearerAuth('token')
+  @ApiNotFoundResponse({
+    status: HttpStatus.NOT_FOUND,
+    schema: {
+      example: {
+        statusCode: HttpStatus.NOT_FOUND,
+        message: 'Um ou mais equipamentos não foram encontrados',
+      },
+    },
+  })
+  removeMany(
+    @Request() req: JWTType,
+    @Body() deleteManyEquipmentsDto: DeleteManyEquipmentsDto,
+  ) {
+    return this.equipmentsService.removeMany(
+      req,
+      deleteManyEquipmentsDto.equipments,
+    );
+  }
+
   @Delete(':id')
   @ApiOkResponse({
     status: HttpStatus.OK,
@@ -250,7 +278,7 @@ export class EquipmentsController {
     name: 'id',
     type: String,
   })
-  remove(
+  removeOne(
     @Request() req: JWTType,
     @Param('id', new ParseUUIDPipe()) id: string,
   ) {
