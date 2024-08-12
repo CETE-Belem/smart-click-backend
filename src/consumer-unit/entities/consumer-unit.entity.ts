@@ -44,6 +44,12 @@ export class ConsumerUnitEntity implements Unidade_Consumidora {
   cod_usuario: string;
 
   @ApiProperty({
+    example: '80db693e-2831-4bbd-b322-1143c4ee603a',
+    description: 'Código do criador',
+  })
+  cod_criador: string;
+
+  @ApiProperty({
     example: '2021-08-20T00:00:00.000Z',
     description: 'Data de criação',
   })
