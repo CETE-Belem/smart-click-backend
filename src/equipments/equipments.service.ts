@@ -22,8 +22,7 @@ export class EquipmentsService {
       mac,
       name,
       description,
-      codConcessionaria,
-      codUnidadeConsumidora,
+      numeroUnidadeConsumidora,
       cidade,
       subgrupo,
       tensaoNominal,
@@ -31,30 +30,20 @@ export class EquipmentsService {
       fases_monitoradas,
     } = createEquipmentDto;
 
-    await this.prismaService.concessionaria
-      .findFirstOrThrow({
-        where: {
-          cod_concessionaria: codConcessionaria,
-        },
-      })
-      .catch(() => {
-        throw new NotFoundException('Concessionária não encontrada');
-      });
-
-    await this.prismaService.unidade_Consumidora
-      .findFirstOrThrow({
-        where: {
-          cod_unidade_consumidora: codUnidadeConsumidora,
-        },
-      })
-      .catch(() => {
-        throw new NotFoundException('Unidade consumidora não encontrada');
-      });
+    const { cod_unidade_consumidora, cod_concessionaria } =
+      await this.prismaService.unidade_Consumidora
+        .findFirstOrThrow({
+          where: {
+            numero: numeroUnidadeConsumidora,
+          },
+        })
+        .catch(() => {
+          throw new NotFoundException('Unidade consumidora não encontrada');
+        });
 
     const existingEquipment = await this.prismaService.equipamento.findFirst({
       where: {
         mac,
-        cod_concessionaria: codConcessionaria,
       },
     });
 
@@ -73,7 +62,7 @@ export class EquipmentsService {
         descricao: description,
         concessionaria: {
           connect: {
-            cod_concessionaria: codConcessionaria,
+            cod_concessionaria,
           },
         },
         usuario: {
@@ -83,7 +72,7 @@ export class EquipmentsService {
         },
         unidade_consumidora: {
           connect: {
-            cod_unidade_consumidora: codUnidadeConsumidora,
+            cod_unidade_consumidora,
           },
         },
       },
@@ -108,6 +97,7 @@ export class EquipmentsService {
     limit: number;
     page: number;
     totalPages: number;
+    totalEquipments: number;
     equipments: EquipmentEntity[];
   }> {
     const { limit, page, mac, name, cidade, fase_monitorada, subgrupo, uf } =
@@ -160,6 +150,7 @@ export class EquipmentsService {
       limit,
       page,
       totalPages,
+      totalEquipments,
       equipments: equipments.map((equipment) => new EquipmentEntity(equipment)),
     };
   }
@@ -183,11 +174,10 @@ export class EquipmentsService {
     updateEquipmentDto: UpdateEquipmentDto,
   ): Promise<EquipmentEntity> {
     const {
-      codConcessionaria,
       description,
       mac,
       name,
-      codUnidadeConsumidora,
+      numeroUnidadeConsumidora,
       cidade,
       fases_monitoradas,
       subgrupo,
@@ -195,25 +185,17 @@ export class EquipmentsService {
       uf,
     } = updateEquipmentDto;
 
-    await this.prismaService.concessionaria
+    const unidadeConsumidora = await this.prismaService.unidade_Consumidora
       .findFirstOrThrow({
         where: {
-          cod_concessionaria: codConcessionaria,
-        },
-      })
-      .catch(() => {
-        throw new NotFoundException('Concessionária não encontrada');
-      });
-
-    await this.prismaService.unidade_Consumidora
-      .findFirstOrThrow({
-        where: {
-          cod_unidade_consumidora: codUnidadeConsumidora,
+          numero: numeroUnidadeConsumidora,
         },
       })
       .catch(() => {
         throw new NotFoundException('Unidade consumidora não encontrada');
       });
+
+    const cod_concessionaria = unidadeConsumidora.cod_concessionaria;
 
     await this.prismaService.equipamento
       .findUniqueOrThrow({
@@ -242,12 +224,12 @@ export class EquipmentsService {
         tensao_nominal: tensaoNominal,
         unidade_consumidora: {
           connect: {
-            cod_unidade_consumidora: codUnidadeConsumidora,
+            cod_unidade_consumidora: unidadeConsumidora.cod_unidade_consumidora,
           },
         },
         concessionaria: {
           connect: {
-            cod_concessionaria: codConcessionaria,
+            cod_concessionaria,
           },
         },
       },

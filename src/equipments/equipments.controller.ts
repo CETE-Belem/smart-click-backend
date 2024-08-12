@@ -86,6 +86,9 @@ export class EquipmentsController {
         totalPages: {
           type: 'number',
         },
+        totalEquipments: {
+          type: 'number',
+        },
         equipments: {
           type: 'array',
           items: {

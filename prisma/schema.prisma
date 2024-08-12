@@ -130,7 +130,7 @@ model Equipamento {
   criadoEm     DateTime @default(now())
   atualizadoEm DateTime @updatedAt
 
-  subgrupo Subgrupo 
+  subgrupo Subgrupo
 
   cidade String @db.VarChar(255)
   uf     String @db.VarChar(2)
