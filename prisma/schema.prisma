@@ -58,7 +58,8 @@ model Usuario {
   atualizadoEm DateTime @updatedAt
 
   // 1:n Equipment
-  equipamentos Equipamento[]
+  equipamentos            Equipamento[] @relation(name: "Usuario")
+  equipamentosCadastrados Equipamento[] @relation(name: "Cadastrou")
 
   // 1:n Concessionária
   concessionarias Concessionaria[]
@@ -144,8 +145,12 @@ model Equipamento {
 
   // Relations
   // 1:n User
-  cod_usuario  String
-  usuario      Usuario       @relation(fields: [cod_usuario], references: [cod_usuario], onDelete: Cascade)
+  cod_usuario String?
+  usuario     Usuario? @relation(name: "Usuario", fields: [cod_usuario], references: [cod_usuario], onDelete: Cascade)
+
+  cod_usuario_cadastrou String
+  usuario_cadastrou     Usuario @relation(name: "Cadastrou", fields: [cod_usuario_cadastrou], references: [cod_usuario], onDelete: Cascade)
+
   // 1:1 Measurement
   dados_sensor Dado_Sensor[]
 
