@@ -11,7 +11,10 @@ export class ConcessionaireEntity implements Concessionaria {
     Object.assign(this, partial);
   }
 
-  @ApiProperty()
+  @ApiProperty({
+    nullable: false,
+    example: 'dfc928b3-9998-4d43-a171-7e2814ce1334',
+  })
   cod_concessionaria: string;
   @ApiProperty({
     nullable: false,
