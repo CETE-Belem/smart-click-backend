@@ -75,6 +75,11 @@ export class EquipmentsService {
             cod_unidade_consumidora,
           },
         },
+        usuario_cadastrou: {
+          connect: {
+            cod_usuario: req.user.userId,
+          },
+        },
       },
     });
 

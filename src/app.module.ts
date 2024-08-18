@@ -12,6 +12,7 @@ import { ConcessionaireModule } from './concessionaire/concessionaire.module';
 import { ConsumerUnitModule } from './consumer-unit/consumer-unit.module';
 import { WinstonModule } from 'nest-winston';
 import { winstonConfig } from './config/winston.config';
+// import { AdminModule } from './admin/admin.module';
 
 @Module({
   imports: [
@@ -29,6 +30,7 @@ import { winstonConfig } from './config/winston.config';
     MailModule,
     ConcessionaireModule,
     ConsumerUnitModule,
+    // AdminModule,
   ],
   controllers: [AppController],
   providers: [

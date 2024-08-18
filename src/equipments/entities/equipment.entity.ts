@@ -10,6 +10,7 @@ export class EquipmentEntity implements Equipamento {
   constructor(partial: Partial<EquipmentEntity>) {
     Object.assign(this, partial);
   }
+  cod_usuario_cadastrou: string;
 
   @ApiProperty({
     description: 'O UUID da Concessionária',
