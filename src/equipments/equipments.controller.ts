@@ -12,6 +12,7 @@ import {
   ParseUUIDPipe,
   Query,
   ParseIntPipe,
+  Put,
 } from '@nestjs/common';
 import { EquipmentsService } from './equipments.service';
 import { CreateEquipmentDto } from './dto/create-equipment.dto';
@@ -33,10 +34,11 @@ import { JWTType } from 'src/types/jwt.types';
 import { EquipmentEntity } from './entities/equipment.entity';
 import { ParseFaseMonitoradaPipe } from 'src/common/pipes/ParseFaseMonitoradaPipe.pipe';
 import { Fases, Subgrupo } from '@prisma/client';
-import { DeleteManyEquipmentsDto } from './dto/delete-many-equipments';
+import { Roles } from 'src/common/decorators/roles.decorator';
+import { RolesGuard } from 'src/common/guards/roles.guard';
 
 @ApiTags('equipments')
-@UseGuards(AuthGuard)
+@UseGuards(AuthGuard, RolesGuard)
 @Controller('equipments')
 export class EquipmentsController {
   constructor(private readonly equipmentsService: EquipmentsService) {}
@@ -48,6 +50,7 @@ export class EquipmentsController {
   })
   @ApiBody({ type: CreateEquipmentDto })
   @ApiBearerAuth('token')
+  @Roles('ADMIN')
   @ApiNotFoundResponse({
     status: HttpStatus.NOT_FOUND,
     schema: {
@@ -97,9 +100,21 @@ export class EquipmentsController {
             $ref: getSchemaPath(EquipmentEntity),
           },
         },
+        filters: {
+          type: 'array',
+          items: {
+            example: {
+              query: 'Equipamento 01',
+              city: 'Belém',
+              uf: 'PA',
+              fase_monitorada: 'MONOFASE',
+            },
+          },
+        },
       },
     },
   })
+  @Roles('ADMIN')
   @ApiBearerAuth('token')
   @ApiQuery({
     name: 'page',
@@ -114,14 +129,8 @@ export class EquipmentsController {
     type: Number,
   })
   @ApiQuery({
-    name: 'mac',
-    description: 'Mac do equipamento',
-    required: false,
-    type: String,
-  })
-  @ApiQuery({
-    name: 'name',
-    description: 'Nome do equipamento',
+    name: 'query',
+    description: 'Query de busca',
     required: false,
     type: String,
   })
@@ -153,8 +162,7 @@ export class EquipmentsController {
     @Request() req: JWTType,
     @Query('page', new ParseIntPipe()) page: number,
     @Query('limit', new ParseIntPipe()) limit: number,
-    @Query('mac') mac: string,
-    @Query('name') name: string,
+    @Query('query') query: string,
     @Query('cidade') cidade: string,
     @Query('uf') uf: string,
     @Query('fase_monitorada', ParseFaseMonitoradaPipe) fase_monitorada: Fases,
@@ -163,8 +171,7 @@ export class EquipmentsController {
     return this.equipmentsService.findAll(req, {
       page,
       limit,
-      mac,
-      name,
+      query,
       cidade,
       uf,
       fase_monitorada,
@@ -235,31 +242,60 @@ export class EquipmentsController {
     return this.equipmentsService.update(req, id, updateEquipmentDto);
   }
 
-  @Delete()
+  @Put(':id')
   @ApiOkResponse({
     status: HttpStatus.OK,
+    type: EquipmentEntity,
   })
+  @ApiBody({ type: UpdateEquipmentDto })
   @ApiBearerAuth('token')
   @ApiNotFoundResponse({
     status: HttpStatus.NOT_FOUND,
     schema: {
       example: {
         statusCode: HttpStatus.NOT_FOUND,
-        message: 'Um ou mais equipamentos não foram encontrados',
+        message: 'Equipamento não encontrado',
       },
     },
   })
-  removeMany(
+  @ApiParam({
+    name: 'id',
+    type: String,
+  })
+  adminUpdate(
     @Request() req: JWTType,
-    @Body() deleteManyEquipmentsDto: DeleteManyEquipmentsDto,
+    @Param('id', new ParseUUIDPipe()) id: string,
+    @Body() updateEquipmentDto: UpdateEquipmentDto,
   ) {
-    return this.equipmentsService.removeMany(
-      req,
-      deleteManyEquipmentsDto.equipments,
-    );
+    return this.equipmentsService.adminUpdate(req, id, updateEquipmentDto);
   }
 
+  // @Delete()
+  // @ApiOkResponse({
+  //   status: HttpStatus.OK,
+  // })
+  // @ApiBearerAuth('token')
+  // @ApiNotFoundResponse({
+  //   status: HttpStatus.NOT_FOUND,
+  //   schema: {
+  //     example: {
+  //       statusCode: HttpStatus.NOT_FOUND,
+  //       message: 'Um ou mais equipamentos não foram encontrados',
+  //     },
+  //   },
+  // })
+  // removeMany(
+  //   @Request() req: JWTType,
+  //   @Body() deleteManyEquipmentsDto: DeleteManyEquipmentsDto,
+  // ) {
+  //   return this.equipmentsService.removeMany(
+  //     req,
+  //     deleteManyEquipmentsDto.equipments,
+  //   );
+  // }
+
   @Delete(':id')
+  @Roles('ADMIN')
   @ApiOkResponse({
     status: HttpStatus.OK,
     type: EquipmentEntity,

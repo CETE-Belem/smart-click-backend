@@ -48,6 +48,11 @@ export class UsersService {
         throw new NotFoundException('Unidade consumidora inválida');
       });
 
+    if (existingConsumerUnity.cod_usuario)
+      throw new ConflictException(
+        'Unidade consumidora já pertence a um usuário',
+      );
+
     const existingUser = await this.prismaService.usuario.findFirst({
       where: {
         email,
@@ -319,7 +324,6 @@ export class UsersService {
         cod_usuario: userId,
       },
     });
-
     return new UserEntity(user);
   }
 
