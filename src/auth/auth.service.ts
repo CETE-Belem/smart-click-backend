@@ -24,9 +24,13 @@ export class AuthService {
     private readonly usersService: UsersService,
   ) {}
 
-  public async createAccessToken(userId: string, role: Cargo): Promise<string> {
+  public async createAccessToken(
+    userId: string,
+    role: Cargo,
+    email: string,
+  ): Promise<string> {
     return await this.jwtService.signAsync(
-      { userId, role },
+      { userId, role, email },
       {
         privateKey: process.env.JWT_PRIVATE_KEY,
         algorithm: 'RS256',
@@ -76,6 +80,7 @@ export class AuthService {
     const accessToken = await this.createAccessToken(
       user.cod_usuario,
       user.perfil,
+      user.email,
     );
 
     return {
