@@ -9,6 +9,7 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateConsumerUnitDto } from './dto/create-consumer-unit.dto';
 import { ConsumerUnitEntity } from './entities/consumer-unit.entity';
 import { UpdateConsumerUnitDto } from './dto/update-consumer-unit.dto';
+import { EquipmentEntity } from 'src/equipments/entities/equipment.entity';
 
 @Injectable()
 export class ConsumerUnitService {
@@ -58,6 +59,16 @@ export class ConsumerUnitService {
     });
 
     return new ConsumerUnitEntity(consumerUnit);
+  }
+
+  async findAllEquipments(id: string): Promise<EquipmentEntity[]> {
+    const equipments = await this.prismaService.unidade_Consumidora.findMany({
+      where: {
+        cod_unidade_consumidora: id,
+      },
+    });
+
+    return equipments.map((equipment) => new EquipmentEntity(equipment));
   }
 
   async updateConsumerUnit(

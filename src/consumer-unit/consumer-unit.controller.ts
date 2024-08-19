@@ -131,6 +131,13 @@ export class ConsumerUnitController {
     return this.consumerUnitService.findOneConsumerUnit(id);
   }
 
+  @Get(':id/equipments')
+  @UseGuards(AuthGuard, RolesGuard)
+  @Roles('ADMIN')
+  findAllFromConsumerUnit(@Param('id') id: string) {
+    return this.consumerUnitService.findAllEquipments(id);
+  }
+
   @Post()
   @UseGuards(AuthGuard, RolesGuard)
   @Roles('ADMIN')
