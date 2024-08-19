@@ -120,8 +120,6 @@ export class EquipmentEntity implements Equipamento {
     nullable: false,
     example: 'f1b586b8-a86c-4d2d-83b6-d2e6fa5f2ba3',
   })
-  cod_usuario_cadastrou: string;
-
   @ApiProperty({
     description: 'Unidade Consumidora do Equipamento',
     type: ConsumerUnitEntity,
