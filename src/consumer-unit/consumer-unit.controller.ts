@@ -154,6 +154,16 @@ export class ConsumerUnitController {
       },
     },
   })
+  @ApiUnauthorizedResponse({
+    status: HttpStatus.UNAUTHORIZED,
+    schema: {
+      example: {
+        message: 'Token não encontrado',
+        error: 'Unauthorized',
+        statusCode: 401,
+      },
+    },
+  })
   @ApiParam({
     name: 'id',
     type: 'string',
@@ -181,10 +191,7 @@ export class ConsumerUnitController {
     @Query('mac') mac?: string,
     @Query('unit_number') unitNumber?: string,
   ) {
-    return this.consumerUnitService.findAllEquipments(
-      id,
-      page,
-      limit,
+    return this.consumerUnitService.findAllEquipments(id, page, limit, {
       subgroup,
       city,
       uf,
@@ -192,7 +199,7 @@ export class ConsumerUnitController {
       name,
       mac,
       unitNumber,
-    );
+    });
   }
 
   @Post()

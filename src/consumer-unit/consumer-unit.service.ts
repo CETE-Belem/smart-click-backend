@@ -66,19 +66,33 @@ export class ConsumerUnitService {
     id: string,
     page: number,
     limit: number,
-    subgroup?: Subgrupo,
-    city?: string,
-    uf?: string,
-    phase?: Fases,
-    name?: string,
-    mac?: string,
-    unitNumber?: string,
+    filters: {
+      subgroup?: Subgrupo;
+      city?: string;
+      uf?: string;
+      phase?: Fases;
+      name?: string;
+      mac?: string;
+      unitNumber?: string;
+    },
   ): Promise<{
     equipments: EquipmentEntity[];
     limit: number;
     page: number;
     totalPages: number;
+    totalEquipments;
+    filters: {
+      subgroup?: Subgrupo;
+      city?: string;
+      uf?: string;
+      phase?: Fases;
+      name?: string;
+      mac?: string;
+      unitNumber?: string;
+    };
   }> {
+    const { city, mac, name, phase, subgroup, uf, unitNumber } = filters;
+
     const unit = await this.prismaService.unidade_Consumidora.findUnique({
       where: {
         cod_unidade_consumidora: id,
@@ -119,7 +133,9 @@ export class ConsumerUnitService {
       equipments: equipments.map((equipment) => new EquipmentEntity(equipment)),
       limit,
       page,
-      totalPages: totalPages,
+      totalPages,
+      totalEquipments,
+      filters,
     };
   }
 
