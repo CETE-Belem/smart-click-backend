@@ -5,6 +5,8 @@ import {
   macLength,
   maxDescriptionLength,
 } from 'src/constants/equipment-fields';
+import { ConsumerUnitEntity } from 'src/consumer-unit/entities/consumer-unit.entity';
+import { ConcessionaireEntity } from 'src/concessionaire/entities/concessionaire.entity';
 
 export class EquipmentEntity implements Equipamento {
   constructor(partial: Partial<EquipmentEntity>) {
@@ -110,4 +112,26 @@ export class EquipmentEntity implements Equipamento {
     example: 'TRIFASE',
   })
   fases_monitoradas: Fases;
+
+  @ApiProperty({
+    description: 'Código do usuário que cadastrou o equipamento',
+    type: String,
+    nullable: false,
+    example: 'f1b586b8-a86c-4d2d-83b6-d2e6fa5f2ba3',
+  })
+  cod_usuario_cadastrou: string;
+
+  @ApiProperty({
+    description: 'Unidade Consumidora do Equipamento',
+    type: ConsumerUnitEntity,
+    nullable: false,
+  })
+  unidade_consumidora: ConsumerUnitEntity;
+
+  @ApiProperty({
+    description: 'Con do Equipamento',
+    type: ConcessionaireEntity,
+    nullable: false,
+  })
+  concessionaria: ConcessionaireEntity;
 }
