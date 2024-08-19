@@ -1,7 +1,6 @@
 import {
   Injectable,
   UnauthorizedException,
-  MethodNotAllowedException,
   Inject,
   forwardRef,
 } from '@nestjs/common';
@@ -11,7 +10,7 @@ import * as bcrypt from 'bcrypt';
 import { TurnstileService } from 'src/services/turnstile/turnstile.service';
 import { JwtService } from '@nestjs/jwt';
 import { UserEntity } from 'src/users/entities/user.entity';
-import { Cargo } from '@prisma/client';
+import { Usuario } from '@prisma/client';
 import { UsersService } from 'src/users/users.service';
 
 @Injectable()
@@ -24,13 +23,14 @@ export class AuthService {
     private readonly usersService: UsersService,
   ) {}
 
-  public async createAccessToken(
-    userId: string,
-    role: Cargo,
-    email: string,
-  ): Promise<string> {
+  public async createAccessToken(user: Usuario): Promise<string> {
     return await this.jwtService.signAsync(
-      { userId, role, email },
+      {
+        userId: user.cod_usuario,
+        role: user.perfil,
+        email: user.email,
+        confirmEmail: user.contaConfirmada,
+      },
       {
         privateKey: process.env.JWT_PRIVATE_KEY,
         algorithm: 'RS256',
@@ -58,6 +58,7 @@ export class AuthService {
     loginDto: LoginDto,
   ): Promise<{ accessToken: string; user: UserEntity }> {
     const { captcha, email, password } = loginDto;
+
     const user = await this.prismaService.usuario
       .findUniqueOrThrow({
         where: {
@@ -69,19 +70,14 @@ export class AuthService {
       });
 
     if (!user.contaConfirmada) {
-      await this.usersService.resendConfirmationCode(user.cod_usuario);
-      throw new MethodNotAllowedException('Conta não confirmada');
+      await this.usersService.resendConfirmationCode(user.email);
     }
 
     await this.checkPassword(user.senha, password);
 
     await this.turnstileService.validateToken(captcha);
 
-    const accessToken = await this.createAccessToken(
-      user.cod_usuario,
-      user.perfil,
-      user.email,
-    );
+    const accessToken = await this.createAccessToken(user);
 
     return {
       accessToken,

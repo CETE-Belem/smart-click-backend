@@ -468,11 +468,7 @@ export class UsersService {
       },
     });
 
-    const accessToken = await this.authService.createAccessToken(
-      user.cod_usuario,
-      Cargo.USUARIO,
-      user.email,
-    );
+    const accessToken = await this.authService.createAccessToken(user);
 
     return {
       accessToken,
