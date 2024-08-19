@@ -9,6 +9,7 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateConsumerUnitDto } from './dto/create-consumer-unit.dto';
 import { ConsumerUnitEntity } from './entities/consumer-unit.entity';
 import { UpdateConsumerUnitDto } from './dto/update-consumer-unit.dto';
+import { JWTType } from 'src/types/jwt.types';
 
 @Injectable()
 export class ConsumerUnitService {
@@ -58,6 +59,62 @@ export class ConsumerUnitService {
     });
 
     return new ConsumerUnitEntity(consumerUnit);
+  }
+
+  async findUserUnits(
+    req: JWTType,
+    page: number,
+    limit: number,
+    filters: {
+      city?: string;
+      uf?: string;
+      concessionaireId?: string;
+    },
+  ): Promise<{
+    consumerUnits: ConsumerUnitEntity[];
+    page: number;
+    limit: number;
+    totalPages: number;
+    totalConsumerUnits: number;
+    filters: {
+      city?: string;
+      uf?: string;
+      concessionaireId?: string;
+    };
+  }> {
+    const { city, concessionaireId, uf } = filters;
+
+    const units = await this.prismaService.unidade_Consumidora.findMany({
+      where: {
+        cod_usuario: req.user.userId,
+        cidade: city,
+        cod_concessionaria: concessionaireId,
+        uf,
+      },
+      skip: (page - 1) * limit,
+      take: limit,
+    });
+
+    const totalConsumerUnits =
+      await this.prismaService.unidade_Consumidora.count({
+        where: {
+          cod_usuario: req.user.userId,
+          cidade: city,
+          cod_concessionaria: concessionaireId,
+          uf,
+        },
+      });
+
+    const totalPages = Math.ceil(totalConsumerUnits / limit);
+
+    return {
+      consumerUnits: units.map((unit) => new ConsumerUnitEntity(unit)),
+      limit,
+      page,
+      totalPages,
+      totalConsumerUnits,
+      filters,
+    };
   }
 
   async updateConsumerUnit(
