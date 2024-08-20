@@ -9,6 +9,8 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateConsumerUnitDto } from './dto/create-consumer-unit.dto';
 import { ConsumerUnitEntity } from './entities/consumer-unit.entity';
 import { UpdateConsumerUnitDto } from './dto/update-consumer-unit.dto';
+import { JWTType } from 'src/types/jwt.types';
+import { ConnectConsumerUnitDto } from './dto/connect-consumer-unit.dto';
 
 @Injectable()
 export class ConsumerUnitService {
@@ -54,6 +56,47 @@ export class ConsumerUnitService {
             cod_usuario: userId,
           },
         },
+      },
+    });
+
+    return new ConsumerUnitEntity(consumerUnit);
+  }
+
+  async addUnitToUser(
+    req: JWTType,
+    id: string,
+    connectConsumerUnitDto: ConnectConsumerUnitDto,
+  ): Promise<ConsumerUnitEntity> {
+    const { numero: unitNumber } = connectConsumerUnitDto;
+
+    const validUnit = await this.prismaService.unidade_Consumidora.findUnique({
+      where: {
+        cod_unidade_consumidora: id,
+        numero: String(unitNumber),
+      },
+    });
+
+    if (!validUnit)
+      throw new NotFoundException(
+        `A Unidade Consumidora de id ${id} não foi encontrada`,
+      );
+
+    if (validUnit.cod_usuario)
+      throw new ConflictException(
+        `A Unidade Consumidora de id ${id} já pertence a outro usuário`,
+      );
+
+    const consumerUnit = await this.prismaService.unidade_Consumidora.update({
+      data: {
+        usuario: {
+          connect: {
+            cod_usuario: req.user.userId,
+          },
+        },
+      },
+      where: {
+        cod_unidade_consumidora: id,
+        numero: String(unitNumber),
       },
     });
 

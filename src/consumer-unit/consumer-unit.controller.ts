@@ -34,6 +34,7 @@ import { RolesGuard } from 'src/common/guards/roles.guard';
 import { JWTType } from 'src/types/jwt.types';
 import { ConsumerUnitEntity } from './entities/consumer-unit.entity';
 import { UpdateConsumerUnitDto } from './dto/update-consumer-unit.dto';
+import { ConnectConsumerUnitDto } from './dto/connect-consumer-unit.dto';
 
 @ApiTags('consumer-unit')
 @Controller('consumer-unit')
@@ -193,6 +194,57 @@ export class ConsumerUnitController {
       updateConsumerUnitDto,
       id,
       req.user.userId,
+    );
+  }
+
+  @Patch('/:id/me')
+  @UseGuards(AuthGuard)
+  @ApiBearerAuth('token')
+  @ApiOkResponse({
+    status: HttpStatus.OK,
+    example: {
+      cod_unidade_consumidora: '4f465850-e06d-492c-a11a-c63931a38695',
+      cidade: 'Moraes do Norte',
+      uf: 'SE',
+      numero: '20643782',
+      criadoEm: '2024-08-18T16:35:58.156Z',
+      atualizadoEm: '2024-08-20T02:02:24.145Z',
+      cod_concessionaria: '08ca8920-2d02-4bfa-8b70-067b93ab75c6',
+      cod_criador: '61e4c31b-8a1c-4adc-acfd-3fe0a6216496',
+      cod_usuario: 'e45d5005-bba9-4e3e-a060-786240446ddd',
+    },
+  })
+  @ApiConflictResponse({
+    status: HttpStatus.CONFLICT,
+    description:
+      'A Unidade Consumidora de id [:id] já pertence a outro usuário',
+    example: {
+      message:
+        'A Unidade Consumidora de id 4f465850-e06d-492c-a11a-c63931a38695 já pertence a outro usuário',
+      error: 'Conflict',
+      statusCode: 409,
+    },
+  })
+  @ApiNotFoundResponse({
+    status: HttpStatus.NOT_FOUND,
+    description: 'A Unidade Consumidora de id [:id] não foi encontrada',
+    example: {
+      message:
+        'A Unidade Consumidora de id 4f465850-e06d-492c-a11a-c63931a38695 não foi encontrada',
+      error: 'Not Found',
+      statusCode: 404,
+    },
+  })
+  @ApiParam({ name: 'id', type: 'string', required: true })
+  addUnitToUser(
+    @Request() req: JWTType,
+    @Param('id') id: string,
+    @Body() connectConsumerUnitDto: ConnectConsumerUnitDto,
+  ) {
+    return this.consumerUnitService.addUnitToUser(
+      req,
+      id,
+      connectConsumerUnitDto,
     );
   }
 
