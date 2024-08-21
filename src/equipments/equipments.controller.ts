@@ -24,6 +24,7 @@ import {
   ApiCreatedResponse,
   ApiNotFoundResponse,
   ApiOkResponse,
+  ApiOperation,
   ApiParam,
   ApiQuery,
   ApiTags,
@@ -206,6 +207,7 @@ export class EquipmentsController {
   }
 
   @Patch(':id')
+  @ApiOperation({ summary: 'Atualiza um equipamento como Usuário' })
   @ApiOkResponse({
     status: HttpStatus.OK,
     type: EquipmentEntity,
@@ -243,6 +245,8 @@ export class EquipmentsController {
   }
 
   @Put(':id')
+  @Roles('ADMIN')
+  @ApiOperation({ summary: 'Atualiza um equipamento como Admin' })
   @ApiOkResponse({
     status: HttpStatus.OK,
     type: EquipmentEntity,
