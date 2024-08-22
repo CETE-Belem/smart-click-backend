@@ -7,6 +7,7 @@ import {
 } from 'src/constants/equipment-fields';
 import { ConsumerUnitEntity } from 'src/consumer-unit/entities/consumer-unit.entity';
 import { ConcessionaireEntity } from 'src/concessionaire/entities/concessionaire.entity';
+import { Transform } from 'class-transformer';
 
 export class EquipmentEntity implements Equipamento {
   constructor(partial: Partial<EquipmentEntity>) {
@@ -79,6 +80,7 @@ export class EquipmentEntity implements Equipamento {
     nullable: false,
     example: '220',
   })
+  @Transform(({ value }) => value.toNumber())
   tensao_nominal: Prisma.Decimal;
 
   @ApiProperty({

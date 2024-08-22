@@ -4,11 +4,12 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { CreateEquipmentDto } from './dto/create-equipment.dto';
-import { UpdateEquipmentDto } from './dto/update-equipment.dto';
+import { AdminUpdateEquipmentDto } from './dto/admin-update-equipment.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { EquipmentEntity } from './entities/equipment.entity';
 import { JWTType } from 'src/types/jwt.types';
-import { Fases, Subgrupo } from '@prisma/client';
+import { Cargo, Fases, Subgrupo } from '@prisma/client';
+import { UserUpdateEquipmentDto } from './dto/user-update-equipment.dto';
 
 @Injectable()
 export class EquipmentsService {
@@ -115,121 +116,258 @@ export class EquipmentsService {
     const { limit, page, query, cidade, fase_monitorada, subgrupo, uf } =
       options;
 
-    const equipments = await this.prismaService.equipamento.findMany({
+    const usuario = await this.prismaService.usuario.findUnique({
       where: {
         cod_usuario: req.user.userId,
-        OR: [
-          {
-            nome: {
-              contains: query,
-              mode: 'insensitive',
-            },
+      },
+    });
+
+    if (usuario?.perfil !== Cargo.ADMIN) {
+      const equipments = await this.prismaService.equipamento.findMany({
+        where: {
+          usuario: {
+            cod_usuario: req.user.userId,
           },
-          {
-            mac: {
-              contains: query,
-              mode: 'insensitive',
-            },
-          },
-          {
-            unidade_consumidora: {
-              numero: {
+          OR: [
+            {
+              nome: {
                 contains: query,
                 mode: 'insensitive',
               },
             },
-          },
-        ],
-        cidade: {
-          contains: cidade,
-          mode: 'insensitive',
-        },
-        uf,
-        fases_monitoradas: fase_monitorada,
-        subgrupo,
-      },
-      orderBy: {
-        criadoEm: 'asc',
-      },
-      skip: (page - 1) * limit,
-      take: limit,
-      include: {
-        unidade_consumidora: true,
-        concessionaria: true,
-      },
-    });
-
-    const totalEquipments = await this.prismaService.equipamento.count({
-      where: {
-        cod_usuario: req.user.userId,
-        OR: [
-          {
-            nome: {
-              contains: query,
-              mode: 'insensitive',
-            },
-          },
-          {
-            mac: {
-              contains: query,
-              mode: 'insensitive',
-            },
-          },
-          {
-            unidade_consumidora: {
-              numero: {
+            {
+              mac: {
                 contains: query,
                 mode: 'insensitive',
               },
             },
+            {
+              unidade_consumidora: {
+                numero: {
+                  contains: query,
+                  mode: 'insensitive',
+                },
+              },
+            },
+          ],
+          cidade: {
+            contains: cidade,
+            mode: 'insensitive',
           },
-        ],
-        cidade: {
-          contains: cidade,
-          mode: 'insensitive',
-        },
-        uf,
-        fases_monitoradas: fase_monitorada,
-        subgrupo,
-      },
-    });
-
-    const totalPages = Math.ceil(totalEquipments / limit);
-
-    return {
-      limit,
-      page,
-      totalPages,
-      totalEquipments,
-      equipments: equipments.map((equipment) => new EquipmentEntity(equipment)),
-      filters: [
-        {
-          query,
-          city: cidade,
           uf,
-          fase_monitorada,
+          fases_monitoradas: fase_monitorada,
+          subgrupo,
         },
-      ],
-    };
+        orderBy: {
+          criadoEm: 'asc',
+        },
+        skip: (page - 1) * limit,
+        take: limit,
+        include: {
+          unidade_consumidora: true,
+          concessionaria: true,
+        },
+      });
+
+      const totalEquipments = await this.prismaService.equipamento.count({
+        where: {
+          usuario: {
+            cod_usuario: req.user.userId,
+          },
+          OR: [
+            {
+              nome: {
+                contains: query,
+                mode: 'insensitive',
+              },
+            },
+            {
+              mac: {
+                contains: query,
+                mode: 'insensitive',
+              },
+            },
+            {
+              unidade_consumidora: {
+                numero: {
+                  contains: query,
+                  mode: 'insensitive',
+                },
+              },
+            },
+          ],
+          cidade: {
+            contains: cidade,
+            mode: 'insensitive',
+          },
+          uf,
+          fases_monitoradas: fase_monitorada,
+          subgrupo,
+        },
+      });
+
+      const totalPages = Math.ceil(totalEquipments / limit);
+
+      return {
+        limit,
+        page,
+        totalPages,
+        totalEquipments,
+        equipments: equipments.map(
+          (equipment) => new EquipmentEntity(equipment),
+        ),
+        filters: [
+          {
+            query,
+            city: cidade,
+            uf,
+            fase_monitorada,
+          },
+        ],
+      };
+    } else {
+      const equipments = await this.prismaService.equipamento.findMany({
+        where: {
+          OR: [
+            {
+              nome: {
+                contains: query,
+                mode: 'insensitive',
+              },
+            },
+            {
+              mac: {
+                contains: query,
+                mode: 'insensitive',
+              },
+            },
+            {
+              unidade_consumidora: {
+                numero: {
+                  contains: query,
+                  mode: 'insensitive',
+                },
+              },
+            },
+          ],
+          cidade: {
+            contains: cidade,
+            mode: 'insensitive',
+          },
+          uf,
+          fases_monitoradas: fase_monitorada,
+          subgrupo,
+        },
+        orderBy: {
+          criadoEm: 'asc',
+        },
+        skip: (page - 1) * limit,
+        take: limit,
+        include: {
+          unidade_consumidora: true,
+          concessionaria: true,
+        },
+      });
+
+      const totalEquipments = await this.prismaService.equipamento.count({
+        where: {
+          OR: [
+            {
+              nome: {
+                contains: query,
+                mode: 'insensitive',
+              },
+            },
+            {
+              mac: {
+                contains: query,
+                mode: 'insensitive',
+              },
+            },
+            {
+              unidade_consumidora: {
+                numero: {
+                  contains: query,
+                  mode: 'insensitive',
+                },
+              },
+            },
+          ],
+          cidade: {
+            contains: cidade,
+            mode: 'insensitive',
+          },
+          uf,
+          fases_monitoradas: fase_monitorada,
+          subgrupo,
+        },
+      });
+
+      const totalPages = Math.ceil(totalEquipments / limit);
+
+      return {
+        limit,
+        page,
+        totalPages,
+        totalEquipments,
+        equipments: equipments.map(
+          (equipment) => new EquipmentEntity(equipment),
+        ),
+        filters: [
+          {
+            query,
+            city: cidade,
+            uf,
+            fase_monitorada,
+          },
+        ],
+      };
+    }
   }
 
   async findOne(req: JWTType, id: string): Promise<EquipmentEntity> {
-    const equipment = await this.prismaService.equipamento.findUnique({
+    const usuario = await this.prismaService.usuario.findUnique({
       where: {
-        cod_equipamento: id,
         cod_usuario: req.user.userId,
       },
     });
 
-    if (!equipment) throw new NotFoundException('Equipamento não encontrado');
+    if (usuario.perfil === Cargo.ADMIN) {
+      const equipment = await this.prismaService.equipamento.findUnique({
+        where: {
+          cod_equipamento: id,
+        },
+        include: {
+          unidade_consumidora: true,
+          concessionaria: true,
+        },
+      });
 
-    return new EquipmentEntity(equipment);
+      if (!equipment) throw new NotFoundException('Equipamento não encontrado');
+
+      return new EquipmentEntity(equipment);
+    } else {
+      const equipment = await this.prismaService.equipamento.findUnique({
+        where: {
+          cod_equipamento: id,
+          cod_usuario: req.user.userId,
+        },
+        include: {
+          unidade_consumidora: true,
+          concessionaria: true,
+        },
+      });
+
+      if (!equipment) throw new NotFoundException('Equipamento não encontrado');
+
+      return new EquipmentEntity(equipment);
+    }
   }
 
   async update(
     req: JWTType,
     id: string,
-    updateEquipmentDto: UpdateEquipmentDto,
+    updateEquipmentDto: UserUpdateEquipmentDto,
   ): Promise<EquipmentEntity> {
     const { description, name } = updateEquipmentDto;
 
@@ -259,7 +397,7 @@ export class EquipmentsService {
   async adminUpdate(
     req: JWTType,
     id: string,
-    updateEquipmentDto: UpdateEquipmentDto,
+    updateEquipmentDto: AdminUpdateEquipmentDto,
   ): Promise<EquipmentEntity> {
     const {
       description,

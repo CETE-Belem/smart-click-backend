@@ -16,7 +16,7 @@ import {
 } from '@nestjs/common';
 import { EquipmentsService } from './equipments.service';
 import { CreateEquipmentDto } from './dto/create-equipment.dto';
-import { UpdateEquipmentDto } from './dto/update-equipment.dto';
+import { AdminUpdateEquipmentDto } from './dto/admin-update-equipment.dto';
 import {
   ApiBearerAuth,
   ApiBody,
@@ -37,6 +37,7 @@ import { ParseFaseMonitoradaPipe } from 'src/common/pipes/ParseFaseMonitoradaPip
 import { Fases, Subgrupo } from '@prisma/client';
 import { Roles } from 'src/common/decorators/roles.decorator';
 import { RolesGuard } from 'src/common/guards/roles.guard';
+import { UserUpdateEquipmentDto } from './dto/user-update-equipment.dto';
 
 @ApiTags('equipments')
 @UseGuards(AuthGuard, RolesGuard)
@@ -115,7 +116,6 @@ export class EquipmentsController {
       },
     },
   })
-  @Roles('ADMIN')
   @ApiBearerAuth('token')
   @ApiQuery({
     name: 'page',
@@ -212,7 +212,7 @@ export class EquipmentsController {
     status: HttpStatus.OK,
     type: EquipmentEntity,
   })
-  @ApiBody({ type: UpdateEquipmentDto })
+  @ApiBody({ type: UserUpdateEquipmentDto })
   @ApiBearerAuth('token')
   @ApiNotFoundResponse({
     status: HttpStatus.NOT_FOUND,
@@ -239,7 +239,7 @@ export class EquipmentsController {
   update(
     @Request() req: JWTType,
     @Param('id', new ParseUUIDPipe()) id: string,
-    @Body() updateEquipmentDto: UpdateEquipmentDto,
+    @Body() updateEquipmentDto: UserUpdateEquipmentDto,
   ) {
     return this.equipmentsService.update(req, id, updateEquipmentDto);
   }
@@ -251,7 +251,7 @@ export class EquipmentsController {
     status: HttpStatus.OK,
     type: EquipmentEntity,
   })
-  @ApiBody({ type: UpdateEquipmentDto })
+  @ApiBody({ type: AdminUpdateEquipmentDto })
   @ApiBearerAuth('token')
   @ApiNotFoundResponse({
     status: HttpStatus.NOT_FOUND,
@@ -269,7 +269,7 @@ export class EquipmentsController {
   adminUpdate(
     @Request() req: JWTType,
     @Param('id', new ParseUUIDPipe()) id: string,
-    @Body() updateEquipmentDto: UpdateEquipmentDto,
+    @Body() updateEquipmentDto: AdminUpdateEquipmentDto,
   ) {
     return this.equipmentsService.adminUpdate(req, id, updateEquipmentDto);
   }
