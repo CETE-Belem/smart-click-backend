@@ -12,6 +12,7 @@ import {
   Query,
   ParseIntPipe,
   Delete,
+  BadRequestException,
 } from '@nestjs/common';
 import { ConsumerUnitService } from './consumer-unit.service';
 import { CreateConsumerUnitDto } from './dto/create-consumer-unit.dto';
@@ -181,8 +182,28 @@ export class ConsumerUnitController {
   @ApiParam({ name: 'unit_number', type: 'number', required: false })
   findAllEquipments(
     @Param('id') id: string,
-    @Query('page', new ParseIntPipe()) page: number,
-    @Query('limit', new ParseIntPipe()) limit: number,
+    @Query(
+      'page',
+      new ParseIntPipe({
+        exceptionFactory: () => {
+          return new BadRequestException(
+            'O parâmetro (page) deve existir e ser maior que 0.',
+          );
+        },
+      }),
+    )
+    page: number,
+    @Query(
+      'limit',
+      new ParseIntPipe({
+        exceptionFactory: () => {
+          return new BadRequestException(
+            'O parâmetro (limit) deve existir e ser maior que 0.',
+          );
+        },
+      }),
+    )
+    limit: number,
     @Query('subgroup') subgroup?: Subgrupo,
     @Query('city') city?: string,
     @Query('uf') uf?: string,
