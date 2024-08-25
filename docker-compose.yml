@@ -11,7 +11,14 @@ services:
       - POSTGRES_PASSWORD=amazontech
       - POSTGRES_USER=amazontech
       - POSTGRES_DB=amazontech_db
-
+  mosquitto:
+    image: toke/mosquitto
+    ports:
+      - 1883:1883
+      - 9001:9001
+    environment:
+      - MOSQUITTO_USERNAME=omnia
+      - MOSQUITTO_PASSWORD=omnia
   # backend:
   #   image: amazontech-backend
   #   build:

@@ -13,6 +13,11 @@ import { ConsumerUnitModule } from './consumer-unit/consumer-unit.module';
 import { WinstonModule } from 'nest-winston';
 import { winstonConfig } from './config/winston.config';
 import { LoggerInterceptor } from './common/interceptors/logger.interceptor';
+import { ConflictInterceptor } from './common/interceptors/conflict.interceptor';
+import { DatabaseInterceptor } from './common/interceptors/database.interceptor';
+import { MqttModule } from './services/mqtt/mqtt.module';
+import { WebSocketsModule } from './gateways/websocket.module';
+import { SensorDataModule } from './sensor-data/sensor-data.module';
 
 @Module({
   imports: [
@@ -20,16 +25,19 @@ import { LoggerInterceptor } from './common/interceptors/logger.interceptor';
     ThrottlerModule.forRoot([
       {
         ttl: 60000,
-        limit: 10,
+        limit: 50,
       },
     ]),
     PrismaModule,
+    MqttModule,
+    WebSocketsModule,
     UsersModule,
     AuthModule,
     EquipmentsModule,
     MailModule,
     ConcessionaireModule,
     ConsumerUnitModule,
+    SensorDataModule,
   ],
   controllers: [AppController],
   providers: [
@@ -41,6 +49,14 @@ import { LoggerInterceptor } from './common/interceptors/logger.interceptor';
     {
       provide: APP_INTERCEPTOR,
       useClass: LoggerInterceptor,
+    },
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: ConflictInterceptor,
+    },
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: DatabaseInterceptor,
     },
   ],
 })
