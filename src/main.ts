@@ -1,4 +1,4 @@
-import { NestFactory, Reflector, HttpAdapterHost } from '@nestjs/core';
+import { NestFactory, Reflector } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { ValidationPipe, ClassSerializerInterceptor } from '@nestjs/common';
@@ -7,10 +7,15 @@ import { winstonConfig } from './config/winston.config';
 import helmet from 'helmet';
 import { APIGuard } from './common/guards/api.guard';
 import * as cookieParser from 'cookie-parser';
+import { ConflictInterceptor } from './common/interceptors/conflict.interceptor';
+import { DatabaseInterceptor } from './common/interceptors/database.interceptor';
 
 async function bootstrap() {
-  const logger = WinstonModule.createLogger(winstonConfig);
-  const app = await NestFactory.create(AppModule, { logger });
+  const app = await NestFactory.create(AppModule, {
+    logger: WinstonModule.createLogger(winstonConfig),
+  });
+  app.useGlobalInterceptors(new ConflictInterceptor());
+  app.useGlobalInterceptors(new DatabaseInterceptor());
   app.enableCors();
   app.use(helmet());
   app.use(cookieParser());
