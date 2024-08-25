@@ -8,6 +8,7 @@ import { UpdateConcessionaireDto } from './dto/update-concessionaire.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { JWTType } from 'src/types/jwt.types';
 import { ConcessionaireEntity } from './entities/concessionaire.entity';
+import { ConsumerUnitEntity } from 'src/consumer-unit/entities/consumer-unit.entity';
 
 @Injectable()
 export class ConcessionaireService {
@@ -46,6 +47,68 @@ export class ConcessionaireService {
     });
 
     return new ConcessionaireEntity(concessionaire);
+  }
+
+  async findConsumerUnits(
+    id: string,
+    page: number,
+    limit: number,
+    filters: {
+      city?: string;
+      uf?: string;
+    },
+  ): Promise<{
+    consumerUnits: ConsumerUnitEntity[];
+    page: number;
+    limit: number;
+    totalPages: number;
+    totalConsumerUnits: number;
+    filters: { city?: string; uf?: string };
+  }> {
+    const concessionaire = await this.prismaService.concessionaria.findUnique({
+      where: {
+        cod_concessionaria: id,
+      },
+    });
+
+    if (!concessionaire)
+      throw new NotFoundException(
+        `Concessionária de id ${id} não foi encontrada`,
+      );
+
+    const { city, uf } = filters;
+
+    const consumerUnits = await this.prismaService.unidade_Consumidora.findMany(
+      {
+        where: {
+          cod_concessionaria: id,
+          uf,
+          cidade: city,
+        },
+        take: limit,
+        skip: (page - 1) * limit,
+      },
+    );
+
+    const totalConsumerUnits =
+      await this.prismaService.unidade_Consumidora.count({
+        where: {
+          cod_concessionaria: id,
+          uf,
+          cidade: city,
+        },
+      });
+
+    const totalPages = Math.ceil(totalConsumerUnits / limit);
+
+    return {
+      consumerUnits: consumerUnits.map((unit) => new ConsumerUnitEntity(unit)),
+      limit,
+      page,
+      totalPages,
+      totalConsumerUnits,
+      filters,
+    };
   }
 
   async findAll(
