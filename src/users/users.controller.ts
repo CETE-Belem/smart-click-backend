@@ -38,7 +38,6 @@ import { RolesGuard } from 'src/common/guards/roles.guard';
 import { Roles } from 'src/common/decorators/roles.decorator';
 import { AdminUpdateUserDto } from './dto/admin-update-user.dto';
 import { Cargo } from '@prisma/client';
-import { MaxLength } from 'class-validator';
 import { CreateAdminDto } from './dto/create-admin.dto';
 
 @ApiTags('users')

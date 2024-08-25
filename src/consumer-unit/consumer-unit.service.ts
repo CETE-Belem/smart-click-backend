@@ -245,6 +245,7 @@ export class ConsumerUnitService {
       limit,
       page,
       totalPages,
+      totalConsumerUnit,
       consumerUnits: consumerUnits.map(
         (consumerUnits) => new ConsumerUnitEntity(consumerUnits),
       ),
