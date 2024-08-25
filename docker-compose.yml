@@ -17,8 +17,8 @@ services:
       - 1883:1883
       - 9001:9001
     environment:
-      - MOSQUITTO_USERNAME=omnia
-      - MOSQUITTO_PASSWORD=omnia
+      - MOSQUITTO_USERNAME=amazontech
+      - MOSQUITTO_PASSWORD=amazontech
   # backend:
   #   image: amazontech-backend
   #   build:
