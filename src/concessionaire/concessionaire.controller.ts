@@ -12,6 +12,7 @@ import {
   Query,
   ParseIntPipe,
   HttpStatus,
+  BadRequestException,
 } from '@nestjs/common';
 import { ConcessionaireService } from './concessionaire.service';
 import { CreateConcessionaireDto } from './dto/create-concessionaire.dto';
@@ -188,8 +189,26 @@ export class ConcessionaireController {
   })
   findConsumerUnits(
     @Param('id') id: string,
-    @Query('page', new ParseIntPipe()) page: number,
-    @Query('limit', new ParseIntPipe()) limit: number,
+    @Query(
+      'page',
+      new ParseIntPipe({
+        exceptionFactory: () =>
+          new BadRequestException(
+            'O parâmetro (page) deve existir e ser maior que 0.',
+          ),
+      }),
+    )
+    page: number,
+    @Query(
+      'limit',
+      new ParseIntPipe({
+        exceptionFactory: () =>
+          new BadRequestException(
+            'O parâmetro (limit) deve existir e ser maior que 0.',
+          ),
+      }),
+    )
+    limit: number,
     @Query('city') city?: string,
     @Query('uf') uf?: string,
   ) {
