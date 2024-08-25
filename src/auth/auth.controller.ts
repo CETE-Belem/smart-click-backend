@@ -7,7 +7,6 @@ import {
   ApiForbiddenResponse,
   ApiMethodNotAllowedResponse,
   ApiNotFoundResponse,
-  // ApiOkResponse,
   ApiTags,
   ApiUnauthorizedResponse,
   getSchemaPath,

@@ -2,7 +2,7 @@ import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
-import { APP_GUARD } from '@nestjs/core';
+import { APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
 import { PrismaModule } from './prisma/prisma.module';
 import { UsersModule } from './users/users.module';
 import { AuthModule } from './auth/auth.module';
@@ -12,7 +12,7 @@ import { ConcessionaireModule } from './concessionaire/concessionaire.module';
 import { ConsumerUnitModule } from './consumer-unit/consumer-unit.module';
 import { WinstonModule } from 'nest-winston';
 import { winstonConfig } from './config/winston.config';
-// import { AdminModule } from './admin/admin.module';
+import { LoggerInterceptor } from './common/interceptors/logger.interceptor';
 
 @Module({
   imports: [
@@ -38,6 +38,10 @@ import { winstonConfig } from './config/winston.config';
     {
       provide: APP_GUARD,
       useClass: ThrottlerGuard,
+    },
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: LoggerInterceptor,
     },
   ],
 })

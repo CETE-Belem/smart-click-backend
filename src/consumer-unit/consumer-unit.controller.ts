@@ -12,6 +12,7 @@ import {
   Query,
   ParseIntPipe,
   Delete,
+  BadRequestException,
 } from '@nestjs/common';
 import { ConsumerUnitService } from './consumer-unit.service';
 import { CreateConsumerUnitDto } from './dto/create-consumer-unit.dto';
@@ -34,6 +35,8 @@ import { RolesGuard } from 'src/common/guards/roles.guard';
 import { JWTType } from 'src/types/jwt.types';
 import { ConsumerUnitEntity } from './entities/consumer-unit.entity';
 import { UpdateConsumerUnitDto } from './dto/update-consumer-unit.dto';
+import { Fases, Subgrupo } from '@prisma/client';
+import { EquipmentEntity } from 'src/equipments/entities/equipment.entity';
 
 @ApiTags('consumer-unit')
 @Controller('consumer-unit')
@@ -205,6 +208,95 @@ export class ConsumerUnitController {
   @ApiParam({ name: 'id', type: 'string' })
   findOne(@Param('id', new ParseUUIDPipe()) id: string) {
     return this.consumerUnitService.findOneConsumerUnit(id);
+  }
+
+  @Get(':id/equipments')
+  @UseGuards(AuthGuard, RolesGuard)
+  @Roles('ADMIN')
+  @ApiBearerAuth('token')
+  @ApiOkResponse({
+    status: HttpStatus.OK,
+    description: 'Equipamentos atrelados a uma Unidade Consumidora',
+    type: [EquipmentEntity],
+  })
+  @ApiNotFoundResponse({
+    status: HttpStatus.NOT_FOUND,
+    description: 'Unidade consumidora com id [:id] não foi encontrada',
+    schema: {
+      example: {
+        statusCode: HttpStatus.NOT_FOUND,
+        message:
+          'Unidade consumidora com id 421fd1c9-8382-4b65-b07a-3f94fe3768bd não foi encontrada',
+        error: 'Not Found',
+      },
+    },
+  })
+  @ApiUnauthorizedResponse({
+    status: HttpStatus.UNAUTHORIZED,
+    schema: {
+      example: {
+        message: 'Token não encontrado',
+        error: 'Unauthorized',
+        statusCode: 401,
+      },
+    },
+  })
+  @ApiParam({
+    name: 'id',
+    type: 'string',
+    required: true,
+    description: 'Id da unidade consumidora',
+  })
+  @ApiParam({ name: 'page', type: 'number', required: true })
+  @ApiParam({ name: 'limit', type: 'number', required: true })
+  @ApiParam({ name: 'subgroup', type: 'Subgrupo', required: false })
+  @ApiParam({ name: 'city', type: 'string', required: false })
+  @ApiParam({ name: 'uf', type: 'string', required: false })
+  @ApiParam({ name: 'phase', type: 'Fases', required: false })
+  @ApiParam({ name: 'name', type: 'string', required: false })
+  @ApiParam({ name: 'mac', type: 'string', required: false })
+  @ApiParam({ name: 'unit_number', type: 'number', required: false })
+  findAllEquipments(
+    @Param('id') id: string,
+    @Query(
+      'page',
+      new ParseIntPipe({
+        exceptionFactory: () => {
+          return new BadRequestException(
+            'O parâmetro (page) deve existir e ser maior que 0.',
+          );
+        },
+      }),
+    )
+    page: number,
+    @Query(
+      'limit',
+      new ParseIntPipe({
+        exceptionFactory: () => {
+          return new BadRequestException(
+            'O parâmetro (limit) deve existir e ser maior que 0.',
+          );
+        },
+      }),
+    )
+    limit: number,
+    @Query('subgroup') subgroup?: Subgrupo,
+    @Query('city') city?: string,
+    @Query('uf') uf?: string,
+    @Query('phase') phase?: Fases,
+    @Query('name') name?: string,
+    @Query('mac') mac?: string,
+    @Query('unit_number') unitNumber?: string,
+  ) {
+    return this.consumerUnitService.findAllEquipments(id, page, limit, {
+      subgroup,
+      city,
+      uf,
+      phase,
+      name,
+      mac,
+      unitNumber,
+    });
   }
 
   @Post()
