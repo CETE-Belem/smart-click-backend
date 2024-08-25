@@ -38,6 +38,7 @@ import { RolesGuard } from 'src/common/guards/roles.guard';
 import { Roles } from 'src/common/decorators/roles.decorator';
 import { AdminUpdateUserDto } from './dto/admin-update-user.dto';
 import { Cargo } from '@prisma/client';
+import { MaxLength } from 'class-validator';
 import { CreateAdminDto } from './dto/create-admin.dto';
 
 @ApiTags('users')
@@ -330,6 +331,36 @@ export class UsersController {
   })
   sendRecoverCode(@Param('email') email: string) {
     return this.usersService.sendRecoverCode(email);
+  }
+
+  @Patch('/:email/resend-recover-code')
+  @ApiOkResponse({
+    status: HttpStatus.OK,
+    description: 'Código de recuperação reenviado',
+    schema: {
+      example: {
+        statusCode: HttpStatus.OK,
+        message: 'Código de recuperação reenviado',
+      },
+    },
+  })
+  @ApiNotFoundResponse({
+    status: HttpStatus.NOT_FOUND,
+    description: 'Usuário não encontrado',
+    schema: {
+      example: {
+        statusCode: HttpStatus.NOT_FOUND,
+        message: 'Usuário não encontrado',
+      },
+    },
+  })
+  @ApiParam({
+    name: 'email',
+    type: 'string',
+    description: 'Email do usuário',
+  })
+  resendRecoverCode(@Param('email') email: string) {
+    return this.usersService.resendRecoverCode(email);
   }
 
   @Patch('/:email/recover-password')
