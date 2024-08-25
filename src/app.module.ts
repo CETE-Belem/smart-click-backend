@@ -30,6 +30,7 @@ import { LoggerInterceptor } from './common/interceptors/logger.interceptor';
     MailModule,
     ConcessionaireModule,
     ConsumerUnitModule,
+    // AdminModule,
   ],
   controllers: [AppController],
   providers: [
