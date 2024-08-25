@@ -9,6 +9,8 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateConsumerUnitDto } from './dto/create-consumer-unit.dto';
 import { ConsumerUnitEntity } from './entities/consumer-unit.entity';
 import { UpdateConsumerUnitDto } from './dto/update-consumer-unit.dto';
+import { EquipmentEntity } from 'src/equipments/entities/equipment.entity';
+import { Fases, Subgrupo } from '@prisma/client';
 
 @Injectable()
 export class ConsumerUnitService {
@@ -58,6 +60,83 @@ export class ConsumerUnitService {
     });
 
     return new ConsumerUnitEntity(consumerUnit);
+  }
+
+  async findAllEquipments(
+    id: string,
+    page: number,
+    limit: number,
+    filters: {
+      subgroup?: Subgrupo;
+      city?: string;
+      uf?: string;
+      phase?: Fases;
+      name?: string;
+      mac?: string;
+      unitNumber?: string;
+    },
+  ): Promise<{
+    equipments: EquipmentEntity[];
+    limit: number;
+    page: number;
+    totalPages: number;
+    totalEquipments;
+    filters: {
+      subgroup?: Subgrupo;
+      city?: string;
+      uf?: string;
+      phase?: Fases;
+      name?: string;
+      mac?: string;
+      unitNumber?: string;
+    };
+  }> {
+    const { city, mac, name, phase, subgroup, uf, unitNumber } = filters;
+
+    const unit = await this.prismaService.unidade_Consumidora.findUnique({
+      where: {
+        cod_unidade_consumidora: id,
+      },
+    });
+
+    if (!unit)
+      throw new NotFoundException(
+        `Unidade consumidora com id ${id} não foi encontrada`,
+      );
+
+    const equipments = await this.prismaService.equipamento.findMany({
+      where: {
+        cod_unidade_consumidora: id,
+        subgrupo: subgroup,
+        cidade: city,
+        uf,
+        fases_monitoradas: phase,
+        nome: name,
+        mac,
+        unidade_consumidora: {
+          numero: unitNumber,
+        },
+      },
+      take: limit,
+      skip: (page - 1) * limit,
+    });
+
+    const totalEquipments = await this.prismaService.equipamento.count({
+      where: {
+        cod_unidade_consumidora: id,
+      },
+    });
+
+    const totalPages = Math.ceil(totalEquipments / limit);
+
+    return {
+      equipments: equipments.map((equipment) => new EquipmentEntity(equipment)),
+      limit,
+      page,
+      totalPages,
+      totalEquipments,
+      filters,
+    };
   }
 
   async updateConsumerUnit(

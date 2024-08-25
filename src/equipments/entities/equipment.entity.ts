@@ -7,11 +7,13 @@ import {
 } from 'src/constants/equipment-fields';
 import { ConsumerUnitEntity } from 'src/consumer-unit/entities/consumer-unit.entity';
 import { ConcessionaireEntity } from 'src/concessionaire/entities/concessionaire.entity';
+import { Transform } from 'class-transformer';
 
 export class EquipmentEntity implements Equipamento {
   constructor(partial: Partial<EquipmentEntity>) {
     Object.assign(this, partial);
   }
+  cod_usuario_cadastrou: string;
 
   @ApiProperty({
     description: 'O UUID da Concessionária',
@@ -79,6 +81,7 @@ export class EquipmentEntity implements Equipamento {
     nullable: false,
     example: '220',
   })
+  @Transform(({ value }) => value.toNumber())
   tensao_nominal: Prisma.Decimal;
 
   @ApiProperty({
@@ -119,8 +122,6 @@ export class EquipmentEntity implements Equipamento {
     nullable: false,
     example: 'f1b586b8-a86c-4d2d-83b6-d2e6fa5f2ba3',
   })
-  cod_usuario_cadastrou: string;
-
   @ApiProperty({
     description: 'Unidade Consumidora do Equipamento',
     type: ConsumerUnitEntity,
