@@ -12,12 +12,14 @@ services:
       - POSTGRES_USER=amazontech
       - POSTGRES_DB=amazontech_db
 
-  # backend:
-  #   image: amazontech-backend
-  #   build:
-  #     context: .
-  #     dockerfile: Dockerfile
-  #   ports:
-  #     - 3000:3000
+  backend:
+    depends_on:
+      - postgres
+    image: amazontech-backend
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - 3000:3000
 volumes:
   postgres:
