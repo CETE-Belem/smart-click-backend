@@ -25,6 +25,25 @@ async function main() {
       console.log(`Admin ${response.email} criado`);
       return response;
     });
+
+  const adm2 = await prisma.usuario
+    .upsert({
+      where: { email: 'andrecorreasidrim@gmail.com' },
+      update: {},
+      create: {
+        email: 'andrecorreasidrim@gmail.com',
+        nome: 'André Sidrim',
+        senha: password,
+        senhaSalt: passwordSalt,
+        contaConfirmada: true,
+        perfil: 'ADMIN',
+      },
+    })
+    .then((response) => {
+      console.log(`Admin ${response.email} criado`);
+      return response;
+    });
+
   const userCount = await prisma.usuario.count();
 
   if (userCount < 10) {

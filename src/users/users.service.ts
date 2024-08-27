@@ -23,6 +23,7 @@ import { UpdateUserDto } from './dto/udpate-user.dto';
 import { RecoverPasswordDto } from './dto/recover-password.dto';
 import { AdminUpdateUserDto } from './dto/admin-update-user.dto';
 import { Cargo } from '@prisma/client';
+import { CreateAdminDto } from './dto/create-admin.dto';
 
 @Injectable()
 export class UsersService {
@@ -95,6 +96,59 @@ export class UsersService {
       data: {
         codigo: confirmationCode,
         expiraEm: new Date(Date.now() + 15 * 60 * 1000), //15 minutes
+        usuario: {
+          connect: {
+            cod_usuario: user.cod_usuario,
+          },
+        },
+      },
+    });
+
+    this.mailService
+      .sendMail({
+        email: user.email,
+        subject: 'Código de confirmação de conta',
+        template: ConfirmationCode({ confirmationCode }),
+      })
+      .then(() => {
+        console.log(
+          `Email de código de confirmação de conta enviado para ${user.email}`,
+        );
+      });
+
+    return new UserEntity(user);
+  }
+
+  async createAdmin(createAdminDto: CreateAdminDto) {
+    const { email, name, password } = createAdminDto;
+
+    const existingUser = await this.prismaService.usuario.findFirst({
+      where: {
+        email,
+      },
+    });
+
+    if (existingUser) throw new ConflictException('Email já cadastrado');
+
+    const salt = await generateSalt();
+    const hashedPassword = await hashPassword(password, salt);
+
+    const user = await this.prismaService.usuario.create({
+      data: {
+        email,
+        senha: hashedPassword,
+        senhaSalt: salt,
+        nome: name,
+        perfil: Cargo.ADMIN,
+      },
+    });
+
+    const confirmationCode = generateConfirmationCode();
+
+    await this.prismaService.codigo_Confirmacao.create({
+      data: {
+        codigo: confirmationCode,
+        expiraEm: new Date(Date.now() + 30 * 60 * 1000), // 30 minutes
         usuario: {
           connect: {
             cod_usuario: user.cod_usuario,
@@ -371,6 +425,49 @@ export class UsersService {
         senhaSalt: passwordSalt,
       },
     });
+  }
+
+  async resendRecoverCode(email: string): Promise<void> {
+    const user = await this.prismaService.usuario.findUnique({
+      where: {
+        email,
+      },
+    });
+
+    if (!user) throw new NotFoundException('Usuário não encontrado');
+
+    const recoverCode = generateRecoverCode();
+
+    await this.prismaService.codigo_Recuperacao.upsert({
+      where: {
+        cod_usuario: user.cod_usuario,
+      },
+      update: {
+        codigo: recoverCode,
+        expiraEm: new Date(Date.now() + 15 * 60 * 1000), // 15 minutes
+      },
+      create: {
+        codigo: recoverCode,
+        expiraEm: new Date(Date.now() + 15 * 60 * 1000), // 15 minutes
+        usuario: {
+          connect: {
+            cod_usuario: user.cod_usuario,
+          },
+        },
+      },
+    });
+
+    this.mailService
+      .sendMail({
+        email: user.email,
+        subject: 'Código de recuperação de senha',
+        template: RecoverCode({ recoverCode }),
+      })
+      .then(() => {
+        console.log(
+          `Email de código de recuperação de senha reenviado para ${user.email}`,
+        );
+      });
   }
 
   async resendConfirmationCode(email: string): Promise<void> {
