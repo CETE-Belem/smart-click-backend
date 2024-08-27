@@ -41,6 +41,15 @@ export class ConsumerUnitService {
       throw new ConflictException('Unidade consumidora já existe');
     }
 
+    if (
+      (createConsumerUnitDto.subgrupo as string).startsWith('B') &&
+      createConsumerUnitDto.optanteTB === false
+    ) {
+      throw new BadRequestException(
+        "Subgrupo 'B' deve ser optante de tarifa branca",
+      );
+    }
+
     const consumerUnit = await this.prismaService.unidade_Consumidora.create({
       data: {
         cidade: createConsumerUnitDto.cidade,
@@ -199,6 +208,7 @@ export class ConsumerUnitService {
       uf: string;
       city: string;
       concessionaire: string;
+      subgroup: Subgrupo;
     },
   ) {
     if (page <= 0 || limit <= 0) {
@@ -207,27 +217,32 @@ export class ConsumerUnitService {
       );
     }
 
-    const whereCondition: {
-      cidade?: {
-        contains: string;
-      };
-      uf?: {
-        contains: string;
-      };
-      cod_concessionaria?: string;
-    } = {
-      uf: {
-        contains: filters.uf,
-      },
-      cidade: {
-        contains: filters.city,
-      },
-      cod_concessionaria: filters.concessionaire,
-    };
-
     const consumerUnits = await this.prismaService.unidade_Consumidora.findMany(
       {
-        where: whereCondition,
+        where: {
+          OR: [
+            {
+              uf: {
+                contains: filters.uf,
+                mode: 'insensitive',
+              },
+            },
+            {
+              cidade: {
+                contains: filters.city,
+                mode: 'insensitive',
+              },
+            },
+            {
+              ...(filters.concessionaire && {
+                concessionaria: { cod_concessionaria: filters.concessionaire },
+              }),
+            },
+            {
+              ...(filters.subgroup && { subgrupo: filters.subgroup }),
+            },
+          ],
+        },
         skip: (page - 1) * limit,
         take: limit,
         orderBy: {
@@ -238,7 +253,30 @@ export class ConsumerUnitService {
 
     const totalConsumerUnit =
       await this.prismaService.unidade_Consumidora.count({
-        where: whereCondition,
+        where: {
+          OR: [
+            {
+              uf: {
+                contains: filters.uf,
+                mode: 'insensitive',
+              },
+            },
+            {
+              cidade: {
+                contains: filters.city,
+                mode: 'insensitive',
+              },
+            },
+            {
+              ...(filters.concessionaire && {
+                concessionaria: { cod_concessionaria: filters.concessionaire },
+              }),
+            },
+            {
+              ...(filters.subgroup && { subgrupo: filters.subgroup }),
+            },
+          ],
+        },
       });
 
     const totalPages = Math.ceil(totalConsumerUnit / limit);

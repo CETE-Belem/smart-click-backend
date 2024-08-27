@@ -37,6 +37,7 @@ import { ConsumerUnitEntity } from './entities/consumer-unit.entity';
 import { UpdateConsumerUnitDto } from './dto/update-consumer-unit.dto';
 import { Fases, Subgrupo } from '@prisma/client';
 import { EquipmentEntity } from 'src/equipments/entities/equipment.entity';
+import { ParseSubgrupoPipe } from 'src/common/pipes/ParseSubgrupoPipe.pipe';
 
 @ApiTags('consumer-units')
 @Controller('consumer-units')
@@ -68,6 +69,7 @@ export class ConsumerUnitController {
               city: 'Belém',
               uf: 'PA',
               concessionaire: '0b6cf373-ab3a-48fc-8288-b8d3e75a9fbd',
+              subgroup: 'A1',
             },
           },
         },
@@ -101,11 +103,14 @@ export class ConsumerUnitController {
     @Query('uf') uf?: string,
     @Query('concessionaire', new ParseUUIDPipe({ optional: true }))
     concessionaire?: string,
+    @Query('subgroup', new ParseSubgrupoPipe({ optional: true }))
+    subgroup?: Subgrupo,
   ) {
     return this.consumerUnitService.findAllConsumerUnits(page, limit, {
       concessionaire,
       city,
       uf,
+      subgroup,
     });
   }
 
