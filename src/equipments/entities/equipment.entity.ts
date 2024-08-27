@@ -122,7 +122,7 @@ export class EquipmentEntity implements Equipamento {
   unidade_consumidora: ConsumerUnitEntity;
 
   @ApiProperty({
-    description: 'Con do Equipamento',
+    description: 'Concessionaria do Equipamento',
     type: ConcessionaireEntity,
     nullable: false,
   })

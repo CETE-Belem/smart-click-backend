@@ -379,6 +379,10 @@ export class EquipmentsService {
         nome: name,
         descricao: description,
       },
+      include: {
+        unidade_consumidora: true,
+        concessionaria: true,
+      },
     });
 
     return new EquipmentEntity(equipment);
@@ -446,6 +450,10 @@ export class EquipmentsService {
             cod_concessionaria,
           },
         },
+      },
+      include: {
+        concessionaria: true,
+        unidade_consumidora: true,
       },
     });
 
