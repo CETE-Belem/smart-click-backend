@@ -2,7 +2,7 @@ import { Inject, Injectable } from '@nestjs/common';
 import * as mqtt from 'mqtt';
 import { FrontWebSocketService } from 'src/gateways/front-events/front-websocket.service';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { SensorDataService } from 'src/sensor-data/sensor-data.service';
+import { SensorDataService } from 'src/sensor-datas/sensor-datas.service';
 import { Logger } from 'winston';
 
 @Injectable()
@@ -24,13 +24,24 @@ export class MqttService {
         clientId: process.env.MQTT_CLIENT_ID, // ID do cliente
       },
     );
-    this.client.on('connect', async () => {
+    this.client.on('connect', () => {
       this.connected = true;
       console.log('MQTT connected');
       this.logger.info('MQTT connected');
+
+      this.client.subscribe('+/smartclick/fafbfc', (error) => {
+        if (error) {
+          console.error('MQTT subscribe error: ', error);
+          this.logger.error('MQTT subscribe error: ', error);
+        } else {
+          console.log('MQTT subscribe success');
+          this.logger.info('MQTT subscribe success');
+        }
+      });
     });
 
     this.client.on('message', (topic, message) => {
+      console.log('Received message from topic: ', topic);
       this.handleMessage(topic, message.toString()); // Tratar a mensagem recebida
     });
 
@@ -107,6 +118,9 @@ export class MqttService {
       equipments.map(
         (device) => `${device.mac.replaceAll(':', '-')}/smartclick/#`,
       ),
+      (error) => {
+        error && this.logger.error('MQTT subscribe error: ', error);
+      },
     );
   }
 

@@ -8,7 +8,7 @@ import { UpdateConcessionaireDto } from './dto/update-concessionaire.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { JWTType } from 'src/types/jwt.types';
 import { ConcessionaireEntity } from './entities/concessionaire.entity';
-import { ConsumerUnitEntity } from 'src/consumer-unit/entities/consumer-unit.entity';
+import { ConsumerUnitEntity } from 'src/consumer-units/entities/consumer-unit.entity';
 
 @Injectable()
 export class ConcessionaireService {

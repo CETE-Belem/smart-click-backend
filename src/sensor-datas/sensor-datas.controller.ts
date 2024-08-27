@@ -1,5 +1,5 @@
 import { Controller } from '@nestjs/common';
-import { SensorDataService } from './sensor-data.service';
+import { SensorDataService } from './sensor-datas.service';
 
 @Controller('sensor-data')
 export class SensorDataController {

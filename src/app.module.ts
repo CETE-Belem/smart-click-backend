@@ -8,8 +8,8 @@ import { UsersModule } from './users/users.module';
 import { AuthModule } from './auth/auth.module';
 import { EquipmentsModule } from './equipments/equipments.module';
 import { MailModule } from './mail/mail.module';
-import { ConcessionaireModule } from './concessionaire/concessionaire.module';
-import { ConsumerUnitModule } from './consumer-unit/consumer-unit.module';
+import { ConcessionaireModule } from './concessionaires/concessionaires.module';
+import { ConsumerUnitModule } from './consumer-units/consumer-units.module';
 import { WinstonModule } from 'nest-winston';
 import { winstonConfig } from './config/winston.config';
 import { LoggerInterceptor } from './common/interceptors/logger.interceptor';
@@ -17,7 +17,7 @@ import { ConflictInterceptor } from './common/interceptors/conflict.interceptor'
 import { DatabaseInterceptor } from './common/interceptors/database.interceptor';
 import { MqttModule } from './services/mqtt/mqtt.module';
 import { WebSocketsModule } from './gateways/websocket.module';
-import { SensorDataModule } from './sensor-data/sensor-data.module';
+import { SensorDataModule } from './sensor-datas/sensor-datas.module';
 
 @Module({
   imports: [

@@ -7,6 +7,7 @@ enum PrismaErrors {
 }
 
 export const handleDatabaseError = (err: PrismaClientError) => {
+  console.log(err);
   switch (err.code) {
     case PrismaErrors.UniqueConstraintFail:
       return new UniqueConstraintError(err);

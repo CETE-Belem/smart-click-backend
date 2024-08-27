@@ -14,7 +14,7 @@ import {
   HttpStatus,
   BadRequestException,
 } from '@nestjs/common';
-import { ConcessionaireService } from './concessionaire.service';
+import { ConcessionaireService } from './concessionaires.service';
 import { CreateConcessionaireDto } from './dto/create-concessionaire.dto';
 import { UpdateConcessionaireDto } from './dto/update-concessionaire.dto';
 import {
@@ -37,7 +37,7 @@ import { JWTType } from 'src/types/jwt.types';
 import { ConcessionaireEntity } from './entities/concessionaire.entity';
 
 @ApiTags('concessionaires')
-@Controller('concessionaire')
+@Controller('concessionaires')
 export class ConcessionaireController {
   constructor(private readonly concessionaireService: ConcessionaireService) {}
 

@@ -84,7 +84,6 @@ export class ConsumerUnitService {
     totalPages: number;
     totalEquipments;
     filters: {
-      subgroup?: Subgrupo;
       city?: string;
       uf?: string;
       phase?: Fases;
@@ -93,7 +92,7 @@ export class ConsumerUnitService {
       unitNumber?: string;
     };
   }> {
-    const { city, mac, name, phase, subgroup, uf, unitNumber } = filters;
+    const { city, mac, name, phase, uf, unitNumber } = filters;
 
     const unit = await this.prismaService.unidade_Consumidora.findUnique({
       where: {

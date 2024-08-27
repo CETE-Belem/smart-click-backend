@@ -69,11 +69,7 @@ export class EquipmentsService {
             cod_usuario: req.user.userId,
           },
         },
-        usuario: {
-          connect: {
-            cod_usuario,
-          },
-        },
+        ...(cod_usuario && { usuario: { connect: { cod_usuario } } }),
         unidade_consumidora: {
           connect: {
             cod_unidade_consumidora,
@@ -117,7 +113,6 @@ export class EquipmentsService {
         cod_usuario: req.user.userId,
       },
     });
-
     if (usuario?.perfil !== Cargo.ADMIN) {
       const equipments = await this.prismaService.equipamento.findMany({
         where: {
@@ -350,7 +345,10 @@ export class EquipmentsService {
         },
       });
 
-      if (!equipment) throw new NotFoundException('Equipamento não encontrado');
+      if (!equipment)
+        throw new NotFoundException(
+          'Equipamento não encontrado ou não pertence ao usuário',
+        );
 
       return new EquipmentEntity(equipment);
     }

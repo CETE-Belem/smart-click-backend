@@ -5,8 +5,8 @@ import {
   macLength,
   maxDescriptionLength,
 } from 'src/constants/equipment-fields';
-import { ConsumerUnitEntity } from 'src/consumer-unit/entities/consumer-unit.entity';
-import { ConcessionaireEntity } from 'src/concessionaire/entities/concessionaire.entity';
+import { ConsumerUnitEntity } from 'src/consumer-units/entities/consumer-unit.entity';
+import { ConcessionaireEntity } from 'src/concessionaires/entities/concessionaire.entity';
 import { Transform } from 'class-transformer';
 
 export class EquipmentEntity implements Equipamento {

@@ -14,7 +14,7 @@ import {
   Delete,
   BadRequestException,
 } from '@nestjs/common';
-import { ConsumerUnitService } from './consumer-unit.service';
+import { ConsumerUnitService } from './consumer-units.service';
 import { CreateConsumerUnitDto } from './dto/create-consumer-unit.dto';
 import {
   ApiCreatedResponse,
@@ -38,8 +38,8 @@ import { UpdateConsumerUnitDto } from './dto/update-consumer-unit.dto';
 import { Fases, Subgrupo } from '@prisma/client';
 import { EquipmentEntity } from 'src/equipments/entities/equipment.entity';
 
-@ApiTags('consumer-unit')
-@Controller('consumer-unit')
+@ApiTags('consumer-units')
+@Controller('consumer-units')
 export class ConsumerUnitController {
   constructor(private readonly consumerUnitService: ConsumerUnitService) {}
 
