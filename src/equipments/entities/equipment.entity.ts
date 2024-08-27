@@ -1,4 +1,4 @@
-import { Equipamento, Fases, Prisma, Subgrupo } from '@prisma/client';
+import { Equipamento, Fases, Prisma } from '@prisma/client';
 import { ApiProperty } from '@nestjs/swagger';
 import {
   maxNameLength,
@@ -98,14 +98,6 @@ export class EquipmentEntity implements Equipamento {
     example: 'Belém',
   })
   cidade: string;
-
-  @ApiProperty({
-    description: 'Subgrupo do Equipamento',
-    type: String,
-    nullable: false,
-    example: 'A1',
-  })
-  subgrupo: Subgrupo;
 
   @ApiProperty({
     description: 'Fase do Equipamento',
