@@ -109,7 +109,6 @@ export class ConsumerUnitService {
     const equipments = await this.prismaService.equipamento.findMany({
       where: {
         cod_unidade_consumidora: id,
-        subgrupo: subgroup,
         cidade: city,
         uf,
         fases_monitoradas: phase,
