@@ -8,7 +8,7 @@ import { AdminUpdateEquipmentDto } from './dto/admin-update-equipment.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { EquipmentEntity } from './entities/equipment.entity';
 import { JWTType } from 'src/types/jwt.types';
-import { Cargo, Fases, Subgrupo } from '@prisma/client';
+import { Cargo, Fases } from '@prisma/client';
 import { UserUpdateEquipmentDto } from './dto/user-update-equipment.dto';
 
 @Injectable()
@@ -25,7 +25,6 @@ export class EquipmentsService {
       description,
       numeroUnidadeConsumidora,
       cidade,
-      subgrupo,
       tensaoNominal,
       uf,
       fases_monitoradas,
@@ -58,7 +57,6 @@ export class EquipmentsService {
         uf,
         tensao_nominal: tensaoNominal,
         fases_monitoradas,
-        subgrupo,
         nome: name,
         descricao: description,
         concessionaria: {
@@ -93,7 +91,6 @@ export class EquipmentsService {
       page: number;
       limit: number;
       query: string;
-      subgrupo: Subgrupo;
       cidade: string;
       uf: string;
       fase_monitorada: Fases;
@@ -113,8 +110,7 @@ export class EquipmentsService {
       },
     ];
   }> {
-    const { limit, page, query, cidade, fase_monitorada, subgrupo, uf } =
-      options;
+    const { limit, page, query, cidade, fase_monitorada, uf } = options;
 
     const usuario = await this.prismaService.usuario.findUnique({
       where: {
@@ -156,7 +152,6 @@ export class EquipmentsService {
           },
           uf,
           fases_monitoradas: fase_monitorada,
-          subgrupo,
         },
         orderBy: {
           criadoEm: 'asc',
@@ -202,7 +197,6 @@ export class EquipmentsService {
           },
           uf,
           fases_monitoradas: fase_monitorada,
-          subgrupo,
         },
       });
 
@@ -256,7 +250,6 @@ export class EquipmentsService {
           },
           uf,
           fases_monitoradas: fase_monitorada,
-          subgrupo,
         },
         orderBy: {
           criadoEm: 'asc',
@@ -299,7 +292,6 @@ export class EquipmentsService {
           },
           uf,
           fases_monitoradas: fase_monitorada,
-          subgrupo,
         },
       });
 
@@ -406,7 +398,6 @@ export class EquipmentsService {
       numeroUnidadeConsumidora,
       cidade,
       fases_monitoradas,
-      subgrupo,
       tensaoNominal,
       uf,
     } = updateEquipmentDto;
@@ -446,7 +437,6 @@ export class EquipmentsService {
         cidade,
         uf,
         fases_monitoradas,
-        subgrupo,
         tensao_nominal: tensaoNominal,
         unidade_consumidora: {
           connect: {

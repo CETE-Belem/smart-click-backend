@@ -46,6 +46,8 @@ export class ConsumerUnitService {
         cidade: createConsumerUnitDto.cidade,
         uf: createConsumerUnitDto.uf,
         numero: createConsumerUnitDto.numero,
+        subgrupo: createConsumerUnitDto.subgrupo,
+        optanteTB: createConsumerUnitDto.optanteTB,
         concessionaria: {
           connect: {
             cod_concessionaria: createConsumerUnitDto.cod_concessionaria,
@@ -174,6 +176,8 @@ export class ConsumerUnitService {
         data: {
           cidade: updateConsumerUnitDto.cidade,
           uf: updateConsumerUnitDto.uf,
+          subgrupo: updateConsumerUnitDto.subgrupo,
+          optanteTB: updateConsumerUnitDto.optanteTB,
           concessionaria: {
             connect: {
               cod_concessionaria: updateConsumerUnitDto.cod_concessionaria,

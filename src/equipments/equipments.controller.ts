@@ -34,7 +34,7 @@ import { AuthGuard } from 'src/common/guards/auth.guard';
 import { JWTType } from 'src/types/jwt.types';
 import { EquipmentEntity } from './entities/equipment.entity';
 import { ParseFaseMonitoradaPipe } from 'src/common/pipes/ParseFaseMonitoradaPipe.pipe';
-import { Fases, Subgrupo } from '@prisma/client';
+import { Fases } from '@prisma/client';
 import { Roles } from 'src/common/decorators/roles.decorator';
 import { RolesGuard } from 'src/common/guards/roles.guard';
 import { UserUpdateEquipmentDto } from './dto/user-update-equipment.dto';
@@ -153,12 +153,6 @@ export class EquipmentsController {
     required: false,
     type: String,
   })
-  @ApiQuery({
-    name: 'subgrupo',
-    description: 'Subgrupo',
-    required: false,
-    type: String,
-  })
   findAll(
     @Request() req: JWTType,
     @Query('page', new ParseIntPipe()) page: number,
@@ -167,7 +161,6 @@ export class EquipmentsController {
     @Query('cidade') cidade: string,
     @Query('uf') uf: string,
     @Query('fase_monitorada', ParseFaseMonitoradaPipe) fase_monitorada: Fases,
-    @Query('subgrupo') subgrupo: Subgrupo,
   ) {
     return this.equipmentsService.findAll(req, {
       page,
@@ -176,7 +169,6 @@ export class EquipmentsController {
       cidade,
       uf,
       fase_monitorada,
-      subgrupo,
     });
   }
 

@@ -7,16 +7,18 @@ import {
 } from '@nestjs/common';
 import { Logger } from 'winston';
 import { Observable } from 'rxjs';
+import { Response, Request } from 'express';
 
 @Injectable()
 export class LoggerInterceptor implements NestInterceptor {
   constructor(@Inject('winston') private logger: Logger) {}
   intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
-    this.log(context.switchToHttp().getRequest());
+    this.logReq(context.switchToHttp().getRequest());
+    this.logRes(context.switchToHttp().getResponse());
     return next.handle();
   }
 
-  private log(req) {
+  private logReq(req: Request) {
     const body = { ...req.body };
     delete body.password;
 
@@ -34,6 +36,16 @@ export class LoggerInterceptor implements NestInterceptor {
         },
         from: req.ip,
         madeBy: userEmail,
+      }),
+    );
+  }
+
+  private logRes(res: Response) {
+    this.logger.info(
+      JSON.stringify({
+        timestamp: new Date().toISOString(),
+        status: res.statusCode,
+        message: res.statusMessage,
       }),
     );
   }

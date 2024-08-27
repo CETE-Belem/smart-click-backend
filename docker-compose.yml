@@ -11,7 +11,14 @@ services:
       - POSTGRES_PASSWORD=amazontech
       - POSTGRES_USER=amazontech
       - POSTGRES_DB=amazontech_db
-
+  mosquitto:
+    image: toke/mosquitto
+    ports:
+      - 1883:1883
+      - 9001:9001
+    environment:
+      - MOSQUITTO_USERNAME=amazontech
+      - MOSQUITTO_PASSWORD=amazontech
   backend:
     depends_on:
       - postgres
