@@ -141,6 +141,7 @@ model Equipamento {
   tensao_nominal    Decimal
   fases_monitoradas Fases
 
+  //todo: verificar se é necessário
   // Relations
   // 1:n User
   cod_usuario String?

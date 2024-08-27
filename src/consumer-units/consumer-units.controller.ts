@@ -62,6 +62,7 @@ export class ConsumerUnitController {
         page: { type: 'number', example: 2 },
         limit: { type: 'number', example: 10 },
         totalPages: { type: 'number', example: 10 },
+        totalConsumerUnits: { type: 'number', example: 100 },
         filters: {
           type: 'array',
           items: {

@@ -251,7 +251,7 @@ export class ConsumerUnitService {
       },
     );
 
-    const totalConsumerUnit =
+    const totalConsumerUnits =
       await this.prismaService.unidade_Consumidora.count({
         where: {
           OR: [
@@ -279,13 +279,13 @@ export class ConsumerUnitService {
         },
       });
 
-    const totalPages = Math.ceil(totalConsumerUnit / limit);
+    const totalPages = Math.ceil(totalConsumerUnits / limit);
 
     return {
       limit,
       page,
       totalPages,
-      totalConsumerUnit,
+      totalConsumerUnits,
       consumerUnits: consumerUnits.map(
         (consumerUnits) => new ConsumerUnitEntity(consumerUnits),
       ),
