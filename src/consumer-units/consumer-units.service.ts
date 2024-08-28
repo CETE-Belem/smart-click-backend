@@ -222,16 +222,20 @@ export class ConsumerUnitService {
         where: {
           OR: [
             {
-              uf: {
-                contains: filters.uf,
-                mode: 'insensitive',
-              },
+              ...(filters.uf && {
+                uf: {
+                  contains: filters.uf,
+                  mode: 'insensitive',
+                },
+              }),
             },
             {
-              cidade: {
-                contains: filters.city,
-                mode: 'insensitive',
-              },
+              ...(filters.city && {
+                cidade: {
+                  contains: filters.city,
+                  mode: 'insensitive',
+                },
+              }),
             },
             {
               ...(filters.concessionaire && {
@@ -256,16 +260,20 @@ export class ConsumerUnitService {
         where: {
           OR: [
             {
-              uf: {
-                contains: filters.uf,
-                mode: 'insensitive',
-              },
+              ...(filters.uf && {
+                uf: {
+                  contains: filters.uf,
+                  mode: 'insensitive',
+                },
+              }),
             },
             {
-              cidade: {
-                contains: filters.city,
-                mode: 'insensitive',
-              },
+              ...(filters.city && {
+                cidade: {
+                  contains: filters.city,
+                  mode: 'insensitive',
+                },
+              }),
             },
             {
               ...(filters.concessionaire && {
