@@ -12,8 +12,7 @@ export class SensorDataService {
 
   async handleData(data: string, mac: string) {
     try {
-      const pattern =
-        /^\d+\|\d{1,3}\.\d{2}V\|\d{1,3}\.\d{2}A\|\d{1,3}\.\d{2}VA\|\d{1,3}\.\d{2}W\|\d{1,3}\.\d{2}\|\d{1,3}\.\d{2}V\|\d{1,3}\.\d{2}A\|\d{1,3}\.\d{2}VA\|\d{1,3}\.\d{2}W\|\d{1,3}\.\d{2}\|\d{1,3}\.\d{2}V\|\d{1,3}\.\d{2}A\|\d{1,3}\.\d{2}VA\|\d{1,3}\.\d{2}W\|\d{1,3}\.\d{2}$/;
+      const pattern = /^(\d+(\.\d+)?)(\|(\d+(\.\d+)?))*$/;
 
       if (!pattern.test(data)) {
         throw new Error('Invalid data');
