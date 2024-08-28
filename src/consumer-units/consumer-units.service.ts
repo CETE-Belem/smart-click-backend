@@ -217,36 +217,59 @@ export class ConsumerUnitService {
       );
     }
 
+    let whereClause = {};
+
+    if (
+      filters.uf ||
+      filters.city ||
+      filters.concessionaire ||
+      filters.subgroup
+    ) {
+      whereClause = {
+        OR: [
+          ...(filters.uf
+            ? [
+                {
+                  uf: {
+                    contains: filters.uf,
+                    mode: 'insensitive',
+                  },
+                },
+              ]
+            : []),
+          ...(filters.city
+            ? [
+                {
+                  cidade: {
+                    contains: filters.city,
+                    mode: 'insensitive',
+                  },
+                },
+              ]
+            : []),
+          ...(filters.concessionaire
+            ? [
+                {
+                  concessionaria: {
+                    cod_concessionaria: filters.concessionaire,
+                  },
+                },
+              ]
+            : []),
+          ...(filters.subgroup
+            ? [
+                {
+                  subgrupo: filters.subgroup,
+                },
+              ]
+            : []),
+        ],
+      };
+    }
+
     const consumerUnits = await this.prismaService.unidade_Consumidora.findMany(
       {
-        where: {
-          OR: [
-            {
-              ...(filters.uf && {
-                uf: {
-                  contains: filters.uf,
-                  mode: 'insensitive',
-                },
-              }),
-            },
-            {
-              ...(filters.city && {
-                cidade: {
-                  contains: filters.city,
-                  mode: 'insensitive',
-                },
-              }),
-            },
-            {
-              ...(filters.concessionaire && {
-                concessionaria: { cod_concessionaria: filters.concessionaire },
-              }),
-            },
-            {
-              ...(filters.subgroup && { subgrupo: filters.subgroup }),
-            },
-          ],
-        },
+        where: whereClause,
         skip: (page - 1) * limit,
         take: limit,
         orderBy: {
@@ -257,34 +280,7 @@ export class ConsumerUnitService {
 
     const totalConsumerUnits =
       await this.prismaService.unidade_Consumidora.count({
-        where: {
-          OR: [
-            {
-              ...(filters.uf && {
-                uf: {
-                  contains: filters.uf,
-                  mode: 'insensitive',
-                },
-              }),
-            },
-            {
-              ...(filters.city && {
-                cidade: {
-                  contains: filters.city,
-                  mode: 'insensitive',
-                },
-              }),
-            },
-            {
-              ...(filters.concessionaire && {
-                concessionaria: { cod_concessionaria: filters.concessionaire },
-              }),
-            },
-            {
-              ...(filters.subgroup && { subgrupo: filters.subgroup }),
-            },
-          ],
-        },
+        where: whereClause,
       });
 
     const totalPages = Math.ceil(totalConsumerUnits / limit);
