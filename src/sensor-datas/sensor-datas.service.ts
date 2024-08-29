@@ -2,6 +2,7 @@ import { Inject, Injectable } from '@nestjs/common';
 import dayjs from 'dayjs';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { Logger } from 'winston';
+import { SensorChartDataEntity } from './entities/sensor-chart-data.entity';
 
 @Injectable()
 export class SensorDataService {
@@ -85,5 +86,20 @@ export class SensorDataService {
       this.logger.error(e.message);
       //this.handleData(data, mac);
     }
+  }
+
+  async getChartData(equipmentId: string, from: Date, to: Date) {
+    const data = await this.prismaService.dado_Sensor.findMany({
+      where: {
+        equipamento: {
+          cod_equipamento: equipmentId,
+        },
+        data: {
+          gte: from,
+          lte: to,
+        },
+      },
+    });
+    return data.map((d) => new SensorChartDataEntity(d));
   }
 }
