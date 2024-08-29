@@ -3,7 +3,6 @@ import { Observable } from 'rxjs';
 import { Socket } from 'socket.io';
 import { JwtService } from '@nestjs/jwt';
 import { env } from 'src/config/env.config';
-import { JWTType } from 'src/types/jwt.types';
 
 @Injectable()
 export class WsJWTGuard implements CanActivate {

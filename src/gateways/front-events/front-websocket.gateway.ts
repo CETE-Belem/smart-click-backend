@@ -13,7 +13,6 @@ import { env } from 'src/config/env.config';
 import { SocketAuthMiddleware } from 'src/auth/ws.mw';
 
 @WebSocketGateway({
-  namespace: 'events',
   cors: {
     origin: env.NODE_ENV === 'production' ? env.FRONTEND_URL : '*',
   },
@@ -37,6 +36,7 @@ export class FrontWebSocketGateway
   async handleConnection(client: Socket) {
     const userId = client.handshake.query.userId as string;
     if (!userId) return client.disconnect();
+    this.logger.info(`User ${userId} connected to ws`);
     this.frontWebSocketService.associateSocketToUser(userId, client);
     await this.mqttService.subscribeToUserEquipments(userId);
   }

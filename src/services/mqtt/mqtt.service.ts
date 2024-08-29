@@ -69,37 +69,42 @@ export class MqttService {
   }
 
   async handleMessage(topic: string, message: string) {
-    const mac = topic.split('/')[0].replaceAll('-', ':');
+    try {
+      const mac = topic.split('/')[0].replaceAll('-', ':');
 
-    if (!mac.match(/([0-9A-Fa-f]{2}[:]){5}([0-9A-Fa-f]{2})/)) {
-      return;
-    }
+      if (!mac.match(/([0-9A-Fa-f]{2}[:]){5}([0-9A-Fa-f]{2})/)) {
+        return;
+      }
 
-    if (topic.includes('/fafbfc')) {
-      this.logger.info(
-        `Received data from topic: ${topic} | message: ${message}`,
-      );
-      this.sensorDataService.handleData(message, mac);
-      return;
-    }
+      if (topic.includes('/fafbfc')) {
+        this.logger.info(
+          `Received data from topic: ${topic} | message: ${message}`,
+        );
+        this.sensorDataService.handleData(message, mac);
+        return;
+      }
 
-    const equipment = await this.prisma.equipamento.findUnique({
-      where: {
-        mac,
-      },
-    });
-    const userId = equipment.cod_usuario;
-    const sockets = this.frontWebSocketService.findSocketByUserId(userId);
-    sockets.forEach((socket) => {
-      socket.emit(
-        topic.replaceAll('-', ':'),
-        {
+      const equipment = await this.prisma.equipamento.findUnique({
+        where: {
           mac,
-          message,
         },
-        (err) => console.log(err),
-      );
-    });
+      });
+      const userId = equipment.cod_usuario;
+      const sockets = this.frontWebSocketService.findSocketByUserId(userId);
+      sockets.forEach((socket) => {
+        socket.emit(
+          `${topic.replaceAll('-', ':')}`,
+          {
+            mac,
+            data: Number(message),
+          },
+          (err) => console.log(err),
+        );
+      });
+    } catch (error) {
+      console.error('Error in handleMessage: ', error);
+      this.logger.error('Error in handleMessage: ', error);
+    }
   }
 
   async subscribeToUserEquipments(userId: string) {
