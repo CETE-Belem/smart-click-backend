@@ -71,7 +71,8 @@ export class MqttService {
   async handleMessage(topic: string, message: string) {
     try {
       const mac = topic.split('/')[0].replaceAll('-', ':');
-
+      console.log('Received data from topic: ', topic, ' | message: ', message);
+      console.log('MAC: ', mac);
       if (!mac.match(/([0-9A-Fa-f]{2}[:]){5}([0-9A-Fa-f]{2})/)) {
         return;
       }
@@ -108,17 +109,29 @@ export class MqttService {
   }
 
   async subscribeToUserEquipments(userId: string) {
-    const equipments = await this.prisma.equipamento.findMany({
+    const user = await this.prisma.usuario.findUnique({
       where: {
-        usuario: {
-          cod_usuario: userId,
-        },
+        cod_usuario: userId,
       },
       select: {
-        mac: true,
+        perfil: true,
+        equipamentos: {
+          select: {
+            mac: true,
+          },
+        },
       },
-      distinct: ['mac'],
     });
+    if (!user) return;
+
+    if (user.perfil === 'ADMIN') {
+      this.client.subscribe('+/smartclick/#', (error) => {
+        error && this.logger.error('MQTT subscribe error: ', error);
+      });
+      return;
+    }
+
+    const equipments = user.equipamentos;
     this.client.subscribe(
       equipments.map((device) => {
         console.log(
