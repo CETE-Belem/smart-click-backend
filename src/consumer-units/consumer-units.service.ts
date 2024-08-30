@@ -202,13 +202,15 @@ export class ConsumerUnitService {
   }
 
   async findAllConsumerUnits(
+    userId: string,
     page: number,
     limit: number,
     filters: {
-      uf: string;
-      city: string;
-      concessionaire: string;
-      subgroup: Subgrupo;
+      uf?: string;
+      city?: string;
+      concessionaire?: string;
+      subgroup?: Subgrupo;
+      query?: string;
     },
   ) {
     if (page <= 0 || limit <= 0) {
@@ -264,6 +266,57 @@ export class ConsumerUnitService {
               ]
             : []),
         ],
+      };
+    }
+
+    if (filters.query) {
+      whereClause = {
+        ...whereClause,
+        OR: [
+          {
+            cidade: {
+              contains: filters.query,
+              mode: 'insensitive',
+            },
+          },
+          {
+            uf: {
+              contains: filters.query,
+              mode: 'insensitive',
+            },
+          },
+          {
+            numero: {
+              contains: filters.query,
+              mode: 'insensitive',
+            },
+          },
+          {
+            concessionaria: {
+              nome: {
+                contains: filters.query,
+                mode: 'insensitive',
+              },
+            },
+          },
+        ],
+      };
+    }
+
+    const user = await this.prismaService.usuario.findUnique({
+      where: {
+        cod_usuario: userId,
+      },
+    });
+
+    if (!user) {
+      throw new NotFoundException('Usuário não encontrado');
+    }
+
+    if (user.perfil !== 'ADMIN') {
+      whereClause = {
+        ...whereClause,
+        cod_usuario: userId,
       };
     }
 

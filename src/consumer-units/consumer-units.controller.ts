@@ -46,7 +46,6 @@ export class ConsumerUnitController {
 
   @Get()
   @UseGuards(AuthGuard, RolesGuard)
-  @Roles('ADMIN')
   @ApiBearerAuth('token')
   @ApiOkResponse({
     status: HttpStatus.OK,
@@ -98,6 +97,7 @@ export class ConsumerUnitController {
   @ApiParam({ name: 'page', type: 'number', required: true })
   @ApiParam({ name: 'limit', type: 'number', required: true })
   findAll(
+    @Request() req: JWTType,
     @Query('page', new ParseIntPipe()) page: number,
     @Query('limit', new ParseIntPipe()) limit: number,
     @Query('city') city?: string,
@@ -106,13 +106,20 @@ export class ConsumerUnitController {
     concessionaire?: string,
     @Query('subgroup', new ParseSubgrupoPipe({ optional: true }))
     subgroup?: Subgrupo,
+    @Query('query') query?: string,
   ) {
-    return this.consumerUnitService.findAllConsumerUnits(page, limit, {
-      concessionaire,
-      city,
-      uf,
-      subgroup,
-    });
+    return this.consumerUnitService.findAllConsumerUnits(
+      req.user.userId,
+      page,
+      limit,
+      {
+        concessionaire,
+        city,
+        uf,
+        subgroup,
+        query,
+      },
+    );
   }
 
   @Get('/:id')

@@ -41,7 +41,7 @@ export class MqttService {
     });
 
     this.client.on('message', (topic, message) => {
-      console.log('Received message from topic: ', topic);
+      //console.log('Received message from topic: ', topic);
       this.handleMessage(topic, message.toString()); // Tratar a mensagem recebida
     });
 
@@ -144,8 +144,6 @@ export class MqttService {
       },
     });
     if (!user) return;
-
-    console.log(user.perfil);
 
     if (user.perfil === 'ADMIN') {
       this.client.subscribe('+/smartclick/#', (error) => {

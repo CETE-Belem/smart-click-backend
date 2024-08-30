@@ -72,9 +72,6 @@ export class CreateConsumerUnitDto {
     nullable: false,
     example: '4e2b5b1f-6e4f-4f6f-8f5b-3b4f6e4f5b1f',
   })
-  @IsUUID('4', {
-    message: 'O ID da concessionária deve ser um UUID v4',
-  })
   @IsString({
     message: 'O ID da concessionária deve ser uma string',
   })
