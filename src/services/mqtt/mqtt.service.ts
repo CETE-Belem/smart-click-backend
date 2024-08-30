@@ -120,9 +120,13 @@ export class MqttService {
       distinct: ['mac'],
     });
     this.client.subscribe(
-      equipments.map(
-        (device) => `${device.mac.replaceAll(':', '-')}/smartclick/#`,
-      ),
+      equipments.map((device) => {
+        console.log(
+          'Subscribing to: ',
+          `${device.mac.replaceAll(':', '-')}/smartclick/#`,
+        );
+        return `${device.mac.replaceAll(':', '-')}/smartclick/#`;
+      }),
       (error) => {
         error && this.logger.error('MQTT subscribe error: ', error);
       },
