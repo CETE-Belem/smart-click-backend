@@ -71,16 +71,14 @@ export class MqttService {
   async handleMessage(topic: string, message: string) {
     try {
       const mac = topic.split('/')[0].replaceAll('-', ':');
-      console.log('Received data from topic: ', topic, ' | message: ', message);
-      console.log('MAC: ', mac);
       if (!mac.match(/([0-9A-Fa-f]{2}[:]){5}([0-9A-Fa-f]{2})/)) {
         return;
       }
 
       if (topic.includes('/fafbfc')) {
-        this.logger.info(
-          `Received data from topic: ${topic} | message: ${message}`,
-        );
+        // this.logger.info(
+        //   `Received data from topic: ${topic} | message: ${message}`,
+        // );
         this.sensorDataService.handleData(message, mac);
         return;
       }
@@ -92,7 +90,7 @@ export class MqttService {
       });
       const userId = equipment.cod_usuario;
       const sockets = this.frontWebSocketService.findSocketByUserId(userId);
-      sockets.forEach((socket) => {
+      sockets?.forEach((socket) => {
         socket.emit(
           `${topic.replaceAll('-', ':')}`,
           {
@@ -101,6 +99,29 @@ export class MqttService {
           },
           (err) => console.log(err),
         );
+      });
+      const adminUsersId = await this.prisma.usuario.findMany({
+        where: {
+          perfil: 'ADMIN',
+        },
+        select: {
+          cod_usuario: true,
+        },
+      });
+      const adminSockets = adminUsersId.map((admin) =>
+        this.frontWebSocketService.findSocketByUserId(admin.cod_usuario),
+      );
+      adminSockets?.forEach((sockets) => {
+        sockets?.forEach((socket) => {
+          socket.emit(
+            `${topic.replaceAll('-', ':')}`,
+            {
+              mac,
+              data: Number(message),
+            },
+            (err) => console.log(err),
+          );
+        });
       });
     } catch (error) {
       console.error('Error in handleMessage: ', error);
@@ -123,6 +144,8 @@ export class MqttService {
       },
     });
     if (!user) return;
+
+    console.log(user.perfil);
 
     if (user.perfil === 'ADMIN') {
       this.client.subscribe('+/smartclick/#', (error) => {
