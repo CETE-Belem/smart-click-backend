@@ -12,6 +12,7 @@ import {
   Query,
   ParseIntPipe,
   HttpStatus,
+  ParseArrayPipe,
 } from '@nestjs/common';
 import { ConcessionaireService } from './concessionaire.service';
 import { CreateConcessionaireDto } from './dto/create-concessionaire.dto';
@@ -61,6 +62,31 @@ export class ConcessionaireController {
     @Body() createConcessionaireDto: CreateConcessionaireDto,
   ) {
     return this.concessionaireService.create(req, createConcessionaireDto);
+  }
+
+  @Get(':id/rates')
+  @UseGuards(AuthGuard, RolesGuard)
+  @Roles('ADMIN')
+  @ApiBearerAuth('token')
+  findRates(
+    @Param('id') id: string,
+    @Query('page', new ParseIntPipe()) page: number,
+    @Query('limit', new ParseIntPipe()) limit: number,
+    @Query(
+      'dates',
+      new ParseArrayPipe({ items: Date, separator: ',', optional: true }),
+    )
+    dates?: Date[],
+    @Query(
+      'values',
+      new ParseArrayPipe({ items: Number, separator: ',', optional: true }),
+    )
+    values?: number[],
+  ) {
+    return this.concessionaireService.findRates(id, page, limit, {
+      dates,
+      values,
+    });
   }
 
   @Get()

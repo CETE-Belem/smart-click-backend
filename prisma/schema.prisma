@@ -119,7 +119,7 @@ model Intervalo_Tarifa {
   tipo                 Tipo_Tarifa
 
   cod_tarifa String
-  tarifa     Tarifa @relation(fields: [cod_tarifa], references: [cod_tarifa])
+  tarifa     Tarifa @relation(fields: [cod_tarifa], references: [cod_tarifa], onDelete: Cascade)
 
   @@map("intervalo_tarifa")
 }
