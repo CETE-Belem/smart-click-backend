@@ -132,6 +132,7 @@ export class MqttService {
     }
 
     const equipments = user.equipamentos;
+    if (!equipments) return;
     this.client.subscribe(
       equipments.map((device) => {
         console.log(
