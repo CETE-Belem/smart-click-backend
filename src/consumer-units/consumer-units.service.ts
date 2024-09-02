@@ -328,6 +328,10 @@ export class ConsumerUnitService {
         orderBy: {
           criadoEm: 'desc',
         },
+        include: {
+          concessionaria: true,
+          equipamentos: true,
+        },
       },
     );
 
@@ -355,6 +359,10 @@ export class ConsumerUnitService {
       {
         where: {
           cod_unidade_consumidora: consumerUnitId,
+        },
+        include: {
+          concessionaria: true,
+          equipamentos: true,
         },
       },
     );
