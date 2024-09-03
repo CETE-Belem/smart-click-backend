@@ -388,7 +388,7 @@ export class ConsumerUnitService {
         throw new NotFoundException('Unidade consumidora não encontrada');
       });
 
-    if (consumerUnit.cod_usuario !== userId) {
+    if (consumerUnit.cod_criador !== userId) {
       throw new UnauthorizedException(
         'Somente o usuário que criou a unidade consumidora pode deletá-la',
       );
