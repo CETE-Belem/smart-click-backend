@@ -181,6 +181,7 @@ export class ConsumerUnitService {
           cod_unidade_consumidora: consumerUnitId,
         },
         data: {
+          numero: updateConsumerUnitDto.numero,
           cidade: updateConsumerUnitDto.cidade,
           uf: updateConsumerUnitDto.uf,
           subgrupo: updateConsumerUnitDto.subgrupo,
