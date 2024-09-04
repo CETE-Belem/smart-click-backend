@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { Unidade_Consumidora } from '@prisma/client';
+import { Subgrupo, Unidade_Consumidora } from '@prisma/client';
 
 export class ConsumerUnitEntity implements Unidade_Consumidora {
   constructor(partial: Partial<ConsumerUnitEntity>) {
@@ -59,4 +59,18 @@ export class ConsumerUnitEntity implements Unidade_Consumidora {
     description: 'Data de atualização',
   })
   atualizadoEm: Date;
+
+  @ApiProperty({
+    description: 'Subgrupo da unidade consumidora',
+    type: String,
+    nullable: false,
+    example: 'B1',
+  })
+  subgrupo: Subgrupo;
+
+  @ApiProperty({
+    example: true,
+    description: 'Optante TB',
+  })
+  optanteTB: boolean;
 }

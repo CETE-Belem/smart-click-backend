@@ -1,12 +1,13 @@
-import { Equipamento, Fases, Prisma, Subgrupo } from '@prisma/client';
+import { Equipamento, Fases, Prisma } from '@prisma/client';
 import { ApiProperty } from '@nestjs/swagger';
 import {
   maxNameLength,
   macLength,
   maxDescriptionLength,
 } from 'src/constants/equipment-fields';
-import { ConsumerUnitEntity } from 'src/consumer-unit/entities/consumer-unit.entity';
-import { ConcessionaireEntity } from 'src/concessionaire/entities/concessionaire.entity';
+import { ConsumerUnitEntity } from 'src/consumer-units/entities/consumer-unit.entity';
+import { ConcessionaireEntity } from 'src/concessionaires/entities/concessionaire.entity';
+import { Transform } from 'class-transformer';
 
 export class EquipmentEntity implements Equipamento {
   constructor(partial: Partial<EquipmentEntity>) {
@@ -80,6 +81,7 @@ export class EquipmentEntity implements Equipamento {
     nullable: false,
     example: '220',
   })
+  @Transform(({ value }) => value.toNumber())
   tensao_nominal: Prisma.Decimal;
 
   @ApiProperty({
@@ -97,14 +99,6 @@ export class EquipmentEntity implements Equipamento {
     example: 'Belém',
   })
   cidade: string;
-
-  @ApiProperty({
-    description: 'Subgrupo do Equipamento',
-    type: String,
-    nullable: false,
-    example: 'A1',
-  })
-  subgrupo: Subgrupo;
 
   @ApiProperty({
     description: 'Fase do Equipamento',
@@ -128,7 +122,7 @@ export class EquipmentEntity implements Equipamento {
   unidade_consumidora: ConsumerUnitEntity;
 
   @ApiProperty({
-    description: 'Con do Equipamento',
+    description: 'Concessionaria do Equipamento',
     type: ConcessionaireEntity,
     nullable: false,
   })

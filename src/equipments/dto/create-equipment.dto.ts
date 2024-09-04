@@ -105,22 +105,6 @@ export class CreateEquipmentDto {
   cidade: string;
 
   @ApiProperty({
-    description: 'Subgrupo do equipamento',
-    type: String,
-    nullable: false,
-  })
-  @IsString({
-    message: 'Subgrupo do equipamento deve ser uma string',
-  })
-  @MaxLength(255, {
-    message: 'Subgrupo do equipamento deve ter no máximo 255 caracteres',
-  })
-  @IsEnum(Subgrupo, {
-    message: 'Subgrupo do equipamento deve ser um subgrupo',
-  })
-  subgrupo: Subgrupo;
-
-  @ApiProperty({
     description: 'Tensão nominal do equipamento',
     type: Number,
     nullable: false,

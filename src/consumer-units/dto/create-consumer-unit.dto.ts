@@ -1,15 +1,17 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { Subgrupo } from '@prisma/client';
 import {
-  IsNotEmpty,
   IsString,
   IsUUID,
-  Length,
-  Matches,
   MaxLength,
   MinLength,
+  Length,
+  IsNotEmpty,
+  Matches,
+  IsEnum,
 } from 'class-validator';
 
-export class UpdateConsumerUnitDto {
+export class CreateConsumerUnitDto {
   @ApiProperty({
     description: 'Número da unidade consumidora',
     type: String,
@@ -70,11 +72,37 @@ export class UpdateConsumerUnitDto {
     nullable: false,
     example: '4e2b5b1f-6e4f-4f6f-8f5b-3b4f6e4f5b1f',
   })
-  @IsUUID('4', {
-    message: 'O ID da concessionária deve ser um UUID v4',
-  })
   @IsString({
     message: 'O ID da concessionária deve ser uma string',
   })
   cod_concessionaria: string;
+
+  @ApiProperty({
+    description: 'Subgrupo da unidade consumidora',
+    type: String,
+    nullable: false,
+    example: 'B1',
+  })
+  @IsString({
+    message: 'Subgrupo da unidade consumidora deve ser uma string',
+  })
+  @MaxLength(255, {
+    message:
+      'Subgrupo da unidade consumidora deve ter no máximo 255 caracteres',
+  })
+  @IsEnum(Subgrupo, {
+    message: 'Subgrupo da unidade consumidora deve ser um subgrupo',
+  })
+  subgrupo: Subgrupo;
+
+  @ApiProperty({
+    description: 'Optante pela tarifa branca',
+    type: Boolean,
+    nullable: false,
+    example: true,
+  })
+  @IsNotEmpty({
+    message: 'O campo optanteTB não pode ser vazio',
+  })
+  optanteTB: boolean;
 }
