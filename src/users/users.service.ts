@@ -77,18 +77,35 @@ export class UsersService {
     });
 
     // Connect Consumer Unity to User by intermediary table
-    await this.prismaService.unidade_Consumidora.update({
-      where: {
-        cod_unidade_consumidora: existingConsumerUnity.cod_unidade_consumidora,
-      },
-      data: {
-        usuario: {
-          connect: {
-            cod_usuario: user.cod_usuario,
+    const { equipamentos } =
+      await this.prismaService.unidade_Consumidora.update({
+        where: {
+          cod_unidade_consumidora:
+            existingConsumerUnity.cod_unidade_consumidora,
+        },
+        data: {
+          usuario: {
+            connect: {
+              cod_usuario: user.cod_usuario,
+            },
           },
         },
-      },
-    });
+        include: {
+          equipamentos: true,
+        },
+      });
+
+    equipamentos.length > 0 &&
+      (await this.prismaService.equipamento.updateMany({
+        where: {
+          cod_equipamento: {
+            in: equipamentos.map((equipment) => equipment.cod_equipamento),
+          },
+        },
+        data: {
+          cod_usuario: user.cod_usuario,
+        },
+      }));
 
     const confirmationCode = generateConfirmationCode();
 
@@ -427,6 +444,49 @@ export class UsersService {
     });
   }
 
+  async resendRecoverCode(email: string): Promise<void> {
+    const user = await this.prismaService.usuario.findUnique({
+      where: {
+        email,
+      },
+    });
+
+    if (!user) throw new NotFoundException('Usuário não encontrado');
+
+    const recoverCode = generateRecoverCode();
+
+    await this.prismaService.codigo_Recuperacao.upsert({
+      where: {
+        cod_usuario: user.cod_usuario,
+      },
+      update: {
+        codigo: recoverCode,
+        expiraEm: new Date(Date.now() + 15 * 60 * 1000), // 15 minutes
+      },
+      create: {
+        codigo: recoverCode,
+        expiraEm: new Date(Date.now() + 15 * 60 * 1000), // 15 minutes
+        usuario: {
+          connect: {
+            cod_usuario: user.cod_usuario,
+          },
+        },
+      },
+    });
+
+    this.mailService
+      .sendMail({
+        email: user.email,
+        subject: 'Código de recuperação de senha',
+        template: RecoverCode({ recoverCode }),
+      })
+      .then(() => {
+        console.log(
+          `Email de código de recuperação de senha reenviado para ${user.email}`,
+        );
+      });
+  }
+
   async resendConfirmationCode(email: string): Promise<void> {
     const user = await this.prismaService.usuario
       .findUniqueOrThrow({
@@ -522,10 +582,7 @@ export class UsersService {
       },
     });
 
-    const accessToken = await this.authService.createAccessToken(
-      user.cod_usuario,
-      Cargo.USUARIO,
-    );
+    const accessToken = await this.authService.createAccessToken(user);
 
     return {
       accessToken,

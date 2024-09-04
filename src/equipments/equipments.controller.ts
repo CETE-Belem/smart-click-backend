@@ -16,7 +16,7 @@ import {
 } from '@nestjs/common';
 import { EquipmentsService } from './equipments.service';
 import { CreateEquipmentDto } from './dto/create-equipment.dto';
-import { UpdateEquipmentDto } from './dto/update-equipment.dto';
+import { AdminUpdateEquipmentDto } from './dto/admin-update-equipment.dto';
 import {
   ApiBearerAuth,
   ApiBody,
@@ -24,6 +24,7 @@ import {
   ApiCreatedResponse,
   ApiNotFoundResponse,
   ApiOkResponse,
+  ApiOperation,
   ApiParam,
   ApiQuery,
   ApiTags,
@@ -33,9 +34,10 @@ import { AuthGuard } from 'src/common/guards/auth.guard';
 import { JWTType } from 'src/types/jwt.types';
 import { EquipmentEntity } from './entities/equipment.entity';
 import { ParseFaseMonitoradaPipe } from 'src/common/pipes/ParseFaseMonitoradaPipe.pipe';
-import { Fases, Subgrupo } from '@prisma/client';
+import { Fases } from '@prisma/client';
 import { Roles } from 'src/common/decorators/roles.decorator';
 import { RolesGuard } from 'src/common/guards/roles.guard';
+import { UserUpdateEquipmentDto } from './dto/user-update-equipment.dto';
 
 @ApiTags('equipments')
 @UseGuards(AuthGuard, RolesGuard)
@@ -114,7 +116,6 @@ export class EquipmentsController {
       },
     },
   })
-  @Roles('ADMIN')
   @ApiBearerAuth('token')
   @ApiQuery({
     name: 'page',
@@ -152,12 +153,6 @@ export class EquipmentsController {
     required: false,
     type: String,
   })
-  @ApiQuery({
-    name: 'subgrupo',
-    description: 'Subgrupo',
-    required: false,
-    type: String,
-  })
   findAll(
     @Request() req: JWTType,
     @Query('page', new ParseIntPipe()) page: number,
@@ -166,7 +161,6 @@ export class EquipmentsController {
     @Query('cidade') cidade: string,
     @Query('uf') uf: string,
     @Query('fase_monitorada', ParseFaseMonitoradaPipe) fase_monitorada: Fases,
-    @Query('subgrupo') subgrupo: Subgrupo,
   ) {
     return this.equipmentsService.findAll(req, {
       page,
@@ -175,7 +169,6 @@ export class EquipmentsController {
       cidade,
       uf,
       fase_monitorada,
-      subgrupo,
     });
   }
 
@@ -206,11 +199,12 @@ export class EquipmentsController {
   }
 
   @Patch(':id')
+  @ApiOperation({ summary: 'Atualiza um equipamento como Usuário' })
   @ApiOkResponse({
     status: HttpStatus.OK,
     type: EquipmentEntity,
   })
-  @ApiBody({ type: UpdateEquipmentDto })
+  @ApiBody({ type: UserUpdateEquipmentDto })
   @ApiBearerAuth('token')
   @ApiNotFoundResponse({
     status: HttpStatus.NOT_FOUND,
@@ -237,17 +231,19 @@ export class EquipmentsController {
   update(
     @Request() req: JWTType,
     @Param('id', new ParseUUIDPipe()) id: string,
-    @Body() updateEquipmentDto: UpdateEquipmentDto,
+    @Body() updateEquipmentDto: UserUpdateEquipmentDto,
   ) {
     return this.equipmentsService.update(req, id, updateEquipmentDto);
   }
 
   @Put(':id')
+  @Roles('ADMIN')
+  @ApiOperation({ summary: 'Atualiza um equipamento como Admin' })
   @ApiOkResponse({
     status: HttpStatus.OK,
     type: EquipmentEntity,
   })
-  @ApiBody({ type: UpdateEquipmentDto })
+  @ApiBody({ type: AdminUpdateEquipmentDto })
   @ApiBearerAuth('token')
   @ApiNotFoundResponse({
     status: HttpStatus.NOT_FOUND,
@@ -265,7 +261,7 @@ export class EquipmentsController {
   adminUpdate(
     @Request() req: JWTType,
     @Param('id', new ParseUUIDPipe()) id: string,
-    @Body() updateEquipmentDto: UpdateEquipmentDto,
+    @Body() updateEquipmentDto: AdminUpdateEquipmentDto,
   ) {
     return this.equipmentsService.adminUpdate(req, id, updateEquipmentDto);
   }
