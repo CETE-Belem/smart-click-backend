@@ -186,7 +186,6 @@ export class ConsumerUnitController {
   })
   @ApiParam({ name: 'page', type: 'number', required: true })
   @ApiParam({ name: 'limit', type: 'number', required: true })
-  @ApiParam({ name: 'subgroup', type: 'Subgrupo', required: false })
   @ApiParam({ name: 'city', type: 'string', required: false })
   @ApiParam({ name: 'uf', type: 'string', required: false })
   @ApiParam({ name: 'phase', type: 'Fases', required: false })
