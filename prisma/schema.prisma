@@ -108,6 +108,9 @@ model Tarifa {
 
   intervalos_tarifas Intervalo_Tarifa[]
 
+  criadoEm     DateTime @default(now())
+  atualizadoEm DateTime @updatedAt
+
   @@map("tarifa")
 }
 
@@ -122,6 +125,9 @@ model Intervalo_Tarifa {
   tarifa     Tarifa @relation(fields: [cod_tarifa], references: [cod_tarifa], onDelete: Cascade)
 
   @@map("intervalo_tarifa")
+
+  criadoEm     DateTime @default(now())
+  atualizadoEm DateTime @updatedAt
 }
 
 model Equipamento {

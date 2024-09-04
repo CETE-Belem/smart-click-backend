@@ -7,6 +7,7 @@ import {
   IsString,
   ValidateNested,
   IsDateString,
+  IsOptional,
 } from 'class-validator';
 import { Transform, Type } from 'class-transformer';
 import { CreateRateIntervalDto } from './create-rate-interval.dto';
@@ -65,11 +66,8 @@ export class CreateRateDto {
     type: CreateRateIntervalDto,
     nullable: false,
   })
-  @IsNotEmpty({
-    message:
-      'Intervalo da Tarifa é obrigatório. Pelo menos um Intervalo deve ser fornecido',
-  })
   @ValidateNested({ each: true })
   @Type(() => CreateRateIntervalDto)
-  intervalos_tarifas: CreateRateIntervalDto[];
+  @IsOptional()
+  intervalos_tarifas?: CreateRateIntervalDto[];
 }

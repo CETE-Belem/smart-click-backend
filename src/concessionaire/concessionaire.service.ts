@@ -145,7 +145,7 @@ export class ConcessionaireService {
       include: {
         intervalos_tarifas: true,
       },
-      orderBy: { dt_tarifa: 'desc' },
+      orderBy: [{ dt_tarifa: 'desc' }, { criadoEm: 'desc' }],
       take: limit,
       skip: (page - 1) * limit,
     });

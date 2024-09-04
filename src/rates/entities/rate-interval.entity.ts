@@ -42,4 +42,16 @@ export class RateIntervalEntity implements Intervalo_Tarifa {
     nullable: false,
   })
   cod_tarifa: string;
+
+  @ApiProperty({
+    type: Date,
+    nullable: false,
+  })
+  criadoEm: Date;
+
+  @ApiProperty({
+    type: Date,
+    nullable: false,
+  })
+  atualizadoEm: Date;
 }

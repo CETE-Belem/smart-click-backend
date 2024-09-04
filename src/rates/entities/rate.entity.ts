@@ -51,4 +51,16 @@ export class RateEntity implements Tarifa {
     nullable: false,
   })
   intervalo_tarifa: RateIntervalEntity[];
+
+  @ApiProperty({
+    type: Date,
+    nullable: false,
+  })
+  criadoEm: Date;
+
+  @ApiProperty({
+    type: Date,
+    nullable: false,
+  })
+  atualizadoEm: Date;
 }

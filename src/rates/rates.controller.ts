@@ -13,7 +13,6 @@ import {
 } from '@nestjs/common';
 import { RatesService } from './rates.service';
 import { CreateRateDto } from './dto/create-rate.dto';
-import { UpdateRateDto } from './dto/update-rate.dto';
 import { AuthGuard } from 'src/common/guards/auth.guard';
 import { RolesGuard } from 'src/common/guards/roles.guard';
 import { Roles } from 'src/common/decorators/roles.decorator';
@@ -24,6 +23,7 @@ import {
   ApiOkResponse,
   ApiOperation,
 } from '@nestjs/swagger';
+import { UpdateRateDto } from './dto/update-rate.dto';
 
 @Controller('rates')
 export class RatesController {
@@ -38,51 +38,59 @@ export class RatesController {
   })
   @ApiOkResponse({
     example: {
-      cod_tarifa: 'a562c693-8f97-4c7f-a8ba-ccae7ef82a0c',
-      dt_tarifa: '2024-02-29T00:00:00.000Z',
+      cod_tarifa: 'a05b9b49-685b-4081-b07f-13e861c04e04',
+      dt_tarifa: '2012-08-20T13:20:00.000Z',
       valor: {
         s: 1,
-        e: 1,
-        d: [10],
+        e: 2,
+        d: [302],
       },
-      subgrupo: 'A1',
-      cod_concessionaria: '6628d9c1-ce5c-4f12-bd3b-5bcc2840abc8',
+      subgrupo: 'B1',
+      cod_concessionaria: 'ee56ae6d-78f8-450a-9b00-8c345d34acbd',
+      criadoEm: '2024-09-04T03:48:08.810Z',
+      atualizadoEm: '2024-09-04T21:20:27.026Z',
       intervalos_tarifas: [
         {
-          cod_intervalo_tarifa: 'd53d2f76-b916-4369-a190-d1fc1ec5cc0d',
+          cod_intervalo_tarifa: '760787be-4e1a-416b-b932-f828389a37a3',
           de: 0,
-          ate: 120,
+          ate: 10,
           valor: {
             s: 1,
-            e: 1,
-            d: [10],
+            e: 2,
+            d: [302],
           },
           tipo: 'FORA_DE_PONTA',
-          cod_tarifa: 'a562c693-8f97-4c7f-a8ba-ccae7ef82a0c',
+          cod_tarifa: 'a05b9b49-685b-4081-b07f-13e861c04e04',
+          criadoEm: '2024-09-04T21:20:26.999Z',
+          atualizadoEm: '2024-09-04T21:20:26.998Z',
         },
         {
-          cod_intervalo_tarifa: '6f4996cc-88a9-4362-9f12-1d3057aa1b4b',
-          de: 120,
-          ate: 240,
+          cod_intervalo_tarifa: '478b42cd-da4b-42b6-ba97-f0a9828f2a15',
+          de: 10,
+          ate: 100,
           valor: {
             s: 1,
-            e: 1,
-            d: [10],
-          },
-          tipo: 'INTERMEDIARIA',
-          cod_tarifa: 'a562c693-8f97-4c7f-a8ba-ccae7ef82a0c',
-        },
-        {
-          cod_intervalo_tarifa: '27c26fa7-54aa-4a76-a346-c475810aafa3',
-          de: 120,
-          ate: 121,
-          valor: {
-            s: 1,
-            e: 1,
-            d: [10],
+            e: 2,
+            d: [782],
           },
           tipo: 'PONTA',
-          cod_tarifa: 'a562c693-8f97-4c7f-a8ba-ccae7ef82a0c',
+          cod_tarifa: 'a05b9b49-685b-4081-b07f-13e861c04e04',
+          criadoEm: '2024-09-04T21:20:27.015Z',
+          atualizadoEm: '2024-09-04T21:20:27.013Z',
+        },
+        {
+          cod_intervalo_tarifa: '91f92f17-1fa2-474e-b6df-44133f808e57',
+          de: 100,
+          ate: 1440,
+          valor: {
+            s: 1,
+            e: 2,
+            d: [302],
+          },
+          tipo: 'FORA_DE_PONTA',
+          cod_tarifa: 'a05b9b49-685b-4081-b07f-13e861c04e04',
+          criadoEm: '2024-09-04T21:20:27.020Z',
+          atualizadoEm: '2024-09-04T21:20:27.019Z',
         },
       ],
     },
@@ -112,51 +120,59 @@ export class RatesController {
   @ApiOperation({ summary: 'Retorna a tarifa correspondente ao id enviado' })
   @ApiOkResponse({
     example: {
-      cod_tarifa: 'a562c693-8f97-4c7f-a8ba-ccae7ef82a0c',
-      dt_tarifa: '2024-02-29T00:00:00.000Z',
+      cod_tarifa: 'a05b9b49-685b-4081-b07f-13e861c04e04',
+      dt_tarifa: '2012-08-20T13:20:00.000Z',
       valor: {
         s: 1,
-        e: 1,
-        d: [10],
+        e: 2,
+        d: [302],
       },
-      subgrupo: 'A1',
-      cod_concessionaria: '6628d9c1-ce5c-4f12-bd3b-5bcc2840abc8',
+      subgrupo: 'B1',
+      cod_concessionaria: 'ee56ae6d-78f8-450a-9b00-8c345d34acbd',
+      criadoEm: '2024-09-04T03:48:08.810Z',
+      atualizadoEm: '2024-09-04T21:20:27.026Z',
       intervalos_tarifas: [
         {
-          cod_intervalo_tarifa: 'd53d2f76-b916-4369-a190-d1fc1ec5cc0d',
+          cod_intervalo_tarifa: '760787be-4e1a-416b-b932-f828389a37a3',
           de: 0,
-          ate: 120,
+          ate: 10,
           valor: {
             s: 1,
-            e: 1,
-            d: [10],
+            e: 2,
+            d: [302],
           },
           tipo: 'FORA_DE_PONTA',
-          cod_tarifa: 'a562c693-8f97-4c7f-a8ba-ccae7ef82a0c',
+          cod_tarifa: 'a05b9b49-685b-4081-b07f-13e861c04e04',
+          criadoEm: '2024-09-04T21:20:26.999Z',
+          atualizadoEm: '2024-09-04T21:20:26.998Z',
         },
         {
-          cod_intervalo_tarifa: '6f4996cc-88a9-4362-9f12-1d3057aa1b4b',
-          de: 120,
-          ate: 240,
+          cod_intervalo_tarifa: '478b42cd-da4b-42b6-ba97-f0a9828f2a15',
+          de: 10,
+          ate: 100,
           valor: {
             s: 1,
-            e: 1,
-            d: [10],
-          },
-          tipo: 'INTERMEDIARIA',
-          cod_tarifa: 'a562c693-8f97-4c7f-a8ba-ccae7ef82a0c',
-        },
-        {
-          cod_intervalo_tarifa: '27c26fa7-54aa-4a76-a346-c475810aafa3',
-          de: 120,
-          ate: 121,
-          valor: {
-            s: 1,
-            e: 1,
-            d: [10],
+            e: 2,
+            d: [782],
           },
           tipo: 'PONTA',
-          cod_tarifa: 'a562c693-8f97-4c7f-a8ba-ccae7ef82a0c',
+          cod_tarifa: 'a05b9b49-685b-4081-b07f-13e861c04e04',
+          criadoEm: '2024-09-04T21:20:27.015Z',
+          atualizadoEm: '2024-09-04T21:20:27.013Z',
+        },
+        {
+          cod_intervalo_tarifa: '91f92f17-1fa2-474e-b6df-44133f808e57',
+          de: 100,
+          ate: 1440,
+          valor: {
+            s: 1,
+            e: 2,
+            d: [302],
+          },
+          tipo: 'FORA_DE_PONTA',
+          cod_tarifa: 'a05b9b49-685b-4081-b07f-13e861c04e04',
+          criadoEm: '2024-09-04T21:20:27.020Z',
+          atualizadoEm: '2024-09-04T21:20:27.019Z',
         },
       ],
     },
@@ -179,8 +195,90 @@ export class RatesController {
   }
 
   @Patch(':id')
+  @UseGuards(AuthGuard, RolesGuard)
+  @Roles('ADMIN')
+  @ApiBearerAuth('token')
+  @ApiOperation({
+    summary:
+      'Atualiza a tarifa correspondente ao id, com base nos dados enviados, e retorna a tarifa',
+    description:
+      'Atualiza a tarifa correspondente ao id, com base nos dados enviados, e retorna a tarifa. Também possibilita alterações nos seus intervalos',
+  })
+  @ApiOkResponse({
+    example: {
+      cod_tarifa: 'a05b9b49-685b-4081-b07f-13e861c04e04',
+      dt_tarifa: '2012-08-20T13:20:00.000Z',
+      valor: {
+        s: 1,
+        e: 2,
+        d: [302],
+      },
+      subgrupo: 'B1',
+      cod_concessionaria: 'ee56ae6d-78f8-450a-9b00-8c345d34acbd',
+      criadoEm: '2024-09-04T03:48:08.810Z',
+      atualizadoEm: '2024-09-04T21:20:27.026Z',
+      intervalos_tarifas: [
+        {
+          cod_intervalo_tarifa: '760787be-4e1a-416b-b932-f828389a37a3',
+          de: 0,
+          ate: 10,
+          valor: {
+            s: 1,
+            e: 2,
+            d: [302],
+          },
+          tipo: 'FORA_DE_PONTA',
+          cod_tarifa: 'a05b9b49-685b-4081-b07f-13e861c04e04',
+          criadoEm: '2024-09-04T21:20:26.999Z',
+          atualizadoEm: '2024-09-04T21:20:26.998Z',
+        },
+        {
+          cod_intervalo_tarifa: '478b42cd-da4b-42b6-ba97-f0a9828f2a15',
+          de: 10,
+          ate: 100,
+          valor: {
+            s: 1,
+            e: 2,
+            d: [782],
+          },
+          tipo: 'PONTA',
+          cod_tarifa: 'a05b9b49-685b-4081-b07f-13e861c04e04',
+          criadoEm: '2024-09-04T21:20:27.015Z',
+          atualizadoEm: '2024-09-04T21:20:27.013Z',
+        },
+        {
+          cod_intervalo_tarifa: '91f92f17-1fa2-474e-b6df-44133f808e57',
+          de: 100,
+          ate: 1440,
+          valor: {
+            s: 1,
+            e: 2,
+            d: [302],
+          },
+          tipo: 'FORA_DE_PONTA',
+          cod_tarifa: 'a05b9b49-685b-4081-b07f-13e861c04e04',
+          criadoEm: '2024-09-04T21:20:27.020Z',
+          atualizadoEm: '2024-09-04T21:20:27.019Z',
+        },
+      ],
+    },
+  })
+  @ApiBadRequestResponse({
+    example: {
+      message: 'Os intervalos não podem se sobrepor',
+      error: 'Bad Request',
+      statusCode: 400,
+    },
+  })
+  @ApiNotFoundResponse({
+    example: {
+      message: 'Tarifa não foi encontrada',
+      error: 'Not Found',
+      statusCode: 404,
+    },
+  })
   update(@Param('id') id: string, @Body() updateRateDto: UpdateRateDto) {
-    return this.ratesService.update(+id, updateRateDto);
+    return this.ratesService.update(id, updateRateDto);
   }
 
   @Delete(':id')
@@ -192,51 +290,59 @@ export class RatesController {
   })
   @ApiOkResponse({
     example: {
-      cod_tarifa: 'a562c693-8f97-4c7f-a8ba-ccae7ef82a0c',
-      dt_tarifa: '2024-02-29T00:00:00.000Z',
+      cod_tarifa: 'a05b9b49-685b-4081-b07f-13e861c04e04',
+      dt_tarifa: '2012-08-20T13:20:00.000Z',
       valor: {
         s: 1,
-        e: 1,
-        d: [10],
+        e: 2,
+        d: [302],
       },
-      subgrupo: 'A1',
-      cod_concessionaria: '6628d9c1-ce5c-4f12-bd3b-5bcc2840abc8',
+      subgrupo: 'B1',
+      cod_concessionaria: 'ee56ae6d-78f8-450a-9b00-8c345d34acbd',
+      criadoEm: '2024-09-04T03:48:08.810Z',
+      atualizadoEm: '2024-09-04T21:20:27.026Z',
       intervalos_tarifas: [
         {
-          cod_intervalo_tarifa: 'd53d2f76-b916-4369-a190-d1fc1ec5cc0d',
+          cod_intervalo_tarifa: '760787be-4e1a-416b-b932-f828389a37a3',
           de: 0,
-          ate: 120,
+          ate: 10,
           valor: {
             s: 1,
-            e: 1,
-            d: [10],
+            e: 2,
+            d: [302],
           },
           tipo: 'FORA_DE_PONTA',
-          cod_tarifa: 'a562c693-8f97-4c7f-a8ba-ccae7ef82a0c',
+          cod_tarifa: 'a05b9b49-685b-4081-b07f-13e861c04e04',
+          criadoEm: '2024-09-04T21:20:26.999Z',
+          atualizadoEm: '2024-09-04T21:20:26.998Z',
         },
         {
-          cod_intervalo_tarifa: '6f4996cc-88a9-4362-9f12-1d3057aa1b4b',
-          de: 120,
-          ate: 240,
+          cod_intervalo_tarifa: '478b42cd-da4b-42b6-ba97-f0a9828f2a15',
+          de: 10,
+          ate: 100,
           valor: {
             s: 1,
-            e: 1,
-            d: [10],
-          },
-          tipo: 'INTERMEDIARIA',
-          cod_tarifa: 'a562c693-8f97-4c7f-a8ba-ccae7ef82a0c',
-        },
-        {
-          cod_intervalo_tarifa: '27c26fa7-54aa-4a76-a346-c475810aafa3',
-          de: 120,
-          ate: 121,
-          valor: {
-            s: 1,
-            e: 1,
-            d: [10],
+            e: 2,
+            d: [782],
           },
           tipo: 'PONTA',
-          cod_tarifa: 'a562c693-8f97-4c7f-a8ba-ccae7ef82a0c',
+          cod_tarifa: 'a05b9b49-685b-4081-b07f-13e861c04e04',
+          criadoEm: '2024-09-04T21:20:27.015Z',
+          atualizadoEm: '2024-09-04T21:20:27.013Z',
+        },
+        {
+          cod_intervalo_tarifa: '91f92f17-1fa2-474e-b6df-44133f808e57',
+          de: 100,
+          ate: 1440,
+          valor: {
+            s: 1,
+            e: 2,
+            d: [302],
+          },
+          tipo: 'FORA_DE_PONTA',
+          cod_tarifa: 'a05b9b49-685b-4081-b07f-13e861c04e04',
+          criadoEm: '2024-09-04T21:20:27.020Z',
+          atualizadoEm: '2024-09-04T21:20:27.019Z',
         },
       ],
     },
