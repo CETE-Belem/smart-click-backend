@@ -124,6 +124,7 @@ export class ConcessionaireService {
     limit: number;
     page: number;
     totalPages: number;
+    totalConcessionaires: number;
     concessionaires: ConcessionaireEntity[];
   }> {
     const { city, limit, name, page, uf } = options;
@@ -166,6 +167,7 @@ export class ConcessionaireService {
       limit,
       page,
       totalPages,
+      totalConcessionaires,
       concessionaires: concessionaires.map(
         (concessionaire) => new ConcessionaireEntity(concessionaire),
       ),

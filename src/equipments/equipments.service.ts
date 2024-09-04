@@ -8,7 +8,7 @@ import { AdminUpdateEquipmentDto } from './dto/admin-update-equipment.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { EquipmentEntity } from './entities/equipment.entity';
 import { JWTType } from 'src/types/jwt.types';
-import { Cargo, Equipamento, Fases } from '@prisma/client';
+import { Cargo, Fases } from '@prisma/client';
 import { UserUpdateEquipmentDto } from './dto/user-update-equipment.dto';
 
 @Injectable()
