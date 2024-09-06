@@ -197,7 +197,7 @@ export class ConsumerUnitController {
     );
   }
 
-  @Patch('/:id/me')
+  @Patch('/:me')
   @UseGuards(AuthGuard)
   @ApiBearerAuth('token')
   @ApiOkResponse({
@@ -235,17 +235,11 @@ export class ConsumerUnitController {
       statusCode: 404,
     },
   })
-  @ApiParam({ name: 'id', type: 'string', required: true })
   addUnitToUser(
     @Request() req: JWTType,
-    @Param('id') id: string,
     @Body() connectConsumerUnitDto: ConnectConsumerUnitDto,
   ) {
-    return this.consumerUnitService.addUnitToUser(
-      req,
-      id,
-      connectConsumerUnitDto,
-    );
+    return this.consumerUnitService.addUnitToUser(req, connectConsumerUnitDto);
   }
 
   @Delete('/:id')
