@@ -2,6 +2,7 @@ import {
   Injectable,
   NotFoundException,
   ConflictException,
+  BadRequestException,
 } from '@nestjs/common';
 import { CreateConcessionaireDto } from './dto/create-concessionaire.dto';
 import { UpdateConcessionaireDto } from './dto/update-concessionaire.dto';
@@ -116,9 +117,10 @@ export class ConcessionaireService {
     options: {
       page: number;
       limit: number;
-      name: string;
-      uf: string;
-      city: string;
+      uf?: string;
+      city?: string;
+      name?: string;
+      query?: string;
     },
   ): Promise<{
     limit: number;
@@ -127,19 +129,81 @@ export class ConcessionaireService {
     totalConcessionaires: number;
     concessionaires: ConcessionaireEntity[];
   }> {
-    const { city, limit, name, page, uf } = options;
+    const { city, limit, name, page, uf, query } = options;
+
+    if (page <= 0 || limit <= 0) {
+      throw new BadRequestException(
+        'Os parâmetros page/limit devem ser maiores que 0.',
+      );
+    }
+
+    let whereClause = {};
+
+    if (uf || city || name) {
+      whereClause = {
+        OR: [
+          ...(name
+            ? [
+                {
+                  nome: {
+                    contains: name,
+                    mode: 'insensitive',
+                  },
+                },
+              ]
+            : []),
+          ...(uf
+            ? [
+                {
+                  uf: {
+                    contains: uf,
+                    mode: 'insensitive',
+                  },
+                },
+              ]
+            : []),
+          ...(city
+            ? [
+                {
+                  cidade: {
+                    contains: city,
+                    mode: 'insensitive',
+                  },
+                },
+              ]
+            : []),
+        ],
+      };
+    }
+
+    if (query) {
+      whereClause = {
+        ...whereClause,
+        OR: [
+          {
+            nome: {
+              contains: query,
+              mode: 'insensitive',
+            },
+          },
+          {
+            cidade: {
+              contains: query,
+              mode: 'insensitive',
+            },
+          },
+          {
+            uf: {
+              contains: query,
+              mode: 'insensitive',
+            },
+          },
+        ],
+      };
+    }
+
     const concessionaires = await this.prismaService.concessionaria.findMany({
-      where: {
-        cidade: {
-          contains: city,
-        },
-        nome: {
-          contains: name,
-        },
-        uf: {
-          contains: uf,
-        },
-      },
+      where: whereClause,
       orderBy: {
         criadoEm: 'asc',
       },
@@ -148,17 +212,7 @@ export class ConcessionaireService {
     });
 
     const totalConcessionaires = await this.prismaService.concessionaria.count({
-      where: {
-        cidade: {
-          contains: city,
-        },
-        nome: {
-          contains: name,
-        },
-        uf: {
-          contains: uf,
-        },
-      },
+      where: whereClause,
     });
 
     const totalPages = Math.ceil(totalConcessionaires / limit);
