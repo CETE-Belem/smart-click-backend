@@ -231,7 +231,7 @@ export class UsersController {
   }
 
   @Get('/:id')
-  // @UseGuards(AuthGuard)
+  @UseGuards(AuthGuard)
   @ApiBearerAuth('token')
   @ApiOkResponse({
     status: HttpStatus.OK,
