@@ -13,11 +13,11 @@ export class SensorDataService {
 
   async handleData(data: string, mac: string) {
     try {
-      const pattern = /^(\d+(\.\d+)?)(\|(\d+(\.\d+)?))*$/;
+      // const pattern = /^(\d+(\.\d+)?)(\|(\d+(\.\d+)?))*$/;
 
-      if (!pattern.test(data)) {
-        throw new Error('Invalid data');
-      }
+      // if (!pattern.test(data)) {
+      //   throw new Error('Invalid data');
+      // }
 
       const dataSplitted = data.split('|');
       const phaseCount = Number(dataSplitted[0]);
