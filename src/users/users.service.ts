@@ -24,6 +24,7 @@ import { RecoverPasswordDto } from './dto/recover-password.dto';
 import { AdminUpdateUserDto } from './dto/admin-update-user.dto';
 import { Cargo } from '@prisma/client';
 import { CreateAdminDto } from './dto/create-admin.dto';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class UsersService {
@@ -433,7 +434,7 @@ export class UsersService {
     if (!recoverCode)
       throw new NotFoundException('Código de recuperação não encontrado');
 
-    if (recoverCode.codigo !== code)
+    if (bcrypt.compareSync(code, recoverCode.codigo))
       throw new ForbiddenException('Código de recuperação inválido');
 
     if (
@@ -576,7 +577,7 @@ export class UsersService {
     if (!confirmationCode)
       throw new NotFoundException('Código de confirmação não encontrado');
 
-    if (confirmationCode.codigo !== code)
+    if (bcrypt.compareSync(code, confirmationCode.codigo))
       throw new ForbiddenException('Código de confirmação inválido');
 
     if (
