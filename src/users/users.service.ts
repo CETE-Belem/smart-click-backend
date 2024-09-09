@@ -232,15 +232,17 @@ export class UsersService {
       limit: number;
       name: string;
       email: string;
+      query: string;
       role: Cargo;
     },
   ): Promise<{
     limit: number;
     page: number;
+    totalUsers: number;
     totalPages: number;
     users: UserEntity[];
   }> {
-    const { email, limit, name, page, role } = options;
+    const { email, limit, name, page, role, query } = options;
 
     const whereCondition: any = {
       email: {
@@ -250,6 +252,23 @@ export class UsersService {
         contains: name,
       },
     };
+
+    if (!!query) {
+      whereCondition.OR = [
+        {
+          email: {
+            contains: query,
+            mode: 'insensitive',
+          },
+        },
+        {
+          nome: {
+            contains: query,
+            mode: 'insensitive',
+          },
+        },
+      ];
+    }
 
     // Add conditional filtering for perfil and cargo
     if (!!role) {
@@ -267,15 +286,7 @@ export class UsersService {
     });
 
     const totalUsers = await this.prismaService.usuario.count({
-      where: {
-        email: {
-          contains: email,
-        },
-        nome: {
-          contains: name,
-        },
-        perfil: role,
-      },
+      where: whereCondition,
     });
 
     const totalPages = Math.ceil(totalUsers / limit);
@@ -283,6 +294,7 @@ export class UsersService {
     return {
       limit,
       page,
+      totalUsers,
       totalPages,
       users: users.map((user) => new UserEntity(user)),
     };

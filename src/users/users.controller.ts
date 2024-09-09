@@ -201,6 +201,7 @@ export class UsersController {
   @ApiParam({ name: 'role', type: 'string', required: false })
   @ApiParam({ name: 'page', type: 'number', required: true })
   @ApiParam({ name: 'limit', type: 'number', required: true })
+  @ApiParam({ name: 'query', type: 'string', required: false })
   findAll(
     @Request() req: JWTType,
     @Query('name') name: string,
@@ -208,12 +209,14 @@ export class UsersController {
     @Query('role') role: Cargo,
     @Query('page', new ParseIntPipe()) page: number,
     @Query('limit', new ParseIntPipe()) limit: number,
+    @Query('query') query: string,
   ) {
     return this.usersService.findAll(req, {
       name,
       email,
       role,
       page,
+      query,
       limit,
     });
   }
