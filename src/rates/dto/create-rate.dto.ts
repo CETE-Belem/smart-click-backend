@@ -57,7 +57,8 @@ export class CreateRateDto {
     type: Number,
     nullable: false,
   })
-  @IsNumber({}, { message: 'O Valor deve ser um número' })
+  @IsNumber({}, { message: 'Valor deve ser um número' })
+  @IsNotEmpty({ message: 'Valor é obrigatório' })
   @Transform(({ value }) => parseFloat(value))
   valor: number;
 

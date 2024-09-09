@@ -15,9 +15,9 @@ export class RatesService {
   constructor(private readonly prismaService: PrismaService) {}
 
   private completeIntervals(
-    intervals: CreateRateIntervalDto[],
+    intervals: CreateRateIntervalDto[] | UpdateRateIntervalDto[],
     valor: number,
-  ): CreateRateIntervalDto[] {
+  ): CreateRateIntervalDto[] | UpdateRateIntervalDto[] {
     const completedIntervals: CreateRateIntervalDto[] = [...intervals];
 
     if (completedIntervals[completedIntervals.length - 1].ate < 1440) {
@@ -55,8 +55,8 @@ export class RatesService {
 
   private prepareIntervals(
     valor: number,
-    intervals?: CreateRateIntervalDto[],
-  ): CreateRateIntervalDto[] {
+    intervals?: CreateRateIntervalDto[] | UpdateRateIntervalDto[],
+  ): CreateRateIntervalDto[] | UpdateRateIntervalDto[] {
     const defaultInterval: CreateRateIntervalDto = {
       de: 0,
       ate: 1440,
@@ -117,7 +117,6 @@ export class RatesService {
         dt_tarifa,
         subgrupo,
         valor,
-        atualizadoEm: new Date(),
         concessionaria: {
           connect: {
             cod_concessionaria,
@@ -217,39 +216,6 @@ export class RatesService {
       (interval) => !('cod_intervalo_tarifa' in interval),
     ) as CreateRateIntervalDto[];
 
-    for (const interval of intervalsToUpdate)
-      await this.prismaService.intervalo_Tarifa.update({
-        where: {
-          cod_tarifa: id,
-          cod_intervalo_tarifa: interval.cod_intervalo_tarifa,
-        },
-        data: {
-          ...interval,
-          atualizadoEm: new Date(),
-        },
-      });
-
-    for (const interval of intervalsToCreate)
-      await this.prismaService.intervalo_Tarifa.create({
-        data: {
-          ...interval,
-          atualizadoEm: new Date(),
-          tarifa: {
-            connect: {
-              cod_tarifa: id,
-            },
-          },
-        },
-      });
-
-    for (const interval of intervalsToDelete)
-      await this.prismaService.intervalo_Tarifa.delete({
-        where: {
-          cod_tarifa: id,
-          cod_intervalo_tarifa: interval.cod_intervalo_tarifa,
-        },
-      });
-
     const updatedRate = await this.prismaService.tarifa.update({
       where: {
         cod_tarifa: id,
@@ -258,11 +224,26 @@ export class RatesService {
         dt_tarifa,
         subgrupo,
         valor,
-        atualizadoEm: new Date(),
         concessionaria: {
           connect: {
             cod_concessionaria,
           },
+        },
+        intervalos_tarifas: {
+          deleteMany: {
+            cod_intervalo_tarifa: {
+              in: intervalsToDelete.map(
+                (interval) => interval.cod_intervalo_tarifa,
+              ),
+            },
+          },
+          create: intervalsToCreate,
+          update: intervalsToUpdate.map((interval) => ({
+            where: {
+              cod_intervalo_tarifa: interval.cod_intervalo_tarifa,
+            },
+            data: interval,
+          })),
         },
       },
       include: {

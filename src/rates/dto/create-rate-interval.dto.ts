@@ -1,5 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Tipo_Tarifa } from '@prisma/client';
+import { Transform } from 'class-transformer';
 import {
   IsEnum,
   IsNotEmpty,
@@ -48,6 +49,7 @@ export class CreateRateIntervalDto {
   })
   @IsNumber({}, { message: 'Campo [valor] deve ser um número' })
   @IsNotEmpty({ message: 'Campo [valor] é obrigatório' })
+  @Transform(({ value }) => parseFloat(value))
   valor: number;
 
   @ApiProperty({

@@ -3,6 +3,7 @@ import { Subgrupo, Tarifa } from '@prisma/client';
 import { Decimal } from '@prisma/client/runtime/library';
 import { ConcessionaireEntity } from 'src/concessionaire/entities/concessionaire.entity';
 import { RateIntervalEntity } from './rate-interval.entity';
+import { Transform } from 'class-transformer';
 
 export class RateEntity implements Tarifa {
   constructor(partial: Partial<RateEntity>) {
@@ -37,6 +38,7 @@ export class RateEntity implements Tarifa {
     type: Number,
     nullable: false,
   })
+  @Transform(({ value }) => parseFloat(value))
   valor: Decimal;
 
   @ApiProperty({
@@ -46,11 +48,11 @@ export class RateEntity implements Tarifa {
   concessionaria: ConcessionaireEntity;
 
   @ApiProperty({
-    type: () => RateIntervalEntity,
+    type: RateIntervalEntity,
     isArray: true,
     nullable: false,
   })
-  intervalo_tarifa: RateIntervalEntity[];
+  intervalos_tarifas: RateIntervalEntity[];
 
   @ApiProperty({
     type: Date,

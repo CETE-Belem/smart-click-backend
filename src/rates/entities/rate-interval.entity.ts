@@ -1,6 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Intervalo_Tarifa, Tipo_Tarifa } from '@prisma/client';
 import { Decimal } from '@prisma/client/runtime/library';
+import { Transform } from 'class-transformer';
 
 export class RateIntervalEntity implements Intervalo_Tarifa {
   constructor(partial: Partial<RateIntervalEntity>) {
@@ -29,6 +30,7 @@ export class RateIntervalEntity implements Intervalo_Tarifa {
     type: Number,
     nullable: false,
   })
+  @Transform(({ value }) => parseFloat(value))
   valor: Decimal;
 
   @ApiProperty({
