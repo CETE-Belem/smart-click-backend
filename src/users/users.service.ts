@@ -601,4 +601,21 @@ export class UsersService {
       user: new UserEntity(updatedUser),
     };
   }
+
+  async delete(req: JWTType, id: string): Promise<void> {
+    const { userId } = req.user;
+
+    if (userId === id)
+      throw new ForbiddenException('Você não pode deletar sua própria conta');
+
+    await this.prismaService.usuario
+      .delete({
+        where: {
+          cod_usuario: id,
+        },
+      })
+      .catch(() => {
+        throw new NotFoundException('Usuário não encontrado');
+      });
+  }
 }
