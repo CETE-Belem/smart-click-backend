@@ -198,7 +198,6 @@ export class UsersService {
 
     const user = await this.prismaService.usuario.findUnique({
       where: {
-        cod_usuario: userId,
         email,
       },
     });
@@ -330,6 +329,14 @@ export class UsersService {
       .catch(() => {
         throw new NotFoundException('Usuário não encontrado');
       });
+
+    const existingUser = await this.prismaService.usuario.findUnique({
+      where: {
+        email,
+      },
+    });
+
+    if (existingUser) throw new ConflictException('Email já cadastrado');
 
     const updatedUser = await this.prismaService.usuario.update({
       where: {
