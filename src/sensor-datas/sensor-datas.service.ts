@@ -91,7 +91,7 @@ export class SensorDataService {
   async getChartData(equipmentId: string, from: Date, to: Date) {
     const equipamento = await this.prismaService.equipamento.findFirst({
       where: {
-        mac: equipmentId,
+        cod_equipamento: equipmentId,
       },
     });
 
