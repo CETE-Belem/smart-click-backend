@@ -331,8 +331,11 @@ export class UsersService {
         throw new NotFoundException('Usuário não encontrado');
       });
 
-    const existingUser = await this.prismaService.usuario.findUnique({
+    const existingUser = await this.prismaService.usuario.findFirst({
       where: {
+        cod_usuario: {
+          not: id,
+        },
         email,
       },
     });
@@ -434,7 +437,7 @@ export class UsersService {
     if (!recoverCode)
       throw new NotFoundException('Código de recuperação não encontrado');
 
-    if (bcrypt.compareSync(code, recoverCode.codigo))
+    if (!bcrypt.compareSync(code, recoverCode.codigo))
       throw new ForbiddenException('Código de recuperação inválido');
 
     if (
@@ -577,7 +580,7 @@ export class UsersService {
     if (!confirmationCode)
       throw new NotFoundException('Código de confirmação não encontrado');
 
-    if (bcrypt.compareSync(code, confirmationCode.codigo))
+    if (!bcrypt.compareSync(code, confirmationCode.codigo))
       throw new ForbiddenException('Código de confirmação inválido');
 
     if (
@@ -602,7 +605,7 @@ export class UsersService {
       },
     });
 
-    const accessToken = await this.authService.createAccessToken(user);
+    const accessToken = await this.authService.createAccessToken(updatedUser);
 
     return {
       accessToken,

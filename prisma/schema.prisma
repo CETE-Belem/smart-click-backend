@@ -195,7 +195,7 @@ model Dado_Sensor {
 
 model Codigo_Confirmacao {
   cod_codigo  String   @id @default(uuid())
-  codigo      String   @db.VarChar(6)
+  codigo      String
   expiraEm    DateTime
   usuario     Usuario  @relation(fields: [cod_usuario], references: [cod_usuario], onDelete: Cascade)
   cod_usuario String   @unique
@@ -209,7 +209,7 @@ model Codigo_Confirmacao {
 
 model Codigo_Recuperacao {
   cod_codigo  String   @id @default(uuid())
-  codigo      String   @db.VarChar(6)
+  codigo      String
   expiraEm    DateTime
   usuario     Usuario  @relation(fields: [cod_usuario], references: [cod_usuario], onDelete: Cascade)
   cod_usuario String   @unique
