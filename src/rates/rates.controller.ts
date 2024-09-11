@@ -22,9 +22,11 @@ import {
   ApiNotFoundResponse,
   ApiOkResponse,
   ApiOperation,
+  ApiTags,
 } from '@nestjs/swagger';
 import { UpdateRateDto } from './dto/update-rate.dto';
 
+@ApiTags('rates')
 @Controller('rates')
 export class RatesController {
   constructor(private readonly ratesService: RatesService) {}
