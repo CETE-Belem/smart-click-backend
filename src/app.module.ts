@@ -12,6 +12,7 @@ import { ConcessionaireModule } from './concessionaires/concessionaires.module';
 import { ConsumerUnitModule } from './consumer-units/consumer-units.module';
 import { WinstonModule } from 'nest-winston';
 import { winstonConfig } from './config/winston.config';
+import { RatesModule } from './rates/rates.module';
 import { LoggerInterceptor } from './common/interceptors/logger.interceptor';
 import { ConflictInterceptor } from './common/interceptors/conflict.interceptor';
 import { DatabaseInterceptor } from './common/interceptors/database.interceptor';
@@ -37,6 +38,7 @@ import { SensorDataModule } from './sensor-datas/sensor-datas.module';
     MailModule,
     ConcessionaireModule,
     ConsumerUnitModule,
+    RatesModule,
     SensorDataModule,
   ],
   controllers: [AppController],
