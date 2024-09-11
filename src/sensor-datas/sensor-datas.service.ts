@@ -46,21 +46,25 @@ export class SensorDataService {
       const FPC = phaseCount > 2 ? Number(dataSplitted[15]) : null;
       await this.prismaService.dado_Sensor.create({
         data: {
-          vA,
+          vA: Math.abs(vA),
           iA,
-          potenciaAparenteA,
-          potenciaAtivaA,
-          FPA,
-          vB,
+          potenciaAparenteA: Math.abs(potenciaAparenteA),
+          potenciaAtivaA: Math.abs(potenciaAtivaA),
+          FPA: Math.abs(FPA),
+          vB: vB ? Math.abs(vB) : null,
           iB,
-          potenciaAparenteB,
-          potenciaAtivaB,
-          FPB,
-          vC,
+          potenciaAparenteB: potenciaAparenteB
+            ? Math.abs(potenciaAparenteB)
+            : null,
+          potenciaAtivaB: potenciaAtivaB ? Math.abs(potenciaAtivaB) : null,
+          FPB: FPB ? Math.abs(FPB) : null,
+          vC: vC ? Math.abs(vC) : null,
           iC,
-          potenciaAparenteC,
-          potenciaAtivaC,
-          FPC,
+          potenciaAparenteC: potenciaAparenteC
+            ? Math.abs(potenciaAparenteC)
+            : null,
+          potenciaAtivaC: potenciaAtivaC ? Math.abs(potenciaAtivaC) : null,
+          FPC: FPC ? Math.abs(FPC) : null,
           data: await this.prismaService.dado_Sensor
             .findFirstOrThrow({
               where: {
