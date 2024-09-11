@@ -87,8 +87,11 @@ export class MqttService {
         where: {
           mac,
         },
+        include: {
+          unidade_consumidora: true,
+        },
       });
-      const userId = equipment.cod_usuario;
+      const userId = equipment.unidade_consumidora.cod_usuario;
       const sockets = this.frontWebSocketService.findSocketByUserId(userId);
       sockets?.forEach((socket) => {
         socket.emit(
@@ -136,9 +139,13 @@ export class MqttService {
       },
       select: {
         perfil: true,
-        equipamentos: {
-          select: {
-            mac: true,
+        unidade_consumidora: {
+          include: {
+            equipamentos: {
+              select: {
+                mac: true,
+              },
+            },
           },
         },
       },
@@ -152,7 +159,7 @@ export class MqttService {
       return;
     }
 
-    const equipments = user.equipamentos;
+    const equipments = user.unidade_consumidora.equipamentos;
     if (!equipments) return;
     this.client.subscribe(
       equipments.map((device) => {
@@ -171,7 +178,7 @@ export class MqttService {
   async unsubscribeToUserDevices(userId: string) {
     const equipments = await this.prisma.equipamento.findMany({
       where: {
-        usuario: {
+        unidade_consumidora: {
           cod_usuario: userId,
         },
       },

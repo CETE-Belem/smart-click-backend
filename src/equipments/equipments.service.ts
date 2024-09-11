@@ -30,7 +30,7 @@ export class EquipmentsService {
       fases_monitoradas,
     } = createEquipmentDto;
 
-    const { cod_unidade_consumidora, cod_concessionaria, cod_usuario } =
+    const { cod_unidade_consumidora } =
       await this.prismaService.unidade_Consumidora
         .findFirstOrThrow({
           where: {
@@ -59,17 +59,11 @@ export class EquipmentsService {
         fases_monitoradas,
         nome: name,
         descricao: description,
-        concessionaria: {
-          connect: {
-            cod_concessionaria,
-          },
-        },
         usuario_cadastrou: {
           connect: {
             cod_usuario: req.user.userId,
           },
         },
-        ...(cod_usuario && { usuario: { connect: { cod_usuario } } }),
         unidade_consumidora: {
           connect: {
             cod_unidade_consumidora,
@@ -116,7 +110,7 @@ export class EquipmentsService {
     if (usuario?.perfil !== Cargo.ADMIN) {
       const equipments = await this.prismaService.equipamento.findMany({
         where: {
-          usuario: {
+          unidade_consumidora: {
             cod_usuario: req.user.userId,
           },
           OR: [
@@ -154,14 +148,17 @@ export class EquipmentsService {
         skip: (page - 1) * limit,
         take: limit,
         include: {
-          unidade_consumidora: true,
-          concessionaria: true,
+          unidade_consumidora: {
+            include: {
+              concessionaria: true,
+            },
+          },
         },
       });
 
       const totalEquipments = await this.prismaService.equipamento.count({
         where: {
-          usuario: {
+          unidade_consumidora: {
             cod_usuario: req.user.userId,
           },
           OR: [
@@ -252,8 +249,11 @@ export class EquipmentsService {
         skip: (page - 1) * limit,
         take: limit,
         include: {
-          unidade_consumidora: true,
-          concessionaria: true,
+          unidade_consumidora: {
+            include: {
+              concessionaria: true,
+            },
+          },
         },
       });
 
@@ -325,8 +325,11 @@ export class EquipmentsService {
           cod_equipamento: id,
         },
         include: {
-          unidade_consumidora: true,
-          concessionaria: true,
+          unidade_consumidora: {
+            include: {
+              concessionaria: true,
+            },
+          },
         },
       });
 
@@ -337,11 +340,16 @@ export class EquipmentsService {
       const equipment = await this.prismaService.equipamento.findUnique({
         where: {
           cod_equipamento: id,
-          cod_usuario: req.user.userId,
+          unidade_consumidora: {
+            cod_usuario: req.user.userId,
+          },
         },
         include: {
-          unidade_consumidora: true,
-          concessionaria: true,
+          unidade_consumidora: {
+            include: {
+              concessionaria: true,
+            },
+          },
         },
       });
 
@@ -380,8 +388,11 @@ export class EquipmentsService {
         descricao: description,
       },
       include: {
-        unidade_consumidora: true,
-        concessionaria: true,
+        unidade_consumidora: {
+          include: {
+            concessionaria: true,
+          },
+        },
       },
     });
 
@@ -445,15 +456,13 @@ export class EquipmentsService {
             cod_unidade_consumidora: unidadeConsumidora.cod_unidade_consumidora,
           },
         },
-        concessionaria: {
-          connect: {
-            cod_concessionaria,
-          },
-        },
       },
       include: {
-        concessionaria: true,
-        unidade_consumidora: true,
+        unidade_consumidora: {
+          include: {
+            concessionaria: true,
+          },
+        },
       },
     });
 
@@ -484,7 +493,9 @@ export class EquipmentsService {
         cod_equipamento: {
           in: equipments,
         },
-        cod_usuario: req.user.userId,
+        unidade_consumidora: {
+          cod_usuario: req.user.userId,
+        },
       },
     });
 

@@ -78,35 +78,18 @@ export class UsersService {
     });
 
     // Connect Consumer Unity to User by intermediary table
-    const { equipamentos } =
-      await this.prismaService.unidade_Consumidora.update({
-        where: {
-          cod_unidade_consumidora:
-            existingConsumerUnity.cod_unidade_consumidora,
-        },
-        data: {
-          usuario: {
-            connect: {
-              cod_usuario: user.cod_usuario,
-            },
+    await this.prismaService.unidade_Consumidora.update({
+      where: {
+        cod_unidade_consumidora: existingConsumerUnity.cod_unidade_consumidora,
+      },
+      data: {
+        usuario: {
+          connect: {
+            cod_usuario: user.cod_usuario,
           },
         },
-        include: {
-          equipamentos: true,
-        },
-      });
-
-    equipamentos.length > 0 &&
-      (await this.prismaService.equipamento.updateMany({
-        where: {
-          cod_equipamento: {
-            in: equipamentos.map((equipment) => equipment.cod_equipamento),
-          },
-        },
-        data: {
-          cod_usuario: user.cod_usuario,
-        },
-      }));
+      },
+    });
 
     const confirmationCode = generateConfirmationCode();
 

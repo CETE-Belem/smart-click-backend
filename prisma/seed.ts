@@ -1,4 +1,4 @@
-import { PrismaClient } from '@prisma/client';
+import { Dado_Sensor, PrismaClient } from '@prisma/client';
 import { generateSalt, hashPassword } from '../src/services/libs/bcrypt';
 import { fakerPT_BR } from '@faker-js/faker';
 
@@ -114,6 +114,81 @@ async function main() {
         console.log(`Concessionária da cidade ${response.cidade} criada`);
       });
   }
+
+  const consumerUnit = await prisma.unidade_Consumidora.findFirst();
+
+  const equipment = await prisma.equipamento.create({
+    data: {
+      nome: fakerPT_BR.commerce.productName(),
+      fases_monitoradas: 'TRIFASE',
+      tensao_nominal: 220,
+      cidade: fakerPT_BR.location.city(),
+      uf: fakerPT_BR.location.state({ abbreviated: true }),
+      mac: fakerPT_BR.internet.mac(),
+      usuario_cadastrou: {
+        connect: {
+          cod_usuario: adm.cod_usuario,
+        },
+      },
+      unidade_consumidora: {
+        connect: {
+          cod_unidade_consumidora: consumerUnit.cod_unidade_consumidora,
+        },
+      },
+    },
+  });
+
+  console.log(`Equipamento ${equipment.nome} criado`);
+
+  const sensorData = Array.from({ length: 5000 }).map(() => {
+    return {
+      data: fakerPT_BR.date.recent({ days: 1460 }),
+      cod_equipamento: equipment.cod_equipamento,
+      vA: fakerPT_BR.number.float({ min: 0, max: 300, precision: 2 }),
+      iA: fakerPT_BR.number.float({ min: -100, max: 100, precision: 2 }),
+      FPA: fakerPT_BR.number.float({ min: 0, max: 1, precision: 2 }),
+      potenciaAtivaA: fakerPT_BR.number.float({
+        min: 0,
+        max: 300,
+        precision: 2,
+      }),
+      potenciaAparenteA: fakerPT_BR.number.float({
+        min: 0,
+        max: 300,
+        precision: 2,
+      }),
+      vB: fakerPT_BR.number.float({ min: 0, max: 300, precision: 2 }),
+      iB: fakerPT_BR.number.float({ min: -100, max: 100, precision: 2 }),
+      FPB: fakerPT_BR.number.float({ min: 0, max: 1, precision: 2 }),
+      potenciaAtivaB: fakerPT_BR.number.float({
+        min: 0,
+        max: 300,
+        precision: 2,
+      }),
+      potenciaAparenteB: fakerPT_BR.number.float({
+        min: 0,
+        max: 300,
+        precision: 2,
+      }),
+      vC: fakerPT_BR.number.float({ min: 0, max: 300, precision: 2 }),
+      iC: fakerPT_BR.number.float({ min: -100, max: 100, precision: 2 }),
+      FPC: fakerPT_BR.number.float({ min: 0, max: 1, precision: 2 }),
+      potenciaAtivaC: fakerPT_BR.number.float({
+        min: 0,
+        max: 300,
+        precision: 2,
+      }),
+      potenciaAparenteC: fakerPT_BR.number.float({
+        min: 0,
+        max: 300,
+        precision: 2,
+      }),
+    } as Dado_Sensor;
+  });
+
+  await prisma.dado_Sensor.createMany({
+    data: sensorData,
+  });
 }
 
 if (process.env.NODE_ENV !== 'production') {
