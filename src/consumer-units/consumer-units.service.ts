@@ -9,12 +9,9 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateConsumerUnitDto } from './dto/create-consumer-unit.dto';
 import { ConsumerUnitEntity } from './entities/consumer-unit.entity';
 import { UpdateConsumerUnitDto } from './dto/update-consumer-unit.dto';
-<<<<<<< HEAD:src/consumer-unit/consumer-unit.service.ts
 import { JWTType } from 'src/types/jwt.types';
-=======
 import { EquipmentEntity } from 'src/equipments/entities/equipment.entity';
 import { Fases, Subgrupo } from '@prisma/client';
->>>>>>> b5ea3330bf3b917a4df2d9d354e22bcc8ccb076e:src/consumer-units/consumer-units.service.ts
 
 @Injectable()
 export class ConsumerUnitService {
@@ -77,7 +74,6 @@ export class ConsumerUnitService {
     return new ConsumerUnitEntity(consumerUnit);
   }
 
-<<<<<<< HEAD:src/consumer-unit/consumer-unit.service.ts
   async findUserUnits(
     req: JWTType,
     page: number,
@@ -130,7 +126,9 @@ export class ConsumerUnitService {
       page,
       totalPages,
       totalConsumerUnits,
-=======
+      filters,
+    };
+  }
   async findAllEquipments(
     id: string,
     page: number,
@@ -202,7 +200,6 @@ export class ConsumerUnitService {
       page,
       totalPages,
       totalEquipments,
->>>>>>> b5ea3330bf3b917a4df2d9d354e22bcc8ccb076e:src/consumer-units/consumer-units.service.ts
       filters,
     };
   }
