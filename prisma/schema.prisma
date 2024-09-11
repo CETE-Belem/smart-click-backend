@@ -88,8 +88,8 @@ model Concessionaria {
   tarifas               Tarifa[]
   unidades_consumidoras Unidade_Consumidora[]
 
-  cod_criador String
-  criador     Usuario @relation(fields: [cod_criador], references: [cod_usuario])
+  cod_criador String?
+  criador     Usuario? @relation(fields: [cod_criador], references: [cod_usuario], onDelete: SetNull)
 
   criadoEm     DateTime @default(now())
   atualizadoEm DateTime @updatedAt
@@ -141,21 +141,20 @@ model Equipamento {
   criadoEm     DateTime @default(now())
   atualizadoEm DateTime @updatedAt
 
-  subgrupo Subgrupo
-
   cidade String @db.VarChar(255)
   uf     String @db.VarChar(2)
 
   tensao_nominal    Decimal
   fases_monitoradas Fases
 
+  //todo: verificar se é necessário
   // Relations
   // 1:n User
   cod_usuario String?
   usuario     Usuario? @relation(name: "Usuario", fields: [cod_usuario], references: [cod_usuario], onDelete: Cascade)
 
-  cod_usuario_cadastrou String
-  usuario_cadastrou     Usuario @relation(name: "Cadastrou", fields: [cod_usuario_cadastrou], references: [cod_usuario], onDelete: Cascade)
+  cod_usuario_cadastrou String?
+  usuario_cadastrou     Usuario? @relation(name: "Cadastrou", fields: [cod_usuario_cadastrou], references: [cod_usuario])
 
   // 1:1 Measurement
   dados_sensor Dado_Sensor[]
@@ -164,29 +163,29 @@ model Equipamento {
   concessionaria     Concessionaria @relation(fields: [cod_concessionaria], references: [cod_concessionaria])
 
   cod_unidade_consumidora String
-  unidade_consumidora     Unidade_Consumidora @relation(fields: [cod_unidade_consumidora], references: [cod_unidade_consumidora])
+  unidade_consumidora     Unidade_Consumidora @relation(fields: [cod_unidade_consumidora], references: [cod_unidade_consumidora], onDelete: Cascade)
 
   @@map("equipamento")
 }
 
 model Dado_Sensor {
-  id                       String   @id @default(uuid())
-  iA                       Float?
-  iB                       Float?
-  iC                       Float?
-  vA                       Float?
-  vB                       Float?
-  vC                       Float?
-  FPA                      Float?
-  FPB                      Float?
-  FPC                      Float?
-  energiaAtivaExportada    Float?
-  energiaAtivaImportada    Float?
-  energiaReativaExportada  Float?
-  energiaReativaImportada  Float?
-  energiaAparenteExportada Float?
-  energiaAparenteImportada Float?
-  data                     DateTime
+  id                String   @id @default(uuid())
+  iA                Float?
+  iB                Float?
+  iC                Float?
+  vA                Float?
+  vB                Float?
+  vC                Float?
+  FPA               Float?
+  FPB               Float?
+  FPC               Float?
+  potenciaAparenteA Float?
+  potenciaAparenteB Float?
+  potenciaAparenteC Float?
+  potenciaAtivaA    Float?
+  potenciaAtivaB    Float?
+  potenciaAtivaC    Float?
+  data              DateTime
 
   // Timestamps
   criadoEm     DateTime @default(now())
@@ -202,9 +201,9 @@ model Dado_Sensor {
 
 model Codigo_Confirmacao {
   cod_codigo  String   @id @default(uuid())
-  codigo      String   @db.VarChar(6)
+  codigo      String
   expiraEm    DateTime
-  usuario     Usuario  @relation(fields: [cod_usuario], references: [cod_usuario])
+  usuario     Usuario  @relation(fields: [cod_usuario], references: [cod_usuario], onDelete: Cascade)
   cod_usuario String   @unique
 
   // Timestamps
@@ -216,9 +215,9 @@ model Codigo_Confirmacao {
 
 model Codigo_Recuperacao {
   cod_codigo  String   @id @default(uuid())
-  codigo      String   @db.VarChar(6)
+  codigo      String
   expiraEm    DateTime
-  usuario     Usuario  @relation(fields: [cod_usuario], references: [cod_usuario])
+  usuario     Usuario  @relation(fields: [cod_usuario], references: [cod_usuario], onDelete: Cascade)
   cod_usuario String   @unique
 
   // Timestamps
@@ -229,10 +228,12 @@ model Codigo_Recuperacao {
 }
 
 model Unidade_Consumidora {
-  cod_unidade_consumidora String @id @default(uuid())
-  cidade                  String @db.VarChar(200)
-  uf                      String @db.VarChar(2)
-  numero                  String @unique @db.VarChar(8)
+  cod_unidade_consumidora String   @id @default(uuid())
+  cidade                  String   @db.VarChar(200)
+  uf                      String   @db.VarChar(2)
+  numero                  String   @unique @db.VarChar(8)
+  subgrupo                Subgrupo
+  optanteTB               Boolean
 
   criadoEm     DateTime @default(now())
   atualizadoEm DateTime @updatedAt
@@ -242,11 +243,11 @@ model Unidade_Consumidora {
   cod_concessionaria String
   concessionaria     Concessionaria @relation(fields: [cod_concessionaria], references: [cod_concessionaria])
 
-  cod_criador String
-  criador     Usuario @relation(name: "Criador", fields: [cod_criador], references: [cod_usuario])
+  cod_criador String?
+  criador     Usuario? @relation(name: "Criador", fields: [cod_criador], references: [cod_usuario], onDelete: SetNull)
 
   cod_usuario String?  @unique
-  usuario     Usuario? @relation(name: "Usuario", fields: [cod_usuario], references: [cod_usuario])
+  usuario     Usuario? @relation(name: "Usuario", fields: [cod_usuario], references: [cod_usuario], onDelete: SetNull)
 
   @@map("unidade_consumidora")
 }

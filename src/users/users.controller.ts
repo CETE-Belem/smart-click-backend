@@ -11,6 +11,7 @@ import {
   Get,
   ParseIntPipe,
   Query,
+  Delete,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import {
@@ -38,6 +39,7 @@ import { RolesGuard } from 'src/common/guards/roles.guard';
 import { Roles } from 'src/common/decorators/roles.decorator';
 import { AdminUpdateUserDto } from './dto/admin-update-user.dto';
 import { Cargo } from '@prisma/client';
+import { CreateAdminDto } from './dto/create-admin.dto';
 
 @ApiTags('users')
 @Controller('users')
@@ -83,6 +85,29 @@ export class UsersController {
   @ApiBody({ type: CreateUserDto })
   create(@Body() createUserDto: CreateUserDto) {
     return this.usersService.create(createUserDto);
+  }
+
+  @Post('/admin')
+  @UseGuards(AuthGuard, RolesGuard)
+  @Roles('ADMIN')
+  @ApiExtraModels(UserEntity)
+  @ApiCreatedResponse({
+    status: HttpStatus.CREATED,
+    type: UserEntity,
+  })
+  @ApiConflictResponse({
+    status: HttpStatus.CONFLICT,
+    description: 'Email já cadastrado',
+    schema: {
+      example: {
+        statusCode: HttpStatus.CONFLICT,
+        message: 'Email já cadastrado',
+      },
+    },
+  })
+  @ApiBody({ type: CreateAdminDto })
+  createAdmin(@Body() createAdminDto: CreateAdminDto) {
+    return this.usersService.createAdmin(createAdminDto);
   }
 
   @Patch()
@@ -177,6 +202,7 @@ export class UsersController {
   @ApiParam({ name: 'role', type: 'string', required: false })
   @ApiParam({ name: 'page', type: 'number', required: true })
   @ApiParam({ name: 'limit', type: 'number', required: true })
+  @ApiParam({ name: 'query', type: 'string', required: false })
   findAll(
     @Request() req: JWTType,
     @Query('name') name: string,
@@ -184,12 +210,14 @@ export class UsersController {
     @Query('role') role: Cargo,
     @Query('page', new ParseIntPipe()) page: number,
     @Query('limit', new ParseIntPipe()) limit: number,
+    @Query('query') query: string,
   ) {
     return this.usersService.findAll(req, {
       name,
       email,
       role,
       page,
+      query,
       limit,
     });
   }
@@ -308,6 +336,36 @@ export class UsersController {
     return this.usersService.sendRecoverCode(email);
   }
 
+  @Patch('/:email/resend-recover-code')
+  @ApiOkResponse({
+    status: HttpStatus.OK,
+    description: 'Código de recuperação reenviado',
+    schema: {
+      example: {
+        statusCode: HttpStatus.OK,
+        message: 'Código de recuperação reenviado',
+      },
+    },
+  })
+  @ApiNotFoundResponse({
+    status: HttpStatus.NOT_FOUND,
+    description: 'Usuário não encontrado',
+    schema: {
+      example: {
+        statusCode: HttpStatus.NOT_FOUND,
+        message: 'Usuário não encontrado',
+      },
+    },
+  })
+  @ApiParam({
+    name: 'email',
+    type: 'string',
+    description: 'Email do usuário',
+  })
+  resendRecoverCode(@Param('email') email: string) {
+    return this.usersService.resendRecoverCode(email);
+  }
+
   @Patch('/:email/recover-password')
   @ApiOkResponse({
     status: HttpStatus.OK,
@@ -424,5 +482,57 @@ export class UsersController {
     @Body() confirmCodeDto: ConfirmCodeDto,
   ) {
     return this.usersService.confirmCode(email, confirmCodeDto);
+  }
+
+  @Delete('/:id')
+  @UseGuards(AuthGuard, RolesGuard)
+  @Roles('ADMIN')
+  @ApiBearerAuth('token')
+  @ApiOkResponse({
+    status: HttpStatus.OK,
+    description: 'Usuário deletado',
+    schema: {
+      example: {
+        statusCode: HttpStatus.OK,
+        message: 'Usuário deletado',
+      },
+    },
+  })
+  @ApiNotFoundResponse({
+    status: HttpStatus.NOT_FOUND,
+    description: 'Usuário não encontrado',
+    schema: {
+      example: {
+        statusCode: HttpStatus.NOT_FOUND,
+        message: 'Usuário não encontrado',
+      },
+    },
+  })
+  @ApiForbiddenResponse({
+    status: HttpStatus.FORBIDDEN,
+    description: 'Usuário não autorizado',
+    schema: {
+      example: {
+        statusCode: HttpStatus.FORBIDDEN,
+        message: 'Usuário não autorizado',
+      },
+    },
+  })
+  @ApiForbiddenResponse({
+    status: HttpStatus.FORBIDDEN,
+    description: 'Você não pode deletar sua própria conta',
+    schema: {
+      example: {
+        statusCode: HttpStatus.FORBIDDEN,
+        message: 'Você não pode deletar sua própria conta',
+      },
+    },
+  })
+  @ApiParam({ name: 'id', type: 'string' })
+  delete(
+    @Request() req: JWTType,
+    @Param('id', new ParseUUIDPipe()) id: string,
+  ) {
+    return this.usersService.delete(req, id);
   }
 }

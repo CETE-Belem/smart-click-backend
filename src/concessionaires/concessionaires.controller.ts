@@ -13,8 +13,9 @@ import {
   ParseIntPipe,
   HttpStatus,
   ParseArrayPipe,
+  BadRequestException,
 } from '@nestjs/common';
-import { ConcessionaireService } from './concessionaire.service';
+import { ConcessionaireService } from './concessionaires.service';
 import { CreateConcessionaireDto } from './dto/create-concessionaire.dto';
 import { UpdateConcessionaireDto } from './dto/update-concessionaire.dto';
 import {
@@ -38,7 +39,7 @@ import { JWTType } from 'src/types/jwt.types';
 import { ConcessionaireEntity } from './entities/concessionaire.entity';
 
 @ApiTags('concessionaires')
-@Controller('concessionaire')
+@Controller('concessionaires')
 export class ConcessionaireController {
   constructor(private readonly concessionaireService: ConcessionaireService) {}
 
@@ -500,15 +501,130 @@ export class ConcessionaireController {
     @Query('name') name: string,
     @Query('uf') uf: string,
     @Query('city') city: string,
-    @Query('page', new ParseIntPipe()) page: number,
-    @Query('limit', new ParseIntPipe()) limit: number,
+    @Query(
+      'page',
+      new ParseIntPipe({
+        exceptionFactory: () => {
+          return new BadRequestException(
+            'O parâmetro (page) deve existir e ser maior que 0.',
+          );
+        },
+      }),
+    )
+    page: number,
+    @Query(
+      'limit',
+      new ParseIntPipe({
+        exceptionFactory: () => {
+          return new BadRequestException(
+            'O parâmetro (limit) deve existir e ser maior que 0.',
+          );
+        },
+      }),
+    )
+    limit: number,
+    @Query('query') query?: string,
   ) {
     return this.concessionaireService.findAll(req, {
-      name,
-      uf,
-      city,
       page,
       limit,
+      uf,
+      name,
+      city,
+      query,
+    });
+  }
+
+  @Get('/:id/consumer-unit')
+  @UseGuards(AuthGuard, RolesGuard)
+  @Roles('ADMIN')
+  @ApiBearerAuth('token')
+  @ApiParam({ name: 'id', type: 'string', required: true })
+  @ApiParam({ name: 'page', type: 'number', required: true })
+  @ApiParam({ name: 'limit', type: 'number', required: true })
+  @ApiParam({ name: 'city', type: 'string', required: false })
+  @ApiParam({ name: 'uf', type: 'string', required: false })
+  @ApiOkResponse({
+    status: HttpStatus.OK,
+    example: {
+      consumerUnits: [
+        {
+          cod_unidade_consumidora: '421fd1c9-8382-4b65-b07a-3f94fe3768bd',
+          cidade: 'Pietro de Nossa Senhora',
+          uf: 'PI',
+          numero: '85639330',
+          criadoEm: '2024-08-18T16:35:58.129Z',
+          atualizadoEm: '2024-08-18T16:35:58.129Z',
+          cod_concessionaria: '08ca8920-2d02-4bfa-8b70-067b93ab75c6',
+          cod_criador: '61e4c31b-8a1c-4adc-acfd-3fe0a6216496',
+          cod_usuario: null,
+        },
+        {
+          cod_unidade_consumidora: '4f465850-e06d-492c-a11a-c63931a38695',
+          cidade: 'Moraes do Norte',
+          uf: 'SE',
+          numero: '20643782',
+          criadoEm: '2024-08-18T16:35:58.156Z',
+          atualizadoEm: '2024-08-18T16:35:58.156Z',
+          cod_concessionaria: '08ca8920-2d02-4bfa-8b70-067b93ab75c6',
+          cod_criador: '61e4c31b-8a1c-4adc-acfd-3fe0a6216496',
+          cod_usuario: null,
+        },
+      ],
+      limit: 20,
+      page: 1,
+      totalPages: 1,
+      totalConsumerUnits: 2,
+      filters: {},
+    },
+  })
+  @ApiUnauthorizedResponse({
+    status: HttpStatus.UNAUTHORIZED,
+    description: 'Usuário não autorizado',
+    example: {
+      message: 'Usuário não autorizado',
+      error: 'Unauthorized',
+      statusCode: 401,
+    },
+  })
+  @ApiNotFoundResponse({
+    status: HttpStatus.NOT_FOUND,
+    description: 'Concessionária de id [:id] não foi encontrada',
+    example: {
+      message:
+        'Concessionária de id 08ca8920-2d02-4bfa-8b70-067b93ab75c6 não foi encontrada',
+      error: 'Not Found',
+      statusCode: 404,
+    },
+  })
+  findConsumerUnits(
+    @Param('id') id: string,
+    @Query(
+      'page',
+      new ParseIntPipe({
+        exceptionFactory: () =>
+          new BadRequestException(
+            'O parâmetro (page) deve existir e ser maior que 0.',
+          ),
+      }),
+    )
+    page: number,
+    @Query(
+      'limit',
+      new ParseIntPipe({
+        exceptionFactory: () =>
+          new BadRequestException(
+            'O parâmetro (limit) deve existir e ser maior que 0.',
+          ),
+      }),
+    )
+    limit: number,
+    @Query('city') city?: string,
+    @Query('uf') uf?: string,
+  ) {
+    return this.concessionaireService.findConsumerUnits(id, page, limit, {
+      city,
+      uf,
     });
   }
 
