@@ -11,6 +11,7 @@ import {
   Get,
   ParseIntPipe,
   Query,
+  Delete,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import {
@@ -201,6 +202,7 @@ export class UsersController {
   @ApiParam({ name: 'role', type: 'string', required: false })
   @ApiParam({ name: 'page', type: 'number', required: true })
   @ApiParam({ name: 'limit', type: 'number', required: true })
+  @ApiParam({ name: 'query', type: 'string', required: false })
   findAll(
     @Request() req: JWTType,
     @Query('name') name: string,
@@ -208,12 +210,14 @@ export class UsersController {
     @Query('role') role: Cargo,
     @Query('page', new ParseIntPipe()) page: number,
     @Query('limit', new ParseIntPipe()) limit: number,
+    @Query('query') query: string,
   ) {
     return this.usersService.findAll(req, {
       name,
       email,
       role,
       page,
+      query,
       limit,
     });
   }
@@ -231,7 +235,7 @@ export class UsersController {
   }
 
   @Get('/:id')
-  // @UseGuards(AuthGuard)
+  @UseGuards(AuthGuard)
   @ApiBearerAuth('token')
   @ApiOkResponse({
     status: HttpStatus.OK,
@@ -478,5 +482,57 @@ export class UsersController {
     @Body() confirmCodeDto: ConfirmCodeDto,
   ) {
     return this.usersService.confirmCode(email, confirmCodeDto);
+  }
+
+  @Delete('/:id')
+  @UseGuards(AuthGuard, RolesGuard)
+  @Roles('ADMIN')
+  @ApiBearerAuth('token')
+  @ApiOkResponse({
+    status: HttpStatus.OK,
+    description: 'Usuário deletado',
+    schema: {
+      example: {
+        statusCode: HttpStatus.OK,
+        message: 'Usuário deletado',
+      },
+    },
+  })
+  @ApiNotFoundResponse({
+    status: HttpStatus.NOT_FOUND,
+    description: 'Usuário não encontrado',
+    schema: {
+      example: {
+        statusCode: HttpStatus.NOT_FOUND,
+        message: 'Usuário não encontrado',
+      },
+    },
+  })
+  @ApiForbiddenResponse({
+    status: HttpStatus.FORBIDDEN,
+    description: 'Usuário não autorizado',
+    schema: {
+      example: {
+        statusCode: HttpStatus.FORBIDDEN,
+        message: 'Usuário não autorizado',
+      },
+    },
+  })
+  @ApiForbiddenResponse({
+    status: HttpStatus.FORBIDDEN,
+    description: 'Você não pode deletar sua própria conta',
+    schema: {
+      example: {
+        statusCode: HttpStatus.FORBIDDEN,
+        message: 'Você não pode deletar sua própria conta',
+      },
+    },
+  })
+  @ApiParam({ name: 'id', type: 'string' })
+  delete(
+    @Request() req: JWTType,
+    @Param('id', new ParseUUIDPipe()) id: string,
+  ) {
+    return this.usersService.delete(req, id);
   }
 }

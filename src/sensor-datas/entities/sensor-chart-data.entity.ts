@@ -1,4 +1,6 @@
+import { ApiProperty } from '@nestjs/swagger';
 import { Dado_Sensor } from '@prisma/client';
+import { PhaseChartData } from './phase-chart-data.entity';
 
 export class SensorChartDataEntity {
   constructor(data: Dado_Sensor) {
@@ -29,7 +31,18 @@ export class SensorChartDataEntity {
       };
     }
   }
+  @ApiProperty({
+    description: 'Data',
+    type: String,
+    nullable: false,
+  })
   date: Date;
+
+  @ApiProperty({
+    description: 'Fase A',
+    type: PhaseChartData,
+    nullable: false,
+  })
   faseA: {
     v: number;
     i: number;
@@ -37,6 +50,11 @@ export class SensorChartDataEntity {
     potenciaAtiva: number;
     FP: number;
   };
+  @ApiProperty({
+    description: 'Fase B',
+    type: PhaseChartData,
+    nullable: true,
+  })
   faseB?: {
     v: number;
     i: number;
@@ -44,6 +62,11 @@ export class SensorChartDataEntity {
     potenciaAtiva: number;
     FP: number;
   };
+  @ApiProperty({
+    description: 'Fase C',
+    type: PhaseChartData,
+    nullable: true,
+  })
   faseC?: {
     v: number;
     i: number;

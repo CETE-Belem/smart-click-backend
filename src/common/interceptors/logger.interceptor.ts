@@ -28,7 +28,7 @@ export class LoggerInterceptor implements NestInterceptor {
       JSON.stringify({
         timestamp: new Date().toISOString(),
         method: req.method,
-        route: req.route.path,
+        route: req.url,
         data: {
           body: body,
           query: req.query,
@@ -43,7 +43,7 @@ export class LoggerInterceptor implements NestInterceptor {
   private logRes(res: Response) {
     this.logger.info(
       JSON.stringify({
-        route: res.req.route.path,
+        route: res.req.url,
         timestamp: new Date().toISOString(),
         status: res.statusCode,
         message: res.statusMessage,

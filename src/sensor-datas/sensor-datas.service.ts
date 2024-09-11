@@ -1,4 +1,4 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import dayjs from 'dayjs';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { Logger } from 'winston';
@@ -13,11 +13,11 @@ export class SensorDataService {
 
   async handleData(data: string, mac: string) {
     try {
-      const pattern = /^(\d+(\.\d+)?)(\|(\d+(\.\d+)?))*$/;
+      // const pattern = /^(\d+(\.\d+)?)(\|(\d+(\.\d+)?))*$/;
 
-      if (!pattern.test(data)) {
-        throw new Error('Invalid data');
-      }
+      // if (!pattern.test(data)) {
+      //   throw new Error('Invalid data');
+      // }
 
       const dataSplitted = data.split('|');
       const phaseCount = Number(dataSplitted[0]);
@@ -89,6 +89,16 @@ export class SensorDataService {
   }
 
   async getChartData(equipmentId: string, from: Date, to: Date) {
+    const equipamento = await this.prismaService.equipamento.findFirst({
+      where: {
+        cod_equipamento: equipmentId,
+      },
+    });
+
+    if (!equipamento) {
+      throw new NotFoundException('Equipamento não encontrado');
+    }
+
     const data = await this.prismaService.dado_Sensor.findMany({
       where: {
         equipamento: {

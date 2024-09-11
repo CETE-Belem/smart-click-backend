@@ -113,15 +113,37 @@ export class ConcessionaireController {
     @Query('name') name: string,
     @Query('uf') uf: string,
     @Query('city') city: string,
-    @Query('page', new ParseIntPipe()) page: number,
-    @Query('limit', new ParseIntPipe()) limit: number,
+    @Query(
+      'page',
+      new ParseIntPipe({
+        exceptionFactory: () => {
+          return new BadRequestException(
+            'O parâmetro (page) deve existir e ser maior que 0.',
+          );
+        },
+      }),
+    )
+    page: number,
+    @Query(
+      'limit',
+      new ParseIntPipe({
+        exceptionFactory: () => {
+          return new BadRequestException(
+            'O parâmetro (limit) deve existir e ser maior que 0.',
+          );
+        },
+      }),
+    )
+    limit: number,
+    @Query('query') query?: string,
   ) {
     return this.concessionaireService.findAll(req, {
-      name,
-      uf,
-      city,
       page,
       limit,
+      uf,
+      name,
+      city,
+      query,
     });
   }
 
