@@ -1,9 +1,9 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Subgrupo, Tarifa } from '@prisma/client';
 import { Decimal } from '@prisma/client/runtime/library';
-import { ConcessionaireEntity } from 'src/concessionaire/entities/concessionaire.entity';
 import { RateIntervalEntity } from './rate-interval.entity';
 import { Transform } from 'class-transformer';
+import { ConcessionaireEntity } from 'src/concessionaires/entities/concessionaire.entity';
 
 export class RateEntity implements Tarifa {
   constructor(partial: Partial<RateEntity>) {
