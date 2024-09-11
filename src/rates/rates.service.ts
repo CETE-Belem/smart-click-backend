@@ -9,6 +9,7 @@ import { RateEntity } from './entities/rate.entity';
 import { CreateRateIntervalDto } from './dto/create-rate-interval.dto';
 import { UpdateRateIntervalDto } from './dto/update-rate-interval.dto';
 import { UpdateRateDto } from './dto/update-rate.dto';
+import { RateIntervalEntity } from './entities/rate-interval.entity';
 
 @Injectable()
 export class RatesService {

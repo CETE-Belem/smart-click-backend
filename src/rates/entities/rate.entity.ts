@@ -8,6 +8,9 @@ import { ConcessionaireEntity } from 'src/concessionaires/entities/concessionair
 export class RateEntity implements Tarifa {
   constructor(partial: Partial<RateEntity>) {
     Object.assign(this, partial);
+    this.intervalos_tarifas = partial.intervalos_tarifas.map(
+      (intervalo) => new RateIntervalEntity(intervalo),
+    );
   }
 
   @ApiProperty({
