@@ -22,7 +22,7 @@ import { JWTType } from 'src/types/jwt.types';
 import { UpdateUserDto } from './dto/udpate-user.dto';
 import { RecoverPasswordDto } from './dto/recover-password.dto';
 import { AdminUpdateUserDto } from './dto/admin-update-user.dto';
-import { Cargo } from '@prisma/client';
+import { Cargo, Subgrupo } from '@prisma/client';
 import { CreateAdminDto } from './dto/create-admin.dto';
 import * as bcrypt from 'bcrypt';
 import { ConsumerUnitEntity } from 'src/consumer-units/entities/consumer-unit.entity';
@@ -639,6 +639,7 @@ export class UsersService {
       city?: string;
       uf?: string;
       concessionaireId?: string;
+      subgroup?: Subgrupo;
     },
   ): Promise<{
     consumerUnits: ConsumerUnitEntity[];
@@ -650,9 +651,10 @@ export class UsersService {
       city?: string;
       uf?: string;
       concessionaireId?: string;
+      subgroup?: Subgrupo;
     };
   }> {
-    const { city, concessionaireId, uf } = filters;
+    const { city, concessionaireId, uf, subgroup } = filters;
 
     const units = await this.prismaService.unidade_Consumidora.findMany({
       where: {
@@ -660,6 +662,7 @@ export class UsersService {
         cidade: city,
         cod_concessionaria: concessionaireId,
         uf,
+        subgrupo: subgroup,
       },
       skip: (page - 1) * limit,
       take: limit,

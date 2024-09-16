@@ -39,9 +39,10 @@ import { RecoverPasswordDto } from './dto/recover-password.dto';
 import { RolesGuard } from 'src/common/guards/roles.guard';
 import { Roles } from 'src/common/decorators/roles.decorator';
 import { AdminUpdateUserDto } from './dto/admin-update-user.dto';
-import { Cargo } from '@prisma/client';
+import { Cargo, Subgrupo } from '@prisma/client';
 import { CreateAdminDto } from './dto/create-admin.dto';
 import { ConsumerUnitEntity } from 'src/consumer-units/entities/consumer-unit.entity';
+import { ParseSubgrupoPipe } from 'src/common/pipes/ParseSubgrupoPipe.pipe';
 
 @ApiTags('users')
 @Controller('users')
@@ -554,11 +555,14 @@ export class UsersController {
     @Query('city') city?: string,
     @Query('uf') uf?: string,
     @Query('concessionaire_id') concessionaireId?: string,
+    @Query('subgroup', new ParseSubgrupoPipe({ optional: true }))
+    subgroup?: Subgrupo,
   ) {
     return this.usersService.findConsumerUnits(req, page, limit, {
       city,
       uf,
       concessionaireId,
+      subgroup,
     });
   }
 
