@@ -56,7 +56,7 @@ export class UsersService {
 
     const existingUser = await this.prismaService.usuario.findFirst({
       where: {
-        email,
+        email: email.toLocaleLowerCase(),
       },
     });
 
@@ -69,7 +69,7 @@ export class UsersService {
 
     const user = await this.prismaService.usuario.create({
       data: {
-        email,
+        email: email.toLocaleLowerCase(),
         senha: hashedPassword,
         senhaSalt: salt,
         nome: name,
@@ -125,7 +125,7 @@ export class UsersService {
 
     const existingUser = await this.prismaService.usuario.findFirst({
       where: {
-        email,
+        email: email.toLocaleLowerCase(),
       },
     });
 
@@ -136,7 +136,7 @@ export class UsersService {
 
     const user = await this.prismaService.usuario.create({
       data: {
-        email,
+        email: email.toLocaleLowerCase(),
         senha: hashedPassword,
         senhaSalt: salt,
         nome: name,
@@ -180,13 +180,16 @@ export class UsersService {
     const { userId } = req.user;
     const { email, name, password } = updateUserDto;
 
-    const user = await this.prismaService.usuario.findUnique({
+    const user = await this.prismaService.usuario.findFirst({
       where: {
-        email,
+        email: email.toLocaleLowerCase(),
+        cod_usuario: {
+          not: userId,
+        },
       },
     });
 
-    if (!user) throw new ConflictException('Usuário já cadastrado');
+    if (user) throw new ConflictException('Email já cadastrado');
 
     const passwordSalt = password ? await generateSalt() : null;
     const hashedPassword = password
@@ -198,7 +201,7 @@ export class UsersService {
         cod_usuario: userId,
       },
       data: {
-        email,
+        email: email.toLocaleLowerCase(),
         nome: name,
         senha: hashedPassword ?? user.senha,
         senhaSalt: passwordSalt ?? user.senhaSalt,
@@ -331,7 +334,7 @@ export class UsersService {
       },
       data: {
         nome: name,
-        email,
+        email: email.toLocaleLowerCase(),
         perfil: role,
       },
     });
