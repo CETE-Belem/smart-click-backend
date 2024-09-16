@@ -239,3 +239,69 @@ model Unidade_Consumidora {
 
   @@map("unidade_consumidora")
 }
+
+model MediaDiaria {
+  data                    DateTime
+  media_vA                Float?
+  media_iA                Float?
+  media_potenciaAparenteA Float?
+  media_potenciaAtivaA    Float?
+  media_FPA               Float?
+  media_vB                Float?
+  media_iB                Float?
+  media_potenciaAparenteB Float?
+  media_potenciaAtivaB    Float?
+  media_FPB               Float?
+  media_vC                Float?
+  media_iC                Float?
+  media_potenciaAparenteC Float?
+  media_potenciaAtivaC    Float?
+  media_FPC               Float?
+
+  @@id([data]) // Definindo a data como chave primária para garantir unicidade
+  @@map("media_diaria") // Mapeia o nome da view no banco de dados
+}
+
+model MediaMensal {
+  mes                     DateTime
+  media_vA                Float?
+  media_iA                Float?
+  media_potenciaAparenteA Float?
+  media_potenciaAtivaA    Float?
+  media_FPA               Float?
+  media_vB                Float?
+  media_iB                Float?
+  media_potenciaAparenteB Float?
+  media_potenciaAtivaB    Float?
+  media_FPB               Float?
+  media_vC                Float?
+  media_iC                Float?
+  media_potenciaAparenteC Float?
+  media_potenciaAtivaC    Float?
+  media_FPC               Float?
+
+  @@id([mes]) // Definindo o mês como chave primária para garantir unicidade
+  @@map("media_mensal") // Mapeia o nome da view no banco de dados
+}
+
+model MediaAnual {
+  ano                     DateTime
+  media_vA                Float?
+  media_iA                Float?
+  media_potenciaAparenteA Float?
+  media_potenciaAtivaA    Float?
+  media_FPA               Float?
+  media_vB                Float?
+  media_iB                Float?
+  media_potenciaAparenteB Float?
+  media_potenciaAtivaB    Float?
+  media_FPB               Float?
+  media_vC                Float?
+  media_iC                Float?
+  media_potenciaAparenteC Float?
+  media_potenciaAtivaC    Float?
+  media_FPC               Float?
+
+  @@id([ano]) // Definindo o ano como chave primária para garantir unicidade
+  @@map("media_anual") // Mapeia o nome da view no banco de dados
+}

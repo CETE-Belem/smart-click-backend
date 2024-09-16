@@ -95,7 +95,7 @@ export class UsersService {
 
     await this.prismaService.codigo_Confirmacao.create({
       data: {
-        codigo: confirmationCode,
+        codigo: confirmationCode.code,
         expiraEm: new Date(Date.now() + 15 * 60 * 1000), //15 minutes
         usuario: {
           connect: {
@@ -109,7 +109,7 @@ export class UsersService {
       .sendMail({
         email: user.email,
         subject: 'Código de confirmação de conta',
-        template: ConfirmationCode({ confirmationCode }),
+        template: ConfirmationCode({ confirmationCode: confirmationCode.code }),
       })
       .then(() => {
         console.log(
@@ -148,7 +148,7 @@ export class UsersService {
 
     await this.prismaService.codigo_Confirmacao.create({
       data: {
-        codigo: confirmationCode,
+        codigo: confirmationCode.hashedCode,
         expiraEm: new Date(Date.now() + 30 * 60 * 1000), // 30 minutes
         usuario: {
           connect: {
@@ -162,7 +162,7 @@ export class UsersService {
       .sendMail({
         email: user.email,
         subject: 'Código de confirmação de conta',
-        template: ConfirmationCode({ confirmationCode }),
+        template: ConfirmationCode({ confirmationCode: confirmationCode.code }),
       })
       .then(() => {
         console.log(
@@ -368,11 +368,11 @@ export class UsersService {
         cod_usuario: user.cod_usuario,
       },
       update: {
-        codigo: recoverCode,
+        codigo: recoverCode.hashedCode,
         expiraEm: new Date(Date.now() + 15 * 60 * 1000), //15 minutes
       },
       create: {
-        codigo: recoverCode,
+        codigo: recoverCode.hashedCode,
         expiraEm: new Date(Date.now() + 15 * 60 * 1000), //15 minutes
         usuario: {
           connect: {
@@ -386,7 +386,7 @@ export class UsersService {
       .sendMail({
         email: user.email,
         subject: 'Código de recuperação de senha',
-        template: RecoverCode({ recoverCode }),
+        template: RecoverCode({ recoverCode: recoverCode.code }),
       })
       .then(() => {
         console.log(
@@ -466,11 +466,11 @@ export class UsersService {
         cod_usuario: user.cod_usuario,
       },
       update: {
-        codigo: recoverCode,
+        codigo: recoverCode.hashedCode,
         expiraEm: new Date(Date.now() + 15 * 60 * 1000), // 15 minutes
       },
       create: {
-        codigo: recoverCode,
+        codigo: recoverCode.hashedCode,
         expiraEm: new Date(Date.now() + 15 * 60 * 1000), // 15 minutes
         usuario: {
           connect: {
@@ -484,7 +484,7 @@ export class UsersService {
       .sendMail({
         email: user.email,
         subject: 'Código de recuperação de senha',
-        template: RecoverCode({ recoverCode }),
+        template: RecoverCode({ recoverCode: recoverCode.code }),
       })
       .then(() => {
         console.log(
@@ -511,11 +511,11 @@ export class UsersService {
         cod_usuario: user.cod_usuario,
       },
       update: {
-        codigo: confirmationCode,
+        codigo: confirmationCode.hashedCode,
         expiraEm: new Date(Date.now() + 15 * 60 * 1000), //15 minutes
       },
       create: {
-        codigo: confirmationCode,
+        codigo: confirmationCode.hashedCode,
         expiraEm: new Date(Date.now() + 15 * 60 * 1000), //15 minutes
         usuario: {
           connect: {
@@ -529,7 +529,7 @@ export class UsersService {
       .sendMail({
         email: user.email,
         subject: 'Código de confirmação de conta',
-        template: ConfirmationCode({ confirmationCode }),
+        template: ConfirmationCode({ confirmationCode: confirmationCode.code }),
       })
       .then(() => {
         console.log(
