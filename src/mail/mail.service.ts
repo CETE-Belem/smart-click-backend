@@ -29,12 +29,12 @@ export class MailService {
       },
       {
         from: {
-          name: 'Omnia',
-          address: 'omnia@zenithinova.com.br',
+          name: 'Smart Click',
+          address: 'mailtrap@zenithinova.com.br',
         },
         sender: {
-          name: 'Omnia',
-          address: 'omnia@zenithinova.com.br',
+          name: 'Smart Click',
+          address: 'mailtrap@zenithinova.com.br',
         },
       },
     );
