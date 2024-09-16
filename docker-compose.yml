@@ -11,13 +11,22 @@ services:
       - POSTGRES_PASSWORD=amazontech
       - POSTGRES_USER=amazontech
       - POSTGRES_DB=amazontech_db
-
-  # backend:
-  #   image: amazontech-backend
-  #   build:
-  #     context: .
-  #     dockerfile: Dockerfile
-  #   ports:
-  #     - 3000:3000
+  mosquitto:
+    image: toke/mosquitto
+    ports:
+      - 1883:1883
+      - 9001:9001
+    environment:
+      - MOSQUITTO_USERNAME=amazontech
+      - MOSQUITTO_PASSWORD=amazontech
+  backend:
+    depends_on:
+      - postgres
+    image: amazontech-backend
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - 3000:3000
 volumes:
   postgres:
