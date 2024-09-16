@@ -15,6 +15,7 @@ import {
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import {
+  ApiBadRequestResponse,
   ApiBearerAuth,
   ApiBody,
   ApiConflictResponse,
@@ -40,6 +41,7 @@ import { Roles } from 'src/common/decorators/roles.decorator';
 import { AdminUpdateUserDto } from './dto/admin-update-user.dto';
 import { Cargo } from '@prisma/client';
 import { CreateAdminDto } from './dto/create-admin.dto';
+import { ConsumerUnitEntity } from 'src/consumer-units/entities/consumer-unit.entity';
 
 @ApiTags('users')
 @Controller('users')
@@ -482,6 +484,82 @@ export class UsersController {
     @Body() confirmCodeDto: ConfirmCodeDto,
   ) {
     return this.usersService.confirmCode(email, confirmCodeDto);
+  }
+
+  @Get('/consumer-unit')
+  @UseGuards(AuthGuard)
+  @ApiBearerAuth('token')
+  @ApiOkResponse({
+    status: HttpStatus.OK,
+    description: 'Lista de Unidade Consumidoras do Usuário logado',
+    schema: {
+      properties: {
+        consumerUnits: {
+          type: 'array',
+          items: {
+            $ref: getSchemaPath(ConsumerUnitEntity),
+          },
+        },
+        page: { type: 'number', example: 2 },
+        limit: { type: 'number', example: 10 },
+        totalPages: { type: 'number', example: 10 },
+        totalConsumerUnits: { type: 'number', example: 20 },
+        filters: {
+          type: 'array',
+          items: {
+            example: {
+              city: 'Belém',
+              uf: 'PA',
+              concessionaire: '0b6cf373-ab3a-48fc-8288-b8d3e75a9fbd',
+            },
+          },
+        },
+      },
+    },
+  })
+  @ApiUnauthorizedResponse({
+    status: HttpStatus.UNAUTHORIZED,
+    schema: {
+      example: {
+        message: 'Token não encontrado',
+        error: 'Unauthorized',
+        statusCode: 401,
+      },
+    },
+  })
+  @ApiBadRequestResponse({
+    status: HttpStatus.BAD_REQUEST,
+    schema: {
+      example: {
+        message: 'Os parâmetros page/limit devem ser maiores que 0.',
+        error: 'Bad Request',
+        statusCode: 400,
+      },
+    },
+  })
+  @ApiParam({ name: 'city', type: 'string', required: false })
+  @ApiParam({ name: 'uf', type: 'string', required: false })
+  @ApiParam({
+    name: 'concessionaire_id',
+    type: 'string',
+    required: false,
+    description: 'Id da concessionária',
+  })
+  @ApiParam({ name: 'page', type: 'number', required: true })
+  @ApiParam({ name: 'limit', type: 'number', required: true })
+  findUserUnits(
+    @Request() req: JWTType,
+    @Query('page', new ParseIntPipe()) page: number,
+    @Query('limit', new ParseIntPipe()) limit: number,
+    @Query('city') city?: string,
+    @Query('uf') uf?: string,
+    @Query('concessionaire_id') concessionaireId?: string,
+  ) {
+    return this.usersService.findConsumerUnits(req, page, limit, {
+      city,
+      uf,
+      concessionaireId,
+    });
   }
 
   @Delete('/:id')

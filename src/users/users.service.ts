@@ -25,6 +25,7 @@ import { AdminUpdateUserDto } from './dto/admin-update-user.dto';
 import { Cargo } from '@prisma/client';
 import { CreateAdminDto } from './dto/create-admin.dto';
 import * as bcrypt from 'bcrypt';
+import { ConsumerUnitEntity } from 'src/consumer-units/entities/consumer-unit.entity';
 
 @Injectable()
 export class UsersService {
@@ -628,5 +629,61 @@ export class UsersService {
       .catch(() => {
         throw new NotFoundException('Usuário não encontrado');
       });
+  }
+
+  async findConsumerUnits(
+    req: JWTType,
+    page: number,
+    limit: number,
+    filters: {
+      city?: string;
+      uf?: string;
+      concessionaireId?: string;
+    },
+  ): Promise<{
+    consumerUnits: ConsumerUnitEntity[];
+    page: number;
+    limit: number;
+    totalPages: number;
+    totalConsumerUnits: number;
+    filters: {
+      city?: string;
+      uf?: string;
+      concessionaireId?: string;
+    };
+  }> {
+    const { city, concessionaireId, uf } = filters;
+
+    const units = await this.prismaService.unidade_Consumidora.findMany({
+      where: {
+        cod_usuario: req.user.userId,
+        cidade: city,
+        cod_concessionaria: concessionaireId,
+        uf,
+      },
+      skip: (page - 1) * limit,
+      take: limit,
+    });
+
+    const totalConsumerUnits =
+      await this.prismaService.unidade_Consumidora.count({
+        where: {
+          cod_usuario: req.user.userId,
+          cidade: city,
+          cod_concessionaria: concessionaireId,
+          uf,
+        },
+      });
+
+    const totalPages = Math.ceil(totalConsumerUnits / limit);
+
+    return {
+      consumerUnits: units.map((unit) => new ConsumerUnitEntity(unit)),
+      limit,
+      page,
+      totalPages,
+      totalConsumerUnits,
+      filters,
+    };
   }
 }
