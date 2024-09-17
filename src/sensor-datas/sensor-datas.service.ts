@@ -92,6 +92,31 @@ export class SensorDataService {
     }
   }
 
+  // async getChartData(equipmentId: string, from: Date, to: Date) {
+  //   const equipamento = await this.prismaService.equipamento.findFirst({
+  //     where: {
+  //       cod_equipamento: equipmentId,
+  //     },
+  //   });
+
+  //   if (!equipamento) {
+  //     throw new NotFoundException('Equipamento não encontrado');
+  //   }
+
+  //   const data = await this.prismaService.dado_Sensor.findMany({
+  //     where: {
+  //       equipamento: {
+  //         cod_equipamento: equipmentId,
+  //       },
+  //       data: {
+  //         gte: from,
+  //         lte: to,
+  //       },
+  //     },
+  //   });
+  //   return data.map((d) => new SensorChartDataEntity(d));
+  // }
+
   async getChartData(equipmentId: string, from: Date, to: Date) {
     const equipamento = await this.prismaService.equipamento.findFirst({
       where: {
@@ -103,17 +128,54 @@ export class SensorDataService {
       throw new NotFoundException('Equipamento não encontrado');
     }
 
-    const data = await this.prismaService.dado_Sensor.findMany({
-      where: {
-        equipamento: {
+    to = new Date(to);
+    from = new Date(from);
+
+    const diffInDays = Math.ceil(
+      (to.getTime() - from.getTime()) / (1000 * 60 * 60 * 24),
+    );
+
+    let data: any[];
+
+    if (diffInDays > 30) {
+      // Média mensal
+      data = await this.prismaService.media_mensal.findMany({
+        where: {
           cod_equipamento: equipmentId,
+          mes: {
+            gte: from,
+            lte: to,
+          },
         },
-        data: {
-          gte: from,
-          lte: to,
+      });
+
+      return data.map((d) => SensorChartDataEntity.fromMediaMensal(d));
+    } else if (diffInDays > 1) {
+      // Média diária
+      data = await this.prismaService.media_diaria.findMany({
+        where: {
+          cod_equipamento: equipmentId,
+          data: {
+            gte: from,
+            lte: to,
+          },
         },
-      },
-    });
-    return data.map((d) => new SensorChartDataEntity(d));
+      });
+
+      return data.map((d) => SensorChartDataEntity.fromMediaDiaria(d));
+    } else {
+      // Média anual ou dados diários
+      data = await this.prismaService.media_anual.findMany({
+        where: {
+          cod_equipamento: equipmentId,
+          ano: {
+            gte: from,
+            lte: to,
+          },
+        },
+      });
+
+      return data.map((d) => SensorChartDataEntity.fromMediaAnual(d));
+    }
   }
 }

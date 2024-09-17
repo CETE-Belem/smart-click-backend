@@ -5,7 +5,8 @@
 // Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
 
 generator client {
-  provider = "prisma-client-js"
+  provider        = "prisma-client-js"
+  previewFeatures = ["views"]
 }
 
 datasource db {
@@ -240,68 +241,68 @@ model Unidade_Consumidora {
   @@map("unidade_consumidora")
 }
 
-model MediaDiaria {
-  data                    DateTime
-  media_vA                Float?
-  media_iA                Float?
-  media_potenciaAparenteA Float?
-  media_potenciaAtivaA    Float?
-  media_FPA               Float?
-  media_vB                Float?
-  media_iB                Float?
-  media_potenciaAparenteB Float?
-  media_potenciaAtivaB    Float?
-  media_FPB               Float?
-  media_vC                Float?
-  media_iC                Float?
-  media_potenciaAparenteC Float?
-  media_potenciaAtivaC    Float?
-  media_FPC               Float?
+view media_diaria {
+  cod_equipamento         String
+  data                    DateTime @db.Date
+  media_va                Float?
+  media_ia                Float?
+  media_potenciaaparentea Float?
+  media_potenciaativaa    Float?
+  media_fpa               Float?
+  media_vb                Float?
+  media_ib                Float?
+  media_potenciaaparenteb Float?
+  media_potenciaativab    Float?
+  media_fpb               Float?
+  media_vc                Float?
+  media_ic                Float?
+  media_potenciaaparentec Float?
+  media_potenciaativac    Float?
+  media_fpc               Float?
 
-  @@id([data]) // Definindo a data como chave primária para garantir unicidade
-  @@map("media_diaria") // Mapeia o nome da view no banco de dados
+  @@unique([cod_equipamento, data])
 }
 
-model MediaMensal {
-  mes                     DateTime
-  media_vA                Float?
-  media_iA                Float?
-  media_potenciaAparenteA Float?
-  media_potenciaAtivaA    Float?
-  media_FPA               Float?
-  media_vB                Float?
-  media_iB                Float?
-  media_potenciaAparenteB Float?
-  media_potenciaAtivaB    Float?
-  media_FPB               Float?
-  media_vC                Float?
-  media_iC                Float?
-  media_potenciaAparenteC Float?
-  media_potenciaAtivaC    Float?
-  media_FPC               Float?
+view media_mensal {
+  cod_equipamento         String
+  mes                     DateTime @db.Timestamp(6)
+  media_va                Float?
+  media_ia                Float?
+  media_potenciaaparentea Float?
+  media_potenciaativaa    Float?
+  media_fpa               Float?
+  media_vb                Float?
+  media_ib                Float?
+  media_potenciaaparenteb Float?
+  media_potenciaativab    Float?
+  media_fpb               Float?
+  media_vc                Float?
+  media_ic                Float?
+  media_potenciaaparentec Float?
+  media_potenciaativac    Float?
+  media_fpc               Float?
 
-  @@id([mes]) // Definindo o mês como chave primária para garantir unicidade
-  @@map("media_mensal") // Mapeia o nome da view no banco de dados
+  @@unique([cod_equipamento, mes])
 }
 
-model MediaAnual {
-  ano                     DateTime
-  media_vA                Float?
-  media_iA                Float?
-  media_potenciaAparenteA Float?
-  media_potenciaAtivaA    Float?
-  media_FPA               Float?
-  media_vB                Float?
-  media_iB                Float?
-  media_potenciaAparenteB Float?
-  media_potenciaAtivaB    Float?
-  media_FPB               Float?
-  media_vC                Float?
-  media_iC                Float?
-  media_potenciaAparenteC Float?
-  media_potenciaAtivaC    Float?
-  media_FPC               Float?
+view media_anual {
+  cod_equipamento         String
+  ano                     DateTime @db.Timestamp(6)
+  media_va                Float?
+  media_ia                Float?
+  media_potenciaaparentea Float?
+  media_potenciaativaa    Float?
+  media_fpa               Float?
+  media_vb                Float?
+  media_ib                Float?
+  media_potenciaaparenteb Float?
+  media_potenciaativab    Float?
+  media_fpb               Float?
+  media_vc                Float?
+  media_ic                Float?
+  media_potenciaaparentec Float?
+  media_potenciaativac    Float?
+  media_fpc               Float?
 
-  @@id([ano]) // Definindo o ano como chave primária para garantir unicidade
-  @@map("media_anual") // Mapeia o nome da view no banco de dados
+  @@unique([cod_equipamento, ano])
 }
