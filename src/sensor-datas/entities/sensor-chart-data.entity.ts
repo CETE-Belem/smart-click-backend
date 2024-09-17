@@ -119,28 +119,32 @@ export class SensorChartDataEntity {
     return new SensorChartDataEntity(
       data.data,
       {
-        v: data.media_va!,
-        i: data.media_ia!,
-        potenciaAparente: data.media_potenciaaparentea!,
-        potenciaAtiva: data.media_potenciaativaa!,
-        FP: data.media_fpa!,
+        v: parseFloat(data.media_va!.toFixed(2)),
+        i: parseFloat(data.media_ia!.toFixed(2)),
+        potenciaAparente: parseFloat(data.media_potenciaaparentea!.toFixed(2)),
+        potenciaAtiva: parseFloat(data.media_potenciaativaa!.toFixed(2)),
+        FP: parseFloat(data.media_fpa!.toFixed(2)),
       },
       data.media_vb
         ? {
-            v: data.media_vb!,
-            i: data.media_ib!,
-            potenciaAparente: data.media_potenciaaparenteb!,
-            potenciaAtiva: data.media_potenciaativab!,
-            FP: data.media_fpb!,
+            v: parseFloat(data.media_vb!.toFixed(2)),
+            i: parseFloat(data.media_ib!.toFixed(2)),
+            potenciaAparente: parseFloat(
+              data.media_potenciaaparenteb!.toFixed(2),
+            ),
+            potenciaAtiva: parseFloat(data.media_potenciaativab!.toFixed(2)),
+            FP: parseFloat(data.media_fpb!.toFixed(2)),
           }
         : undefined,
       data.media_vc
         ? {
-            v: data.media_vc!,
-            i: data.media_ic!,
-            potenciaAparente: data.media_potenciaaparentec!,
-            potenciaAtiva: data.media_potenciaativac!,
-            FP: data.media_fpc!,
+            v: parseFloat(data.media_vc!.toFixed(2)),
+            i: parseFloat(data.media_ic!.toFixed(2)),
+            potenciaAparente: parseFloat(
+              data.media_potenciaaparentec!.toFixed(2),
+            ),
+            potenciaAtiva: parseFloat(data.media_potenciaativac!.toFixed(2)),
+            FP: parseFloat(data.media_fpc!.toFixed(2)),
           }
         : undefined,
     );
@@ -150,28 +154,32 @@ export class SensorChartDataEntity {
     return new SensorChartDataEntity(
       data.mes,
       {
-        v: data.media_va!,
-        i: data.media_ia!,
-        potenciaAparente: data.media_potenciaaparentea!,
-        potenciaAtiva: data.media_potenciaativaa!,
-        FP: data.media_fpa!,
+        v: parseFloat(data.media_va!.toFixed(2)),
+        i: parseFloat(data.media_ia!.toFixed(2)),
+        potenciaAparente: parseFloat(data.media_potenciaaparentea!.toFixed(2)),
+        potenciaAtiva: parseFloat(data.media_potenciaativaa!.toFixed(2)),
+        FP: parseFloat(data.media_fpa!.toFixed(2)),
       },
       data.media_vb
         ? {
-            v: data.media_vb!,
-            i: data.media_ib!,
-            potenciaAparente: data.media_potenciaaparenteb!,
-            potenciaAtiva: data.media_potenciaativab!,
-            FP: data.media_fpb!,
+            v: parseFloat(data.media_vb!.toFixed(2)),
+            i: parseFloat(data.media_ib!.toFixed(2)),
+            potenciaAparente: parseFloat(
+              data.media_potenciaaparenteb!.toFixed(2),
+            ),
+            potenciaAtiva: parseFloat(data.media_potenciaativab!.toFixed(2)),
+            FP: parseFloat(data.media_fpb!.toFixed(2)),
           }
         : undefined,
       data.media_vc
         ? {
-            v: data.media_vc!,
-            i: data.media_ic!,
-            potenciaAparente: data.media_potenciaaparentec!,
-            potenciaAtiva: data.media_potenciaativac!,
-            FP: data.media_fpc!,
+            v: parseFloat(data.media_vc!.toFixed(2)),
+            i: parseFloat(data.media_ic!.toFixed(2)),
+            potenciaAparente: parseFloat(
+              data.media_potenciaaparentec!.toFixed(2),
+            ),
+            potenciaAtiva: parseFloat(data.media_potenciaativac!.toFixed(2)),
+            FP: parseFloat(data.media_fpc!.toFixed(2)),
           }
         : undefined,
     );
@@ -181,28 +189,32 @@ export class SensorChartDataEntity {
     return new SensorChartDataEntity(
       data.ano,
       {
-        v: data.media_va!,
-        i: data.media_ia!,
-        potenciaAparente: data.media_potenciaaparentea!,
-        potenciaAtiva: data.media_potenciaativaa!,
-        FP: data.media_fpa!,
+        v: parseFloat(data.media_va!.toFixed(2)),
+        i: parseFloat(data.media_ia!.toFixed(2)),
+        potenciaAparente: parseFloat(data.media_potenciaaparentea!.toFixed(2)),
+        potenciaAtiva: parseFloat(data.media_potenciaativaa!.toFixed(2)),
+        FP: parseFloat(data.media_fpa!.toFixed(2)),
       },
       data.media_vb
         ? {
-            v: data.media_vb!,
-            i: data.media_ib!,
-            potenciaAparente: data.media_potenciaaparenteb!,
-            potenciaAtiva: data.media_potenciaativab!,
-            FP: data.media_fpb!,
+            v: parseFloat(data.media_vb!.toFixed(2)),
+            i: parseFloat(data.media_ib!.toFixed(2)),
+            potenciaAparente: parseFloat(
+              data.media_potenciaaparenteb!.toFixed(2),
+            ),
+            potenciaAtiva: parseFloat(data.media_potenciaativab!.toFixed(2)),
+            FP: parseFloat(data.media_fpb!.toFixed(2)),
           }
         : undefined,
       data.media_vc
         ? {
-            v: data.media_vc!,
-            i: data.media_ic!,
-            potenciaAparente: data.media_potenciaaparentec!,
-            potenciaAtiva: data.media_potenciaativac!,
-            FP: data.media_fpc!,
+            v: parseFloat(data.media_vc!.toFixed(2)),
+            i: parseFloat(data.media_ic!.toFixed(2)),
+            potenciaAparente: parseFloat(
+              data.media_potenciaaparentec!.toFixed(2),
+            ),
+            potenciaAtiva: parseFloat(data.media_potenciaativac!.toFixed(2)),
+            FP: parseFloat(data.media_fpc!.toFixed(2)),
           }
         : undefined,
     );
