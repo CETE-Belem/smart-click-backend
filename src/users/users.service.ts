@@ -180,16 +180,24 @@ export class UsersService {
     const { userId } = req.user;
     const { email, name, password } = updateUserDto;
 
-    const user = await this.prismaService.usuario.findFirst({
-      where: {
-        email: email.toLocaleLowerCase(),
-        cod_usuario: {
-          not: userId,
+    const existingUserWithThisEmail =
+      await this.prismaService.usuario.findFirst({
+        where: {
+          email: email.toLocaleLowerCase(),
+          cod_usuario: {
+            not: userId,
+          },
         },
+      });
+
+    const user = await this.prismaService.usuario.findUnique({
+      where: {
+        cod_usuario: userId,
       },
     });
 
-    if (user) throw new ConflictException('Email já cadastrado');
+    if (existingUserWithThisEmail)
+      throw new ConflictException('Email já cadastrado');
 
     if (!bcrypt.compareSync(password, user.senha)) {
       throw new ForbiddenException('Senha incorreta');
