@@ -126,6 +126,9 @@ export class ConsumerUnitService {
           numero: unitNumber,
         },
       },
+      include: {
+        unidade_consumidora: true,
+      },
       take: limit,
       skip: (page - 1) * limit,
     });
