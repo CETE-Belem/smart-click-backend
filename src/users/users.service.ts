@@ -191,10 +191,9 @@ export class UsersService {
 
     if (user) throw new ConflictException('Email já cadastrado');
 
-    const passwordSalt = password ? await generateSalt() : null;
-    const hashedPassword = password
-      ? await hashPassword(password, passwordSalt)
-      : null;
+    if (!bcrypt.compareSync(password, user.senha)) {
+      throw new ForbiddenException('Senha incorreta');
+    }
 
     const updatedUser = await this.prismaService.usuario.update({
       where: {
@@ -203,8 +202,6 @@ export class UsersService {
       data: {
         email: email.toLocaleLowerCase(),
         nome: name,
-        senha: hashedPassword ?? user.senha,
-        senhaSalt: passwordSalt ?? user.senhaSalt,
       },
     });
 

@@ -62,7 +62,7 @@ export class UpdateUserDto {
     minLength: minPasswordLength,
   })
   @IsOptional({
-    always: true,
+    always: false,
   })
   @MinLength(minPasswordLength, {
     message: `A senha deve ter pelo menos ${minPasswordLength} caracteres`,
@@ -77,5 +77,5 @@ export class UpdateUserDto {
     message:
       'A senha deve conter pelo menos uma letra maiúscula, uma letra minúscula, um número e um caractere especial',
   })
-  password?: string;
+  password: string;
 }
