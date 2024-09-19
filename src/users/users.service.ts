@@ -22,9 +22,10 @@ import { JWTType } from 'src/types/jwt.types';
 import { UpdateUserDto } from './dto/udpate-user.dto';
 import { RecoverPasswordDto } from './dto/recover-password.dto';
 import { AdminUpdateUserDto } from './dto/admin-update-user.dto';
-import { Cargo } from '@prisma/client';
+import { Cargo, Subgrupo } from '@prisma/client';
 import { CreateAdminDto } from './dto/create-admin.dto';
 import * as bcrypt from 'bcrypt';
+import { ConsumerUnitEntity } from 'src/consumer-units/entities/consumer-unit.entity';
 
 @Injectable()
 export class UsersService {
@@ -619,5 +620,64 @@ export class UsersService {
       .catch(() => {
         throw new NotFoundException('Usuário não encontrado');
       });
+  }
+
+  async findConsumerUnits(
+    req: JWTType,
+    page: number,
+    limit: number,
+    filters: {
+      city?: string;
+      uf?: string;
+      concessionaireId?: string;
+      subgroup?: Subgrupo;
+    },
+  ): Promise<{
+    consumerUnits: ConsumerUnitEntity[];
+    page: number;
+    limit: number;
+    totalPages: number;
+    totalConsumerUnits: number;
+    filters: {
+      city?: string;
+      uf?: string;
+      concessionaireId?: string;
+      subgroup?: Subgrupo;
+    };
+  }> {
+    const { city, concessionaireId, uf, subgroup } = filters;
+
+    const units = await this.prismaService.unidade_Consumidora.findMany({
+      where: {
+        cod_usuario: req.user.userId,
+        cidade: city,
+        cod_concessionaria: concessionaireId,
+        uf,
+        subgrupo: subgroup,
+      },
+      skip: (page - 1) * limit,
+      take: limit,
+    });
+
+    const totalConsumerUnits =
+      await this.prismaService.unidade_Consumidora.count({
+        where: {
+          cod_usuario: req.user.userId,
+          cidade: city,
+          cod_concessionaria: concessionaireId,
+          uf,
+        },
+      });
+
+    const totalPages = Math.ceil(totalConsumerUnits / limit);
+
+    return {
+      consumerUnits: units.map((unit) => new ConsumerUnitEntity(unit)),
+      limit,
+      page,
+      totalPages,
+      totalConsumerUnits,
+      filters,
+    };
   }
 }
