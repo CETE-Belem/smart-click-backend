@@ -73,8 +73,8 @@ async function main() {
       .create({
         data: {
           nome: fakerPT_BR.company.name(),
-          cidade: fakerPT_BR.location.city(),
-          uf: fakerPT_BR.location.state({ abbreviated: true }),
+          cidade: 'Belém',
+          uf: 'PA',
           criador: {
             connect: {
               cod_usuario: adm.cod_usuario,
@@ -93,8 +93,8 @@ async function main() {
     await prisma.unidade_Consumidora
       .create({
         data: {
-          cidade: fakerPT_BR.location.city(),
-          uf: fakerPT_BR.location.state({ abbreviated: true }),
+          cidade: 'Belém',
+          uf: 'PA',
           numero: fakerPT_BR.helpers.fromRegExp(/[0-9]{8}/),
           subgrupo: 'B1',
           optanteTB: true,
@@ -122,8 +122,8 @@ async function main() {
       nome: fakerPT_BR.commerce.productName(),
       fases_monitoradas: 'TRIFASE',
       tensao_nominal: 220,
-      cidade: fakerPT_BR.location.city(),
-      uf: fakerPT_BR.location.state({ abbreviated: true }),
+      cidade: 'Belém',
+      uf: 'PA',
       mac: fakerPT_BR.internet.mac(),
       usuario_cadastrou: {
         connect: {
