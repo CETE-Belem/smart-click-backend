@@ -148,8 +148,7 @@ export class ConsumerUnitController {
   }
 
   @Get(':id/equipments')
-  // @UseGuards(AuthGuard, RolesGuard)
-  // @Roles('ADMIN')
+  @UseGuards(AuthGuard)
   @ApiBearerAuth('token')
   @ApiOkResponse({
     status: HttpStatus.OK,
