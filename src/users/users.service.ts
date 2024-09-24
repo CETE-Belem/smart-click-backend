@@ -348,15 +348,34 @@ export class UsersService {
     return new UserEntity(updatedUser);
   }
 
-  async getMe(req: JWTType): Promise<UserEntity> {
+  async getMe(req: JWTType): Promise<{
+    user: UserEntity;
+    equipmentId?: string;
+  }> {
     const { userId } = req.user;
 
     const user = await this.prismaService.usuario.findUnique({
       where: {
         cod_usuario: userId,
       },
+      include: {
+        unidades_consumidoras: {
+          include: {
+            equipamentos: true,
+          },
+        },
+      },
     });
-    return new UserEntity(user);
+
+    const hasOneEquipmentAndUC =
+      user.unidades_consumidoras.length == 1 &&
+      user.unidades_consumidoras[0].equipamentos.length == 1;
+    return {
+      user: new UserEntity(user),
+      equipmentId: hasOneEquipmentAndUC
+        ? user.unidades_consumidoras[0].equipamentos[0].cod_equipamento
+        : null,
+    };
   }
 
   async sendRecoverCode(email: string): Promise<void> {

@@ -139,7 +139,7 @@ export class MqttService {
       },
       select: {
         perfil: true,
-        unidade_consumidora: {
+        unidades_consumidoras: {
           include: {
             equipamentos: {
               select: {
@@ -159,7 +159,9 @@ export class MqttService {
       return;
     }
 
-    const equipments = user.unidade_consumidora.equipamentos;
+    const equipments = user.unidades_consumidoras.flatMap(
+      (e) => e.equipamentos,
+    );
     if (!equipments) return;
     this.client.subscribe(
       equipments.map((device) => {
@@ -185,9 +187,22 @@ export class MqttService {
       distinct: ['mac'],
     });
     this.client.unsubscribe(
-      equipments.map(
-        (device) => `${device.mac.replaceAll(':', '-')}/smartclick/#`,
-      ),
+      equipments.flatMap((device) => {
+        const baseTopic = `${device.mac.replaceAll(':', '-')}/smartclick/`;
+        const unsubscribePaths = [
+          'last_will',
+          'tfa',
+          'tfb',
+          'tfc',
+          'cfa',
+          'cfb',
+          'cfc',
+          'prfa',
+          'prfb',
+          'prfc',
+        ];
+        return unsubscribePaths.map((path) => `${baseTopic}${path}`);
+      }),
       (error) => {
         error && this.logger.error('MQTT unsubscribe error: ', error);
       },

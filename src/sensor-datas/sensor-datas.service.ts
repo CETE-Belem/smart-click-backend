@@ -1,8 +1,10 @@
 import { Inject, Injectable, NotFoundException } from '@nestjs/common';
-import dayjs from 'dayjs';
+import * as dayjs from 'dayjs';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { Logger } from 'winston';
 import { SensorChartDataEntity } from './entities/sensor-chart-data.entity';
+import { media_anual, media_diaria, media_mensal } from '@prisma/client';
+import { EnergyService } from './services/energy.service';
 
 @Injectable()
 export class SensorDataService {
@@ -161,6 +163,7 @@ export class SensorDataService {
           },
         },
       });
+      console.log(data);
 
       return data.map((d) => SensorChartDataEntity.fromMediaDiaria(d));
     } else {
@@ -177,5 +180,44 @@ export class SensorDataService {
 
       return data.map((d) => SensorChartDataEntity.fromMediaAnual(d));
     }
+  }
+
+  async getEnergyConsumption(equipmentId: string, from: Date, to: Date) {
+    const energyService = new EnergyService(this.prismaService);
+
+    await energyService.SetEquipment(equipmentId, from, to);
+
+    return;
+    to = new Date(to);
+    from = new Date(from);
+
+    // const diffInDays = Math.ceil(
+    //   (to.getTime() - from.getTime()) / (1000 * 60 * 60 * 24),
+    // );
+
+    const data = await this.prismaService.dado_Sensor.findMany({
+      where: {
+        equipamento: {
+          cod_equipamento: equipmentId,
+        },
+        data: {
+          gte: from,
+          lte: to,
+        },
+      },
+    });
+
+    if (!data) {
+      throw new NotFoundException('Dados não encontrados');
+    }
+
+    const diffInHours = dayjs(to).diff(from, 'hour');
+
+    const totalEnergy =
+      data.reduce(
+        (acc, d) =>
+          acc + d.potenciaAtivaA + d.potenciaAparenteB + d.potenciaAparenteC,
+        0,
+      ) * diffInHours;
   }
 }
