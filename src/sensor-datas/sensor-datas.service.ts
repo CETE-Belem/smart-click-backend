@@ -152,21 +152,7 @@ export class SensorDataService {
       });
 
       return data.map((d) => SensorChartDataEntity.fromMediaMensal(d));
-    } else if (diffInDays > 1) {
-      // Média diária
-      data = await this.prismaService.media_diaria.findMany({
-        where: {
-          cod_equipamento: equipmentId,
-          data: {
-            gte: from,
-            lte: to,
-          },
-        },
-      });
-      console.log(data);
-
-      return data.map((d) => SensorChartDataEntity.fromMediaDiaria(d));
-    } else {
+    } else if (diffInDays > 365) {
       // Média anual ou dados diários
       data = await this.prismaService.media_anual.findMany({
         where: {
@@ -179,6 +165,30 @@ export class SensorDataService {
       });
 
       return data.map((d) => SensorChartDataEntity.fromMediaAnual(d));
+    } else if (diffInDays > 1) {
+      // Média diária
+      data = await this.prismaService.media_diaria.findMany({
+        where: {
+          cod_equipamento: equipmentId,
+          data: {
+            gte: from,
+            lte: to,
+          },
+        },
+      });
+      return data.map((d) => SensorChartDataEntity.fromMediaDiaria(d));
+    } else {
+      data = await this.prismaService.dado_Sensor.findMany({
+        where: {
+          cod_equipamento: equipmentId,
+          data: {
+            gte: from,
+            lte: to,
+          },
+        },
+      });
+      console.log(data.length);
+      return data.map((d) => SensorChartDataEntity.fromDadoSensor(d));
     }
   }
 
