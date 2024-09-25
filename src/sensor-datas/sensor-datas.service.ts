@@ -52,7 +52,7 @@ export class SensorDataService {
 
       const [day, month, year] = date.split('/');
       const fullYear = year.length === 2 ? `20${year}` : year;
-      const isoDateTime = `${fullYear}-${month}-${day}T${time}`;
+      const isoDateTime = `${fullYear}-${month}-${day}T${time}-03:00`;
       const formattedDate = dayjs(isoDateTime).toDate();
 
       await this.prismaService.dado_Sensor.create({
