@@ -24,6 +24,7 @@ export class MqttService {
         clientId: process.env.MQTT_CLIENT_ID, // ID do cliente
       },
     );
+    this.client.setMaxListeners(20);
     this.client.on('connect', () => {
       this.connected = true;
       console.log('MQTT connected');
@@ -200,6 +201,9 @@ export class MqttService {
           'prfa',
           'prfb',
           'prfc',
+          'pafa',
+          'pafb',
+          'pafc',
         ];
         return unsubscribePaths.map((path) => `${baseTopic}${path}`);
       }),
@@ -207,6 +211,71 @@ export class MqttService {
         error && this.logger.error('MQTT unsubscribe error: ', error);
       },
     );
+  }
+
+  async sendGetConstants(id: string): Promise<{ [key: string]: string }> {
+    const equipment = await this.prisma.equipamento.findUnique({
+      where: {
+        cod_equipamento: id,
+      },
+      select: {
+        mac: true,
+      },
+    });
+
+    if (!equipment) return;
+
+    const baseTopic = `${equipment.mac.replaceAll(':', '-')}/smartclick/`;
+    const subscribePaths = ['ctfa', 'ctfb', 'ctfc', 'ccfa', 'ccfb', 'ccfc'];
+    const arraySubscribePaths = subscribePaths.map(
+      (path) => `${baseTopic}${path}`,
+    );
+
+    const result: { [key: string]: string } = await new Promise(
+      (resolve, reject) => {
+        const receivedMessages: { [key: string]: string } = {};
+
+        // Adiciona um único listener para todas as mensagens
+        const messageHandler = (receivedTopic: string, message: Buffer) => {
+          // Verifica se o tópico recebido está nos tópicos assinados
+          const matchedPath = subscribePaths.find((path) =>
+            receivedTopic.endsWith(path),
+          );
+
+          if (matchedPath) {
+            // Armazena a mensagem usando a última parte do tópico (e.g. 'ctfa') como chave
+            receivedMessages[matchedPath] = message.toString();
+
+            // Verifica se já recebemos todas as mensagens esperadas
+            if (
+              Object.keys(receivedMessages).length === subscribePaths.length
+            ) {
+              this.client.removeListener('message', messageHandler); // Remove o listener após todas as mensagens serem recebidas
+              resolve(receivedMessages); // Retorna todas as mensagens como um objeto
+            }
+          }
+        };
+
+        this.client.on('message', messageHandler);
+
+        // Inscreve-se nos tópicos
+        this.client.subscribe(arraySubscribePaths, (error) => {
+          if (error) {
+            this.logger.error('MQTT subscribe error: ', error);
+            this.client.removeListener('message', messageHandler); // Remove o listener em caso de erro
+            return reject(error);
+          }
+        });
+      },
+    );
+
+    this.client.unsubscribe(arraySubscribePaths, (error) => {
+      if (error) {
+        this.logger.error('MQTT unsubscribe error: ', error);
+      }
+    });
+
+    return result;
   }
 
   async onModuleDestroy() {
