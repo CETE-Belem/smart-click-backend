@@ -46,6 +46,15 @@ export class SensorDataService {
       const potenciaAtivaC =
         phaseCount > 2 ? Number(dataSplitted[14].replace('W', '')) : null;
       const FPC = phaseCount > 2 ? Number(dataSplitted[15]) : null;
+
+      const date = dataSplitted[16];
+      const time = dataSplitted[17];
+
+      const [day, month, year] = date.split('/');
+      const fullYear = year.length === 2 ? `20${year}` : year;
+      const isoDateTime = `${fullYear}-${month}-${day}T${time}`;
+      const formattedDate = dayjs(isoDateTime).toDate();
+
       await this.prismaService.dado_Sensor.create({
         data: {
           vA: Math.abs(vA),
@@ -67,19 +76,7 @@ export class SensorDataService {
             : null,
           potenciaAtivaC: potenciaAtivaC ? Math.abs(potenciaAtivaC) : null,
           FPC: FPC ? Math.abs(FPC) : null,
-          data: await this.prismaService.dado_Sensor
-            .findFirstOrThrow({
-              where: {
-                equipamento: {
-                  mac,
-                },
-              },
-              orderBy: {
-                data: 'desc',
-              },
-            })
-            .then(({ data }) => dayjs(data).add(5, 'minutes').toDate())
-            .catch(() => new Date()),
+          data: formattedDate,
           equipamento: {
             connect: {
               mac,
@@ -187,7 +184,6 @@ export class SensorDataService {
           },
         },
       });
-      console.log(data.length);
       return data.map((d) => SensorChartDataEntity.fromDadoSensor(d));
     }
   }
