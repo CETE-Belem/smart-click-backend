@@ -406,4 +406,40 @@ export class ConsumerUnitService {
 
     return consumerUnit;
   }
+
+  async addUnitToUser(
+    req: JWTType,
+    connectConsumerUnitDto: ConnectConsumerUnitDto,
+  ): Promise<ConsumerUnitEntity> {
+    const { numero: unitNumber } = connectConsumerUnitDto;
+
+    const validUnit = await this.prismaService.unidade_Consumidora.findUnique({
+      where: {
+        numero: String(unitNumber),
+      },
+    });
+
+    if (!validUnit)
+      throw new NotFoundException(`A Unidade Consumidora não foi encontrada`);
+
+    if (validUnit.cod_usuario)
+      throw new ConflictException(
+        `A Unidade Consumidora já pertence a outro usuário`,
+      );
+
+    const consumerUnit = await this.prismaService.unidade_Consumidora.update({
+      data: {
+        usuario: {
+          connect: {
+            cod_usuario: req.user.userId,
+          },
+        },
+      },
+      where: {
+        numero: String(unitNumber),
+      },
+    });
+
+    return new ConsumerUnitEntity(consumerUnit);
+  }
 }
