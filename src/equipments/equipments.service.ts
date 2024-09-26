@@ -10,6 +10,8 @@ import { EquipmentEntity } from './entities/equipment.entity';
 import { JWTType } from 'src/types/jwt.types';
 import { Cargo, Fases } from '@prisma/client';
 import { UserUpdateEquipmentDto } from './dto/user-update-equipment.dto';
+import * as ExcelJS from 'exceljs';
+import { Response } from 'express';
 
 @Injectable()
 export class EquipmentsService {
@@ -310,6 +312,119 @@ export class EquipmentsService {
         ],
       };
     }
+  }
+
+  async generateReport(
+    res: Response,
+    id: string,
+    filters: { from: Date; to: Date },
+  ) {
+    const { from, to } = filters;
+
+    const workbook = new ExcelJS.Workbook();
+    const worksheet = workbook.addWorksheet('Report');
+
+    worksheet.columns = [
+      { header: 'Data', key: 'date', width: 20 },
+      { header: 'Corrente A', key: 'iA', width: 20 },
+      { header: 'Corrente B', key: 'iB', width: 20 },
+      { header: 'Corrente C', key: 'iC', width: 20 },
+      { header: 'Tensão A', key: 'vA', width: 20 },
+      { header: 'Tensão B', key: 'vB', width: 20 },
+      { header: 'Tensão C', key: 'vC', width: 20 },
+      { header: 'Potência Ativa A', key: 'activePowerA', width: 20 },
+      { header: 'Potência Ativa B', key: 'activePowerB', width: 20 },
+      { header: 'Potência Ativa C', key: 'activePowerC', width: 20 },
+      { header: 'Potência Reativa A', key: 'reactivePowerA', width: 20 },
+      { header: 'Potência Reativa B', key: 'reactivePowerB', width: 20 },
+      { header: 'Potência Reativa C', key: 'reactivePowerC', width: 20 },
+      { header: 'Potência Aparente A', key: 'apparentPowerA', width: 20 },
+      { header: 'Potência Aparente B', key: 'apparentPowerB', width: 20 },
+      { header: 'Potência Aparente C', key: 'apparentPowerC', width: 20 },
+    ];
+
+    const equipmentData = await this.prismaService.equipamento.findFirst({
+      where: {
+        cod_equipamento: id,
+        dados_sensor: {
+          every: {
+            atualizadoEm: {
+              gte: from,
+              lte: to,
+            },
+          },
+        },
+      },
+      include: {
+        dados_sensor: true,
+      },
+    });
+
+    if (!equipmentData)
+      throw new NotFoundException('Equipamento não encontrado');
+
+    if (!equipmentData.dados_sensor)
+      throw new NotFoundException('Dados do equipamento não encontrado');
+
+    const calculateReactivePower = (
+      apparentPower: number,
+      activePower: number,
+    ) => {
+      return Math.sqrt(Math.pow(apparentPower, 2) - Math.pow(activePower, 2));
+    };
+
+    const sheetData = equipmentData.dados_sensor.map((data) => ({
+      date: data.criadoEm,
+      iA: data.iA,
+      iB: data.iB,
+      iC: data.iC,
+      vA: data.vA,
+      vB: data.vB,
+      vC: data.vC,
+      activePowerA: data.potenciaAtivaA,
+      activePowerB: data.potenciaAtivaB,
+      activePowerC: data.potenciaAtivaC,
+      reactivePowerA: calculateReactivePower(
+        data.potenciaAparenteA,
+        data.potenciaAtivaA,
+      ),
+      reactivePowerB: calculateReactivePower(
+        data.potenciaAparenteB,
+        data.potenciaAtivaB,
+      ),
+      reactivePowerC: calculateReactivePower(
+        data.potenciaAparenteC,
+        data.potenciaAtivaC,
+      ),
+      apparentPowerA: data.potenciaAparenteA,
+      apparentPowerB: data.potenciaAparenteB,
+      apparentPowerC: data.potenciaAparenteC,
+    }));
+
+    worksheet.addRows(sheetData);
+
+    const buffer = await workbook.xlsx.writeBuffer();
+
+    const currDate = new Date()
+      .toLocaleString('pt-BR')
+      .trim()
+      .split('/')
+      .join('-')
+      .split(', ')
+      .join('_')
+      .split(':')
+      .join('-');
+
+    res.setHeader(
+      'Content-Type',
+      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    );
+    res.setHeader(
+      'Content-Disposition',
+      `attachment; filename=equipamento${id}_${currDate}.xlsx`,
+    );
+
+    res.send(buffer);
   }
 
   async findOne(req: JWTType, id: string): Promise<EquipmentEntity> {
