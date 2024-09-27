@@ -203,6 +203,29 @@ export class EquipmentsController {
   @Get(':id/report')
   @UseGuards(AuthGuard)
   @ApiBearerAuth('token')
+  @ApiOperation({
+    description:
+      'Gera um relatório dos dados do equipamento referente ao id enviado',
+  })
+  @ApiOkResponse({
+    status: HttpStatus.OK,
+    type: Promise<void>,
+  })
+  @ApiNotFoundResponse({
+    status: HttpStatus.NOT_FOUND,
+    example: {
+      message: 'Equipamento não encontrado',
+      error: 'Not Found',
+      statusCode: 404,
+    },
+  })
+  @ApiParam({ name: 'id', type: String, description: 'Id do equipamento' })
+  @ApiQuery({
+    name: 'from',
+    type: String,
+    description: 'Data inicial dos dados',
+  })
+  @ApiQuery({ name: 'to', type: String, description: 'Data final dos dados' })
   generateReport(
     @Res() res: Response,
     @Param('id', new ParseUUIDPipe()) id: string,
