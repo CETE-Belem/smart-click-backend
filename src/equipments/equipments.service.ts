@@ -369,8 +369,10 @@ export class EquipmentsService {
     const calculateReactivePower = (
       apparentPower: number,
       activePower: number,
-    ) => {
-      return Math.sqrt(Math.pow(apparentPower, 2) - Math.pow(activePower, 2));
+    ): number => {
+      return Math.sqrt(
+        Math.abs(Math.pow(apparentPower, 2) - Math.pow(activePower, 2)),
+      );
     };
 
     const sheetData = equipmentData.dados_sensor.map((data) => ({
