@@ -348,7 +348,7 @@ export class EquipmentsService {
         cod_equipamento: id,
         dados_sensor: {
           every: {
-            atualizadoEm: {
+            criadoEm: {
               gte: from,
               lte: to,
             },
