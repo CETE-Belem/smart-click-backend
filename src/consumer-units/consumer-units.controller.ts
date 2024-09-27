@@ -38,6 +38,7 @@ import { UpdateConsumerUnitDto } from './dto/update-consumer-unit.dto';
 import { Fases, Subgrupo } from '@prisma/client';
 import { EquipmentEntity } from 'src/equipments/entities/equipment.entity';
 import { ParseSubgrupoPipe } from 'src/common/pipes/ParseSubgrupoPipe.pipe';
+import { ConnectConsumerUnitDto } from './dto/connect-consumer-unit.dto';
 
 @ApiTags('consumer-units')
 @Controller('consumer-units')
@@ -147,9 +148,53 @@ export class ConsumerUnitController {
     return this.consumerUnitService.findOneConsumerUnit(id);
   }
 
+  @Patch('/:me')
+  @UseGuards(AuthGuard)
+  @ApiBearerAuth('token')
+  @ApiOkResponse({
+    status: HttpStatus.OK,
+    example: {
+      cod_unidade_consumidora: '4f465850-e06d-492c-a11a-c63931a38695',
+      cidade: 'Moraes do Norte',
+      uf: 'SE',
+      numero: '20643782',
+      criadoEm: '2024-08-18T16:35:58.156Z',
+      atualizadoEm: '2024-08-20T02:02:24.145Z',
+      cod_concessionaria: '08ca8920-2d02-4bfa-8b70-067b93ab75c6',
+      cod_criador: '61e4c31b-8a1c-4adc-acfd-3fe0a6216496',
+      cod_usuario: 'e45d5005-bba9-4e3e-a060-786240446ddd',
+    },
+  })
+  @ApiConflictResponse({
+    status: HttpStatus.CONFLICT,
+    description:
+      'A Unidade Consumidora de id [:id] já pertence a outro usuário',
+    example: {
+      message:
+        'A Unidade Consumidora de id 4f465850-e06d-492c-a11a-c63931a38695 já pertence a outro usuário',
+      error: 'Conflict',
+      statusCode: 409,
+    },
+  })
+  @ApiNotFoundResponse({
+    status: HttpStatus.NOT_FOUND,
+    description: 'A Unidade Consumidora de id [:id] não foi encontrada',
+    example: {
+      message:
+        'A Unidade Consumidora de id 4f465850-e06d-492c-a11a-c63931a38695 não foi encontrada',
+      error: 'Not Found',
+      statusCode: 404,
+    },
+  })
+  addUnitToUser(
+    @Request() req: JWTType,
+    @Body() connectConsumerUnitDto: ConnectConsumerUnitDto,
+  ) {
+    return this.consumerUnitService.addUnitToUser(req, connectConsumerUnitDto);
+  }
+
   @Get(':id/equipments')
-  @UseGuards(AuthGuard, RolesGuard)
-  @Roles('ADMIN')
+  @UseGuards(AuthGuard)
   @ApiBearerAuth('token')
   @ApiOkResponse({
     status: HttpStatus.OK,

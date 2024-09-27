@@ -1,8 +1,10 @@
 import { Inject, Injectable, NotFoundException } from '@nestjs/common';
-import dayjs from 'dayjs';
+import * as dayjs from 'dayjs';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { Logger } from 'winston';
 import { SensorChartDataEntity } from './entities/sensor-chart-data.entity';
+import { media_anual, media_diaria, media_mensal } from '@prisma/client';
+import { EnergyService } from './services/energy.service';
 
 @Injectable()
 export class SensorDataService {
@@ -44,6 +46,15 @@ export class SensorDataService {
       const potenciaAtivaC =
         phaseCount > 2 ? Number(dataSplitted[14].replace('W', '')) : null;
       const FPC = phaseCount > 2 ? Number(dataSplitted[15]) : null;
+
+      const date = dataSplitted[16];
+      const time = dataSplitted[17];
+
+      const [day, month, year] = date.split('/');
+      const fullYear = year.length === 2 ? `20${year}` : year;
+      const isoDateTime = `${fullYear}-${month}-${day}T${time}-03:00`;
+      const formattedDate = dayjs(isoDateTime).toDate();
+
       await this.prismaService.dado_Sensor.create({
         data: {
           vA: Math.abs(vA),
@@ -65,19 +76,7 @@ export class SensorDataService {
             : null,
           potenciaAtivaC: potenciaAtivaC ? Math.abs(potenciaAtivaC) : null,
           FPC: FPC ? Math.abs(FPC) : null,
-          data: await this.prismaService.dado_Sensor
-            .findFirstOrThrow({
-              where: {
-                equipamento: {
-                  mac,
-                },
-              },
-              orderBy: {
-                data: 'desc',
-              },
-            })
-            .then(({ data }) => dayjs(data).add(5, 'minutes').toDate())
-            .catch(() => new Date()),
+          data: formattedDate,
           equipamento: {
             connect: {
               mac,
@@ -150,20 +149,7 @@ export class SensorDataService {
       });
 
       return data.map((d) => SensorChartDataEntity.fromMediaMensal(d));
-    } else if (diffInDays > 1) {
-      // Média diária
-      data = await this.prismaService.media_diaria.findMany({
-        where: {
-          cod_equipamento: equipmentId,
-          data: {
-            gte: from,
-            lte: to,
-          },
-        },
-      });
-
-      return data.map((d) => SensorChartDataEntity.fromMediaDiaria(d));
-    } else {
+    } else if (diffInDays > 365) {
       // Média anual ou dados diários
       data = await this.prismaService.media_anual.findMany({
         where: {
@@ -176,6 +162,68 @@ export class SensorDataService {
       });
 
       return data.map((d) => SensorChartDataEntity.fromMediaAnual(d));
+    } else if (diffInDays > 1) {
+      // Média diária
+      data = await this.prismaService.media_diaria.findMany({
+        where: {
+          cod_equipamento: equipmentId,
+          data: {
+            gte: from,
+            lte: to,
+          },
+        },
+      });
+      return data.map((d) => SensorChartDataEntity.fromMediaDiaria(d));
+    } else {
+      data = await this.prismaService.dado_Sensor.findMany({
+        where: {
+          cod_equipamento: equipmentId,
+          data: {
+            gte: from,
+            lte: to,
+          },
+        },
+      });
+      return data.map((d) => SensorChartDataEntity.fromDadoSensor(d));
     }
+  }
+
+  async getEnergyConsumption(equipmentId: string, from: Date, to: Date) {
+    const energyService = new EnergyService(this.prismaService);
+
+    await energyService.SetEquipment(equipmentId, from, to);
+
+    return;
+    to = new Date(to);
+    from = new Date(from);
+
+    // const diffInDays = Math.ceil(
+    //   (to.getTime() - from.getTime()) / (1000 * 60 * 60 * 24),
+    // );
+
+    const data = await this.prismaService.dado_Sensor.findMany({
+      where: {
+        equipamento: {
+          cod_equipamento: equipmentId,
+        },
+        data: {
+          gte: from,
+          lte: to,
+        },
+      },
+    });
+
+    if (!data) {
+      throw new NotFoundException('Dados não encontrados');
+    }
+
+    const diffInHours = dayjs(to).diff(from, 'hour');
+
+    const totalEnergy =
+      data.reduce(
+        (acc, d) =>
+          acc + d.potenciaAtivaA + d.potenciaAparenteB + d.potenciaAparenteC,
+        0,
+      ) * diffInHours;
   }
 }

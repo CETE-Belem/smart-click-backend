@@ -3,6 +3,8 @@ import {
   OnGatewayConnection,
   OnGatewayDisconnect,
   WebSocketServer,
+  SubscribeMessage,
+  MessageBody,
 } from '@nestjs/websockets';
 import { Socket } from 'socket.io';
 import { MqttService } from 'src/services/mqtt/mqtt.service';
@@ -11,6 +13,7 @@ import { Logger } from 'winston';
 import { Inject } from '@nestjs/common';
 import { env } from 'src/config/env.config';
 import { SocketAuthMiddleware } from 'src/auth/ws.mw';
+import { PrismaService } from 'src/prisma/prisma.service';
 
 @WebSocketGateway({
   cors: {
@@ -25,6 +28,7 @@ export class FrontWebSocketGateway
   constructor(
     private readonly frontWebSocketService: FrontWebSocketService,
     private readonly mqttService: MqttService,
+    private readonly prismService: PrismaService,
     @Inject('winston') private logger: Logger,
   ) {}
 
@@ -46,5 +50,16 @@ export class FrontWebSocketGateway
     if (!userId) return;
     this.frontWebSocketService.removeSocketFromUser(userId, client.id);
     await this.mqttService.unsubscribeToUserDevices(userId);
+  }
+
+  @SubscribeMessage('getConstants')
+  async handleGetConstants(@MessageBody() data: string) {
+    const dataPased = JSON.parse(data);
+
+    const { id } = dataPased;
+
+    const response = await this.mqttService.sendGetConstants(id);
+
+    this.server.emit(`constants-${id}`, response);
   }
 }
