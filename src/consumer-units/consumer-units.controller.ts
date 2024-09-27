@@ -148,7 +148,7 @@ export class ConsumerUnitController {
     return this.consumerUnitService.findOneConsumerUnit(id);
   }
 
-  @Patch('/:me')
+  @Patch('/me')
   @UseGuards(AuthGuard)
   @ApiBearerAuth('token')
   @ApiOkResponse({
