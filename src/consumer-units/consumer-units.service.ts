@@ -11,6 +11,8 @@ import { ConsumerUnitEntity } from './entities/consumer-unit.entity';
 import { UpdateConsumerUnitDto } from './dto/update-consumer-unit.dto';
 import { EquipmentEntity } from 'src/equipments/entities/equipment.entity';
 import { Fases, Subgrupo } from '@prisma/client';
+import { ConnectConsumerUnitDto } from './dto/connect-consumer-unit.dto';
+import { JWTType } from 'src/types/jwt.types';
 
 @Injectable()
 export class ConsumerUnitService {
