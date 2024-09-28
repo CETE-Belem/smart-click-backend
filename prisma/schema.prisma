@@ -240,7 +240,7 @@ model Unidade_Consumidora {
   cod_criador String?
   criador     Usuario? @relation(name: "Criador", fields: [cod_criador], references: [cod_usuario], onDelete: SetNull)
 
-  cod_usuario String?  @unique
+  cod_usuario String?
   usuario     Usuario? @relation(name: "Usuario", fields: [cod_usuario], references: [cod_usuario], onDelete: SetNull)
 
   @@map("unidade_consumidora")
