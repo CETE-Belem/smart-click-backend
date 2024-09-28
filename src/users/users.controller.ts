@@ -24,6 +24,7 @@ import {
   ApiForbiddenResponse,
   ApiNotFoundResponse,
   ApiOkResponse,
+  ApiOperation,
   ApiParam,
   ApiTags,
   ApiUnauthorizedResponse,
@@ -616,5 +617,32 @@ export class UsersController {
     @Param('id', new ParseUUIDPipe()) id: string,
   ) {
     return this.usersService.delete(req, id);
+  }
+
+  @Get('/:id/consumer-units')
+  @UseGuards(AuthGuard)
+  @ApiBearerAuth('token')
+  @ApiOperation({ summary: 'Buscar Unidades Consumidoras do Usuário' })
+  @ApiOkResponse({
+    status: HttpStatus.OK,
+    description: 'Unidades encontradas',
+    type: [ConsumerUnitEntity],
+  })
+  @ApiNotFoundResponse({
+    status: HttpStatus.NOT_FOUND,
+    description: 'Usuário não encontrado',
+    schema: {
+      example: {
+        statusCode: HttpStatus.NOT_FOUND,
+        message: 'Usuário não encontrado',
+      },
+    },
+  })
+  @ApiParam({ name: 'id', type: 'string' })
+  getUserConsumerUnit(
+    @Request() req: JWTType,
+    @Param('id', new ParseUUIDPipe()) id: string,
+  ) {
+    return this.usersService.getUserConsumerUnits(id);
   }
 }

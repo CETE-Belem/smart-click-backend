@@ -699,4 +699,24 @@ export class UsersService {
       filters,
     };
   }
+
+  async getUserConsumerUnits(userId: string) {
+    const user = await this.prismaService.usuario.findUnique({
+      where: {
+        cod_usuario: userId,
+      },
+    });
+
+    if (!user) throw new NotFoundException('Usuário não encontrado');
+
+    const consumerUnits = await this.prismaService.unidade_Consumidora.findMany(
+      {
+        where: {
+          cod_usuario: userId,
+        },
+      },
+    );
+
+    return consumerUnits.map((unit) => new ConsumerUnitEntity(unit));
+  }
 }
