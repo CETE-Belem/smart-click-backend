@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   ConflictException,
   ForbiddenException,
   forwardRef,
@@ -700,7 +701,20 @@ export class UsersService {
     };
   }
 
-  async getUserConsumerUnits(userId: string) {
+  async getUserConsumerUnits(
+    userId: string,
+    page: number,
+    limit: number,
+    filters: {
+      query?: string;
+    },
+  ) {
+    if (page <= 0 || limit <= 0) {
+      throw new BadRequestException(
+        'Os parâmetros page/limit devem ser maiores que 0.',
+      );
+    }
+
     const user = await this.prismaService.usuario.findUnique({
       where: {
         cod_usuario: userId,
@@ -709,14 +723,79 @@ export class UsersService {
 
     if (!user) throw new NotFoundException('Usuário não encontrado');
 
+    let whereClause = {};
+
+    if (filters.query) {
+      whereClause = {
+        ...whereClause,
+        OR: [
+          {
+            cidade: {
+              contains: filters.query,
+              mode: 'insensitive',
+            },
+          },
+          {
+            uf: {
+              contains: filters.query,
+              mode: 'insensitive',
+            },
+          },
+          {
+            numero: {
+              contains: filters.query,
+              mode: 'insensitive',
+            },
+          },
+          {
+            concessionaria: {
+              nome: {
+                contains: filters.query,
+                mode: 'insensitive',
+              },
+            },
+          },
+        ],
+      };
+    }
+
     const consumerUnits = await this.prismaService.unidade_Consumidora.findMany(
       {
         where: {
+          ...whereClause,
           cod_usuario: userId,
+        },
+        skip: (page - 1) * limit,
+        take: limit,
+        orderBy: {
+          criadoEm: 'desc',
+        },
+        include: {
+          concessionaria: true,
+          equipamentos: true,
         },
       },
     );
 
-    return consumerUnits.map((unit) => new ConsumerUnitEntity(unit));
+    const totalConsumerUnits =
+      await this.prismaService.unidade_Consumidora.count({
+        where: {
+          ...whereClause,
+          cod_usuario: userId,
+        },
+      });
+
+    const totalPages = Math.ceil(totalConsumerUnits / limit);
+
+    return {
+      limit,
+      page,
+      totalPages,
+      totalConsumerUnits,
+      consumerUnits: consumerUnits.map(
+        (consumerUnits) => new ConsumerUnitEntity(consumerUnits),
+      ),
+      filters,
+    };
   }
 }
