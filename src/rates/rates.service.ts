@@ -9,7 +9,6 @@ import { RateEntity } from './entities/rate.entity';
 import { CreateRateIntervalDto } from './dto/create-rate-interval.dto';
 import { UpdateRateIntervalDto } from './dto/update-rate-interval.dto';
 import { UpdateRateDto } from './dto/update-rate.dto';
-import { RateIntervalEntity } from './entities/rate-interval.entity';
 
 @Injectable()
 export class RatesService {
@@ -21,10 +20,10 @@ export class RatesService {
   ): CreateRateIntervalDto[] | UpdateRateIntervalDto[] {
     const completedIntervals: CreateRateIntervalDto[] = [...intervals];
 
-    if (completedIntervals[completedIntervals.length - 1].ate < 1440) {
+    if (completedIntervals[completedIntervals.length - 1].ate < 1439) {
       completedIntervals.push({
-        de: completedIntervals[completedIntervals.length - 1].ate,
-        ate: 1440,
+        de: completedIntervals[completedIntervals.length - 1].ate + 1,
+        ate: 1439,
         tipo: 'FORA_DE_PONTA',
         valor,
       });
@@ -33,21 +32,20 @@ export class RatesService {
     if (completedIntervals[0].de > 0) {
       completedIntervals.unshift({
         de: 0,
-        ate: completedIntervals[0].de,
+        ate: completedIntervals[0].de - 1,
         tipo: 'FORA_DE_PONTA',
         valor,
       });
     }
 
     for (let i = 0; i < completedIntervals.length - 1; i++) {
-      if (completedIntervals[i].ate < completedIntervals[i + 1].de) {
+      if (completedIntervals[i].ate + 1 < completedIntervals[i + 1].de) {
         completedIntervals.splice(i + 1, 0, {
-          de: completedIntervals[i].ate,
-          ate: completedIntervals[i + 1].de,
+          de: completedIntervals[i].ate + 1,
+          ate: completedIntervals[i + 1].de - 1,
           tipo: 'FORA_DE_PONTA',
           valor,
         });
-        i++;
       }
     }
 
@@ -58,6 +56,11 @@ export class RatesService {
     valor: number,
     intervals?: CreateRateIntervalDto[] | UpdateRateIntervalDto[],
   ): CreateRateIntervalDto[] | UpdateRateIntervalDto[] {
+    if (intervals && intervals.length > 0) {
+      const sortedIntervals = [...intervals].sort((a, b) => a.de - b.de);
+      return this.completeIntervals(sortedIntervals, valor);
+    }
+
     const defaultInterval: CreateRateIntervalDto = {
       de: 0,
       ate: 1440,
@@ -65,11 +68,7 @@ export class RatesService {
       valor,
     };
 
-    const sortedIntervals = (
-      intervals && intervals.length ? [...intervals] : [defaultInterval]
-    ).sort((a, b) => a.de - b.de);
-
-    return this.completeIntervals(sortedIntervals, valor);
+    return [defaultInterval];
   }
 
   private areIntervalsValid(intervals: CreateRateIntervalDto[]): boolean {
@@ -243,7 +242,12 @@ export class RatesService {
             where: {
               cod_intervalo_tarifa: interval.cod_intervalo_tarifa,
             },
-            data: interval,
+            data: {
+              de: interval.de,
+              ate: interval.ate,
+              tipo: interval.tipo,
+              valor: interval.valor,
+            },
           })),
         },
       },
@@ -277,5 +281,27 @@ export class RatesService {
     });
 
     return new RateEntity(rate);
+  }
+
+  async getRateIntervalChart(id: string) {
+    const rate = await this.prismaService.tarifa.findFirst({
+      where: {
+        cod_tarifa: id,
+      },
+      include: {
+        intervalos_tarifas: true,
+      },
+    });
+
+    if (!rate) throw new NotFoundException('Tarifa não encontrada');
+
+    const chart = rate.intervalos_tarifas.map((interval) => ({
+      de: interval.de,
+      ate: interval.ate,
+      tipo: interval.tipo,
+      valor: Number(interval.valor),
+    }));
+
+    return chart;
   }
 }

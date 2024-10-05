@@ -296,4 +296,15 @@ export class RatesController {
   remove(@Param('id') id: string) {
     return this.ratesService.remove(id);
   }
+
+  @Get(':id/chart')
+  @UseGuards(AuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({
+    summary:
+      'Retorna um gráfico com os intervalos da tarifa correspondente ao id enviado',
+  })
+  getRateIntervalChart(@Param('id') id: string) {
+    return this.ratesService.getRateIntervalChart(id);
+  }
 }
