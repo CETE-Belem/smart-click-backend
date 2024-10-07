@@ -9,10 +9,10 @@ generator client {
   previewFeatures = ["views"]
 }
 
-generator erd {
-  provider = "prisma-erd-generator"
-  output   = "../ERD.svg"
-}
+// generator erd {
+//   provider = "prisma-erd-generator"
+//   output   = "../ERD.svg"
+// }
 
 datasource db {
   provider = "postgresql"
@@ -235,7 +235,7 @@ model Unidade_Consumidora {
   equipamentos Equipamento[]
 
   cod_concessionaria String
-  concessionaria     Concessionaria @relation(fields: [cod_concessionaria], references: [cod_concessionaria])
+  concessionaria     Concessionaria @relation(fields: [cod_concessionaria], references: [cod_concessionaria], onDelete: Cascade)
 
   cod_criador String?
   criador     Usuario? @relation(name: "Criador", fields: [cod_criador], references: [cod_usuario], onDelete: SetNull)

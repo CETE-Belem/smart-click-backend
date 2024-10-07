@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsString, MaxLength, MinLength } from 'class-validator';
+import { IsOptional, IsString, MaxLength, MinLength } from 'class-validator';
 import {
   maxNameLength,
   maxDescriptionLength,
@@ -37,5 +37,6 @@ export class UserUpdateEquipmentDto {
   @MaxLength(maxDescriptionLength, {
     message: `A descrição do equipamento deve ter no máximo ${maxDescriptionLength} caracteres`,
   })
+  @IsOptional()
   description?: string;
 }
