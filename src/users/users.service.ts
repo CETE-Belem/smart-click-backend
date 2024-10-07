@@ -36,7 +36,7 @@ export class UsersService {
     private readonly authService: AuthService,
     private readonly turnstileService: TurnstileService,
     private readonly mailService: MailService,
-  ) {}
+  ) { }
 
   async create(createUserDto: CreateUserDto): Promise<UserEntity> {
     const { captcha, email, name, password } = createUserDto;
@@ -159,18 +159,6 @@ export class UsersService {
         },
       },
     });
-
-    this.mailService
-      .sendMail({
-        email: user.email,
-        subject: 'Código de confirmação de conta',
-        template: ConfirmationCode({ confirmationCode: confirmationCode.code }),
-      })
-      .then(() => {
-        console.log(
-          `Email de código de confirmação de conta enviado para ${user.email}`,
-        );
-      });
 
     return new UserEntity(user);
   }
