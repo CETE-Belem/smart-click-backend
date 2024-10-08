@@ -269,8 +269,6 @@ export class ConcessionaireService {
       skip: (page - 1) * limit,
     });
 
-    if (!rates.length) throw new NotFoundException('Nenhuma tarifa encontrada');
-
     const totalRates = await this.prismaService.tarifa.count({
       where: {
         cod_concessionaria: id,
