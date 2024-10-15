@@ -13,6 +13,7 @@ import {
   Query,
   ParseIntPipe,
   Put,
+  Res,
 } from '@nestjs/common';
 import { EquipmentsService } from './equipments.service';
 import { CreateEquipmentDto } from './dto/create-equipment.dto';
@@ -38,6 +39,7 @@ import { Fases } from '@prisma/client';
 import { Roles } from 'src/common/decorators/roles.decorator';
 import { RolesGuard } from 'src/common/guards/roles.guard';
 import { UserUpdateEquipmentDto } from './dto/user-update-equipment.dto';
+import { Response } from 'express';
 
 @ApiTags('equipments')
 @UseGuards(AuthGuard, RolesGuard)
@@ -196,6 +198,41 @@ export class EquipmentsController {
     @Param('id', new ParseUUIDPipe()) id: string,
   ) {
     return this.equipmentsService.findOne(req, id);
+  }
+
+  @Get(':id/report')
+  @UseGuards(AuthGuard)
+  @ApiBearerAuth('token')
+  @ApiOperation({
+    description:
+      'Gera um relatório dos dados do equipamento referente ao id enviado',
+  })
+  @ApiOkResponse({
+    status: HttpStatus.OK,
+    type: Promise<void>,
+  })
+  @ApiNotFoundResponse({
+    status: HttpStatus.NOT_FOUND,
+    example: {
+      message: 'Equipamento não encontrado',
+      error: 'Not Found',
+      statusCode: 404,
+    },
+  })
+  @ApiParam({ name: 'id', type: String, description: 'Id do equipamento' })
+  @ApiQuery({
+    name: 'from',
+    type: String,
+    description: 'Data inicial dos dados',
+  })
+  @ApiQuery({ name: 'to', type: String, description: 'Data final dos dados' })
+  generateReport(
+    @Res() res: Response,
+    @Param('id', new ParseUUIDPipe()) id: string,
+    @Query('from') from: Date,
+    @Query('to') to: Date,
+  ) {
+    return this.equipmentsService.generateReport(res, id, { from, to });
   }
 
   @Patch(':id')
