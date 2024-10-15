@@ -11,6 +11,8 @@ import { ConsumerUnitEntity } from './entities/consumer-unit.entity';
 import { UpdateConsumerUnitDto } from './dto/update-consumer-unit.dto';
 import { EquipmentEntity } from 'src/equipments/entities/equipment.entity';
 import { Fases, Subgrupo } from '@prisma/client';
+import { ConnectConsumerUnitDto } from './dto/connect-consumer-unit.dto';
+import { JWTType } from 'src/types/jwt.types';
 
 @Injectable()
 export class ConsumerUnitService {
@@ -411,6 +413,14 @@ export class ConsumerUnitService {
     req: JWTType,
     connectConsumerUnitDto: ConnectConsumerUnitDto,
   ): Promise<ConsumerUnitEntity> {
+    const user = await this.prismaService.usuario.findUnique({
+      where: { cod_usuario: req.user.userId }, // replace usuarioId with the actual ID you're using
+    });
+
+    if (!user) {
+      throw new NotFoundException('Usuario não encontrado');
+    }
+
     const { numero: unitNumber } = connectConsumerUnitDto;
 
     const validUnit = await this.prismaService.unidade_Consumidora.findUnique({
@@ -431,12 +441,12 @@ export class ConsumerUnitService {
       data: {
         usuario: {
           connect: {
-            cod_usuario: req.user.userId,
+            cod_usuario: user.cod_usuario,
           },
         },
       },
       where: {
-        numero: String(unitNumber),
+        cod_unidade_consumidora: validUnit.cod_unidade_consumidora,
       },
     });
 

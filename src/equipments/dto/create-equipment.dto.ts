@@ -10,6 +10,7 @@ import {
   MinLength,
   IsEnum,
   IsNumber,
+  IsOptional,
 } from 'class-validator';
 import {
   maxNameLength,
@@ -66,6 +67,7 @@ export class CreateEquipmentDto {
   @MaxLength(maxDescriptionLength, {
     message: `A descrição do equipamento deve ter no máximo ${maxDescriptionLength} caracteres`,
   })
+  @IsOptional()
   description?: string;
 
   @ApiProperty({

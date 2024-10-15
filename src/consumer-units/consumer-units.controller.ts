@@ -28,6 +28,7 @@ import {
   ApiParam,
   getSchemaPath,
   ApiBadRequestResponse,
+  ApiQuery,
 } from '@nestjs/swagger';
 import { Roles } from 'src/common/decorators/roles.decorator';
 import { AuthGuard } from 'src/common/guards/auth.guard';
@@ -87,16 +88,22 @@ export class ConsumerUnitController {
       },
     },
   })
-  @ApiParam({ name: 'city', type: 'string', required: false })
-  @ApiParam({ name: 'uf', type: 'string', required: false })
-  @ApiParam({
+  @ApiQuery({ name: 'city', type: 'string', required: false })
+  @ApiQuery({ name: 'uf', type: 'string', required: false })
+  @ApiQuery({
     name: 'concessionaire',
     type: 'string',
     required: false,
     description: 'Id da concessionária',
   })
-  @ApiParam({ name: 'page', type: 'number', required: true })
-  @ApiParam({ name: 'limit', type: 'number', required: true })
+  @ApiQuery({ name: 'page', type: 'number', required: true })
+  @ApiQuery({ name: 'limit', type: 'number', required: true })
+  @ApiQuery({
+    name: 'query',
+    description: 'Query de busca',
+    required: false,
+    type: String,
+  })
   findAll(
     @Request() req: JWTType,
     @Query('page', new ParseIntPipe()) page: number,
@@ -148,7 +155,7 @@ export class ConsumerUnitController {
     return this.consumerUnitService.findOneConsumerUnit(id);
   }
 
-  @Patch('/:me')
+  @Patch('/me')
   @UseGuards(AuthGuard)
   @ApiBearerAuth('token')
   @ApiOkResponse({

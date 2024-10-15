@@ -24,7 +24,9 @@ import {
   ApiForbiddenResponse,
   ApiNotFoundResponse,
   ApiOkResponse,
+  ApiOperation,
   ApiParam,
+  ApiQuery,
   ApiTags,
   ApiUnauthorizedResponse,
   getSchemaPath,
@@ -616,5 +618,65 @@ export class UsersController {
     @Param('id', new ParseUUIDPipe()) id: string,
   ) {
     return this.usersService.delete(req, id);
+  }
+
+  @Get('/:id/consumer-units')
+  @UseGuards(AuthGuard)
+  @ApiBearerAuth('token')
+  @ApiOperation({ summary: 'Buscar Unidades Consumidoras do Usuário' })
+  @ApiOkResponse({
+    status: HttpStatus.OK,
+    description: 'Lista de Unidade Consumidoras',
+    schema: {
+      properties: {
+        consumerUnits: {
+          type: 'array',
+          items: {
+            $ref: getSchemaPath(ConsumerUnitEntity),
+          },
+        },
+        page: { type: 'number', example: 2 },
+        limit: { type: 'number', example: 10 },
+        totalPages: { type: 'number', example: 10 },
+        totalConsumerUnits: { type: 'number', example: 100 },
+        filters: {
+          type: 'array',
+          items: {
+            example: {
+              query: 'Bel',
+            },
+          },
+        },
+      },
+    },
+  })
+  @ApiNotFoundResponse({
+    status: HttpStatus.NOT_FOUND,
+    description: 'Usuário não encontrado',
+    schema: {
+      example: {
+        statusCode: HttpStatus.NOT_FOUND,
+        message: 'Usuário não encontrado',
+      },
+    },
+  })
+  @ApiQuery({ name: 'page', type: 'number', required: true })
+  @ApiQuery({ name: 'limit', type: 'number', required: true })
+  @ApiQuery({
+    name: 'query',
+    description: 'Query de busca',
+    required: false,
+    type: String,
+  })
+  getUserConsumerUnit(
+    @Request() req: JWTType,
+    @Param('id', new ParseUUIDPipe()) id: string,
+    @Query('page', new ParseIntPipe()) page: number,
+    @Query('limit', new ParseIntPipe()) limit: number,
+    @Query('query') query?: string,
+  ) {
+    return this.usersService.getUserConsumerUnits(id, page, limit, {
+      query,
+    });
   }
 }

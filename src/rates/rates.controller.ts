@@ -19,6 +19,7 @@ import { Roles } from 'src/common/decorators/roles.decorator';
 import {
   ApiBadRequestResponse,
   ApiBearerAuth,
+  ApiCreatedResponse,
   ApiNotFoundResponse,
   ApiOkResponse,
   ApiOperation,
@@ -38,7 +39,7 @@ export class RatesController {
   @ApiOperation({
     summary: 'Cria uma nova tarifa, atrelada a uma concessionária, e a retorna',
   })
-  @ApiOkResponse({
+  @ApiCreatedResponse({
     example: {
       cod_tarifa: 'a05b9b49-685b-4081-b07f-13e861c04e04',
       dt_tarifa: '2012-08-20T13:20:00.000Z',
@@ -294,5 +295,16 @@ export class RatesController {
   })
   remove(@Param('id') id: string) {
     return this.ratesService.remove(id);
+  }
+
+  @Get(':id/chart')
+  @UseGuards(AuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({
+    summary:
+      'Retorna um gráfico com os intervalos da tarifa correspondente ao id enviado',
+  })
+  getRateIntervalChart(@Param('id') id: string) {
+    return this.ratesService.getRateIntervalChart(id);
   }
 }
