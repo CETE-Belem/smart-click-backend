@@ -19,10 +19,14 @@ import { DatabaseInterceptor } from './common/interceptors/database.interceptor'
 import { MqttModule } from './services/mqtt/mqtt.module';
 import { WebSocketsModule } from './gateways/websocket.module';
 import { SensorDataModule } from './sensor-datas/sensor-datas.module';
+import { ScheduleModule } from '@nestjs/schedule';
+import { SensorDataService } from './sensor-datas/sensor-datas.service';
+import { MailService } from './mail/mail.service';
 
 @Module({
   imports: [
     WinstonModule.forRoot(winstonConfig),
+    ScheduleModule.forRoot(),
     ThrottlerModule.forRoot([
       {
         ttl: 60000,
@@ -44,6 +48,8 @@ import { SensorDataModule } from './sensor-datas/sensor-datas.module';
   controllers: [AppController],
   providers: [
     AppService,
+    SensorDataService,
+    MailService,
     {
       provide: APP_GUARD,
       useClass: ThrottlerGuard,
