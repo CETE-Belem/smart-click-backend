@@ -341,6 +341,9 @@ export class EquipmentsService {
       { header: 'Potência Aparente A', key: 'apparentPowerA', width: 20 },
       { header: 'Potência Aparente B', key: 'apparentPowerB', width: 20 },
       { header: 'Potência Aparente C', key: 'apparentPowerC', width: 20 },
+      { header: 'Fator de Potência A', key: 'powerFactorA', width: 20 },
+      { header: 'Fator de Potência B', key: 'powerFactorB', width: 20 },
+      { header: 'Fator de Potência C', key: 'powerFactorC', width: 20 },
     ];
 
     const equipmentData = await this.prismaService.equipamento.findFirst({
@@ -401,6 +404,9 @@ export class EquipmentsService {
       apparentPowerA: data.potenciaAparenteA,
       apparentPowerB: data.potenciaAparenteB,
       apparentPowerC: data.potenciaAparenteC,
+      powerFactorA: data.FPA,
+      powerFactorB: data.FPB,
+      powerFactorC: data.FPC,
     }));
 
     worksheet.addRows(sheetData);
