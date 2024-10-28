@@ -36,7 +36,7 @@ export class UsersService {
     private readonly authService: AuthService,
     private readonly turnstileService: TurnstileService,
     private readonly mailService: MailService,
-  ) { }
+  ) {}
 
   async create(createUserDto: CreateUserDto): Promise<UserEntity> {
     const { captcha, email, name, password } = createUserDto;
