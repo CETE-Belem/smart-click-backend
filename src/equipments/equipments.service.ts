@@ -359,7 +359,11 @@ export class EquipmentsService {
         },
       },
       include: {
-        dados_sensor: true,
+        dados_sensor: {
+          orderBy: {
+            criadoEm: 'asc',
+          },
+        },
       },
     });
 
@@ -379,7 +383,7 @@ export class EquipmentsService {
     };
 
     const sheetData = equipmentData.dados_sensor.map((data) => ({
-      date: data.criadoEm,
+      date: data.criadoEm.toLocaleString('pt-BR'),
       iA: data.iA,
       iB: data.iB,
       iC: data.iC,
