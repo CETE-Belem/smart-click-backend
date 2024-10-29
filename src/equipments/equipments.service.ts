@@ -359,7 +359,11 @@ export class EquipmentsService {
         },
       },
       include: {
-        dados_sensor: true,
+        dados_sensor: {
+          orderBy: {
+            criadoEm: 'asc',
+          },
+        },
       },
     });
 
