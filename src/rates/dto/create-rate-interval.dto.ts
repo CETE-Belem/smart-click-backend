@@ -37,8 +37,8 @@ export class CreateRateIntervalDto {
   @IsNotEmpty({ message: 'Campo [ate] é obrigatório' })
   @IsNumber({}, { message: 'Campo [ate] deve ser um número' })
   @IsInt({ message: 'Campo [ate] deve ser um inteiro' })
-  @Max(1440, {
-    message: 'Campo [ate] pode possuir um valor inicial de até 1440 minutos',
+  @Max(1439, {
+    message: 'Campo [ate] pode possuir um valor inicial de até 1439 minutos',
   })
   @IsPositive({ message: 'Campo [ate] deve ser maior que 0 minutos' })
   ate: number;
