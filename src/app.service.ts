@@ -21,12 +21,12 @@ export class AppService implements OnModuleInit {
 
     const equipments = await this.prismaService.equipamento.findMany();
 
-    equipments.forEach(async (equipment) => {
-      await this.sensorDatasService.getEnergyConsumption(
-        equipment.cod_equipamento,
-        startOfLastMonth,
-        endOfLastMonth,
-      );
-    });
+    // equipments.forEach(async (equipment) => {
+    //   await this.sensorDatasService.getEnergyConsumption(
+    //     equipment.cod_equipamento,
+    //     startOfLastMonth,
+    //     endOfLastMonth,
+    //   );
+    // });
   }
 }
