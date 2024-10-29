@@ -63,7 +63,7 @@ export class RatesService {
 
     const defaultInterval: CreateRateIntervalDto = {
       de: 0,
-      ate: 1440,
+      ate: 1439,
       tipo: 'FORA_DE_PONTA',
       valor,
     };
@@ -86,7 +86,7 @@ export class RatesService {
     interval1: CreateRateIntervalDto,
     interval2: CreateRateIntervalDto,
   ) {
-    return interval1.de < interval2.ate && interval2.de < interval1.ate;
+    return interval1.de <= interval2.ate && interval2.de <= interval1.ate;
   }
 
   async create(createRateDto: CreateRateDto): Promise<RateEntity> {
