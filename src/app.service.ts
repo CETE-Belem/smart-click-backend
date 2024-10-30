@@ -20,13 +20,14 @@ export class AppService implements OnModuleInit {
     const endOfLastMonth = currentDateLastMonth.endOf('month').toDate();
 
     const equipments = await this.prismaService.equipamento.findMany();
-
-    equipments.forEach(async (equipment) => {
-      await this.sensorDatasService.getEnergyConsumption(
-        equipment.cod_equipamento,
-        startOfLastMonth,
-        endOfLastMonth,
-      );
-    });
+    await Promise.all(
+      equipments.map(async (equipment) => {
+        return this.sensorDatasService.getEnergyConsumption(
+          equipment.cod_equipamento,
+          startOfLastMonth,
+          endOfLastMonth,
+        );
+      }),
+    );
   }
 }

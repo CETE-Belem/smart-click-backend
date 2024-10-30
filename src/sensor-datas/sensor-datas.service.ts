@@ -138,8 +138,8 @@ export class SensorDataService {
     );
 
     let data: any[];
-
-    if (diffInDays > 30) {
+    console.log(diffInDays);
+    if (diffInDays > 31) {
       // Média mensal
       data = await this.prismaService.media_mensal.findMany({
         where: {
@@ -150,6 +150,7 @@ export class SensorDataService {
           },
         },
       });
+      console.log(data);
 
       return data.map((d) => SensorChartDataEntity.fromMediaMensal(d));
     } else if (diffInDays > 365) {
@@ -192,169 +193,189 @@ export class SensorDataService {
   }
 
   async getEnergyConsumption(equipmentId: string, from: Date, to: Date) {
-    const conventionals: Map<Date, number> = new Map();
-    const rates: Map<Date, Intervalo_Tarifa[]> = new Map();
+    try {
+      const conventionals: Map<Date, number> = new Map();
+      const rates: Map<Date, Intervalo_Tarifa[]> = new Map();
 
-    const unidadeConsumidora = await this.prismaService.equipamento.findUnique({
-      where: {
-        cod_equipamento: equipmentId,
-      },
-      select: {
-        unidade_consumidora: {
-          select: {
-            subgrupo: true,
+      const unidadeConsumidora =
+        await this.prismaService.equipamento.findUnique({
+          where: {
+            cod_equipamento: equipmentId,
           },
-        },
-      },
-    });
+          select: {
+            unidade_consumidora: {
+              select: {
+                subgrupo: true,
+              },
+            },
+          },
+        });
 
-    const unidadeSubgroup = unidadeConsumidora?.unidade_consumidora?.subgrupo;
+      const unidadeSubgroup = unidadeConsumidora?.unidade_consumidora?.subgrupo;
 
-    if (!unidadeSubgroup) {
-      throw new NotFoundException('Subgrupo não encontrado');
-    }
+      if (!unidadeSubgroup) {
+        console.error('Subgrupo não encontrado');
+        return {
+          ok: false,
+        };
+      }
 
-    const equipment = await this.prismaService.equipamento
-      .findUniqueOrThrow({
-        where: {
-          cod_equipamento: equipmentId,
-        },
-        include: {
-          unidade_consumidora: {
-            include: {
-              usuario: true,
-              concessionaria: {
-                include: {
-                  tarifas: {
-                    where: {
-                      AND: [
-                        {
-                          OR: [
-                            {
-                              dt_tarifa: {
-                                lte: dayjs(to).startOf('day').toDate(),
-                                gte: dayjs(from).endOf('day').toDate(),
+      const equipment = await this.prismaService.equipamento
+        .findUniqueOrThrow({
+          where: {
+            cod_equipamento: equipmentId,
+          },
+          include: {
+            unidade_consumidora: {
+              include: {
+                usuario: true,
+                concessionaria: {
+                  include: {
+                    tarifas: {
+                      where: {
+                        AND: [
+                          {
+                            OR: [
+                              {
+                                dt_tarifa: {
+                                  lte: dayjs(to).startOf('day').toDate(),
+                                  gte: dayjs(from).endOf('day').toDate(),
+                                },
                               },
-                            },
-                            {
-                              dt_tarifa: {
-                                lte: dayjs().toDate(),
+                              {
+                                dt_tarifa: {
+                                  lte: dayjs().toDate(),
+                                },
                               },
-                            },
-                          ],
-                        },
-                        {
-                          subgrupo: unidadeSubgroup,
-                        },
-                      ],
-                    },
-                    orderBy: {
-                      dt_tarifa: 'desc',
-                    },
-                    take: 1,
-                    include: {
-                      intervalos_tarifas: true,
+                            ],
+                          },
+                          {
+                            subgrupo: unidadeSubgroup,
+                          },
+                        ],
+                      },
+                      orderBy: {
+                        dt_tarifa: 'desc',
+                      },
+                      take: 1,
+                      include: {
+                        intervalos_tarifas: true,
+                      },
                     },
                   },
                 },
               },
             },
-          },
-          dados_sensor: {
-            where: {
-              data: {
-                lte: dayjs(to).startOf('day').toDate(),
-                gte: dayjs(from).endOf('day').toDate(),
+            dados_sensor: {
+              where: {
+                data: {
+                  lte: dayjs(to).startOf('day').toDate(),
+                  gte: dayjs(from).endOf('day').toDate(),
+                },
               },
             },
           },
-        },
-      })
-      .catch(() => {
-        throw new NotFoundException('Equipamento não encontrado');
-      });
+        })
+        .catch(() => {
+          console.error('Equipamento não encontrado');
+        });
 
-    if (equipment.unidade_consumidora.concessionaria.tarifas.length === 0) {
-      throw new NotFoundException(
-        `Tarifa não encontrada para o intervalo de datas 
+      if (!equipment) {
+        return;
+      }
+
+      if (equipment.unidade_consumidora.concessionaria.tarifas.length === 0) {
+        console.error(
+          `Tarifa não encontrada para o intervalo de datas 
         ${dayjs(from).format('DD/MM/YYYY')} - 
         ${dayjs(to).format('DD/MM/YYYY')} 
         ou para o subgrupo ${unidadeSubgroup}`,
-      );
-    }
-
-    equipment.unidade_consumidora.concessionaria.tarifas.forEach((e) => {
-      conventionals.set(e.dt_tarifa, Number(e.valor));
-      rates.set(e.dt_tarifa, e.intervalos_tarifas);
-    });
-
-    let valueTB = 0;
-    let valueConv = 0;
-
-    equipment.dados_sensor
-      .sort((a, b) => a.data.getTime() - b.data.getTime())
-      .forEach((e, index) => {
-        // First element never have consumption
-        if (index === 0) return;
-
-        const date = dayjs(e.data);
-
-        const rate = rates.get(this.getClosestDate(rates, date.toDate())!);
-
-        const conventional = conventionals.get(
-          this.getClosestDate(conventionals, date.toDate())!,
         );
+        return;
+      }
 
-        // Power sum in Watts
-        const pot =
-          (e.potenciaAtivaA + e.potenciaAtivaB + e.potenciaAtivaC) / 1000;
+      equipment.unidade_consumidora.concessionaria.tarifas.forEach((e) => {
+        conventionals.set(e.dt_tarifa, Number(e.valor));
+        rates.set(e.dt_tarifa, e.intervalos_tarifas);
+      });
 
-        // Collections time difference in Hours
-        const deltaT = dayjs(e.data).diff(
-          dayjs(equipment.dados_sensor[index - 1].data),
-          'hour',
-          true,
-        );
+      let valueTB = 0;
+      let valueConv = 0;
 
-        const energyConsumption = pot * deltaT;
-        const collectTimeInMinutes = convertTimeToMinutes(date, 'HH:mm');
+      equipment.dados_sensor
+        .sort((a, b) => a.data.getTime() - b.data.getTime())
+        .forEach((e, index) => {
+          // First element never have consumption
+          if (index === 0) return;
 
-        const rateToThisTime = rate.find(
-          (r) => r.de <= collectTimeInMinutes && r.ate >= collectTimeInMinutes,
-        );
+          const date = dayjs(e.data);
 
-        if (!rateToThisTime) {
-          throw new NotFoundException(
-            `Intervalo de tarifa não encontrado para data ${date.format('DD/MM/YYYY')} e hora ${date.format('HH:MM')}`,
+          const rate = rates.get(this.getClosestDate(rates, date.toDate())!);
+
+          const conventional = conventionals.get(
+            this.getClosestDate(conventionals, date.toDate())!,
           );
-        }
 
-        valueTB += energyConsumption * Number(rateToThisTime.valor);
-        valueConv += energyConsumption * conventional;
-      });
+          // Power sum in Watts
+          const pot =
+            (e.potenciaAtivaA + e.potenciaAtivaB + e.potenciaAtivaC) / 1000;
 
-    const userEmail = equipment.unidade_consumidora.usuario.email;
-    const optanteTB = equipment.unidade_consumidora.optanteTB;
-    this.mailService
-      .sendMail({
-        email: userEmail,
-        subject: 'Seu relatório de energia está disponível',
-        template: EnergyReport({
-          valueConv,
-          valueTB,
-          from,
-          to,
-          optanteTB,
-          equipmentName: equipment.nome,
-        }),
-      })
-      .then(() => {
-        console.log(`Email de relatório de energia enviado para ${userEmail}`);
-      });
+          // Collections time difference in Hours
+          const deltaT = dayjs(e.data).diff(
+            dayjs(equipment.dados_sensor[index - 1].data),
+            'hour',
+            true,
+          );
 
-    return {
-      ok: true,
-    };
+          const energyConsumption = pot * deltaT;
+          const collectTimeInMinutes = convertTimeToMinutes(date, 'HH:mm');
+
+          const rateToThisTime = rate.find(
+            (r) =>
+              r.de <= collectTimeInMinutes && r.ate >= collectTimeInMinutes,
+          );
+
+          if (!rateToThisTime) {
+            console.error(
+              `Intervalo de tarifa não encontrado para data ${date.format('DD/MM/YYYY')} e hora ${date.format('HH:MM')}`,
+            );
+            return;
+          }
+
+          valueTB += energyConsumption * Number(rateToThisTime.valor);
+          valueConv += energyConsumption * conventional;
+        });
+
+      const userEmail = equipment.unidade_consumidora.usuario.email;
+      const optanteTB = equipment.unidade_consumidora.optanteTB;
+      this.mailService
+        .sendMail({
+          email: userEmail,
+          subject: 'Seu relatório de energia está disponível',
+          template: EnergyReport({
+            valueConv,
+            valueTB,
+            from,
+            to,
+            optanteTB,
+            equipmentName: equipment.nome,
+          }),
+        })
+        .then(() => {
+          console.log(
+            `Email de relatório de energia enviado para ${userEmail}`,
+          );
+        });
+
+      return {
+        ok: true,
+      };
+    } catch (e) {
+      console.log(e.message);
+      return {
+        ok: false,
+      };
+    }
   }
 
   private getClosestDate(

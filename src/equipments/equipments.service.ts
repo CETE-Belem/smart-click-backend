@@ -195,7 +195,6 @@ export class EquipmentsService {
       });
 
       const totalPages = Math.ceil(totalEquipments / limit);
-
       return {
         limit,
         page,
