@@ -6,15 +6,15 @@ const prisma = new PrismaClient();
 
 async function main() {
   const passwordSalt = await generateSalt();
-  const password = await hashPassword('@Abc1234', passwordSalt);
+  const password = await hashPassword('SmartClick12', passwordSalt);
 
   const adm = await prisma.usuario
     .upsert({
-      where: { email: 'rianernesto9@gmail.com' },
+      where: { email: 'adm@gmail.com' },
       update: {},
       create: {
-        email: 'rianernesto9@gmail.com',
-        nome: 'Rian Ernesto',
+        email: 'adm@gmail.com',
+        nome: 'Smart Click',
         senha: password,
         senhaSalt: passwordSalt,
         contaConfirmada: true,
