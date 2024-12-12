@@ -42,12 +42,13 @@ export class MqttService {
     });
 
     this.client.on('message', (topic, message) => {
+      this.logger.info('MQTT mensagem: ', message);
       //console.log('Received message from topic: ', topic);
       this.handleMessage(topic, message.toString()); // Tratar a mensagem recebida
     });
 
     this.client.on('error', (error) => {
-      this.logger.error('MQTT error: ', error);
+      this.logger.error('MQTT mensagem: ', error);
       console.error('MQTT error: ', error);
     });
   }
