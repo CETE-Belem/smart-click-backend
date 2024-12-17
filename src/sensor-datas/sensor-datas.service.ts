@@ -1,19 +1,19 @@
 import { Inject, Injectable, NotFoundException } from '@nestjs/common';
-import * as dayjs from 'dayjs';
-import { PrismaService } from 'src/prisma/prisma.service';
+import dayjs from 'dayjs';
 import { Logger } from 'winston';
 import { SensorChartDataEntity } from './entities/sensor-chart-data.entity';
 import { Intervalo_Tarifa } from '@prisma/client';
-import { convertTimeToMinutes } from 'src/services/utils/convert-time.utils';
-import { MailService } from 'src/mail/mail.service';
-import EnergyReport from 'emails/energy-report';
+import { PrismaService } from '../prisma/prisma.service';
+import { convertTimeToMinutes } from '../services/utils/convert-time.utils';
+import { MailService } from '../mail/mail.service';
+import EnergyReport from '../../emails/energy-report';
 
 @Injectable()
 export class SensorDataService {
   constructor(
     private readonly prismaService: PrismaService,
     private readonly mailService: MailService,
-    @Inject('winston') private logger: Logger,
+    // @Inject('winston') private logger: Logger, // Removido para vercel
   ) {}
 
   async handleData(data: string, mac: string) {
@@ -89,7 +89,7 @@ export class SensorDataService {
       });
     } catch (e) {
       console.log(e.message);
-      this.logger.error(e.message);
+      // this.logger.error(e.message);
       //this.handleData(data, mac);
     }
   }

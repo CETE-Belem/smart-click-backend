@@ -1,9 +1,9 @@
 import { Inject, Injectable } from '@nestjs/common';
 import * as mqtt from 'mqtt';
-import { FrontWebSocketService } from 'src/gateways/front-events/front-websocket.service';
-import { PrismaService } from 'src/prisma/prisma.service';
-import { SensorDataService } from 'src/sensor-datas/sensor-datas.service';
 import { Logger } from 'winston';
+import { FrontWebSocketService } from '../../gateways/front-events/front-websocket.service';
+import { PrismaService } from '../../prisma/prisma.service';
+import { SensorDataService } from '../../sensor-datas/sensor-datas.service';
 
 @Injectable()
 export class MqttService {
@@ -14,7 +14,7 @@ export class MqttService {
     private frontWebSocketService: FrontWebSocketService,
     private prisma: PrismaService,
     private sensorDataService: SensorDataService,
-    @Inject('winston') private logger: Logger,
+    // @Inject('winston') private logger: Logger,
   ) {
     this.client = mqtt.connect(
       `mqtt://${process.env.MQTT_URL}:${process.env.MQTT_PORT}`,
@@ -28,40 +28,33 @@ export class MqttService {
     this.client.on('connect', () => {
       this.connected = true;
       console.log('MQTT connected');
-      this.logger.info('MQTT connected');
 
       this.client.subscribe('+/smartclick/fafbfc', (error) => {
         if (error) {
           console.error('MQTT subscribe error: ', error);
-          this.logger.error('MQTT subscribe error: ', error);
         } else {
           console.log('MQTT subscribe success');
-          this.logger.info('MQTT subscribe success');
         }
       });
     });
 
     this.client.on('message', (topic, message) => {
-      this.logger.info('MQTT mensagem: ', message);
       //console.log('Received message from topic: ', topic);
       this.handleMessage(topic, message.toString()); // Tratar a mensagem recebida
     });
 
     this.client.on('error', (error) => {
-      this.logger.error('MQTT mensagem: ', error);
       console.error('MQTT error: ', error);
     });
   }
 
   publish(topic: string, message: string | Buffer, retain = false): boolean {
     if (!this.client.connected) {
-      this.logger.error('MQTT not connected');
       console.error('MQTT not connected');
       return false;
     }
     this.client.publish(topic, message, { retain }, (err) => {
       if (err) {
-        this.logger.error('MQTT publish error: ', err);
         console.error('MQTT publish error: ', err);
         return false;
       }
@@ -130,7 +123,6 @@ export class MqttService {
       });
     } catch (error) {
       console.error('Error in handleMessage: ', error);
-      this.logger.error('Error in handleMessage: ', error);
     }
   }
 
@@ -156,7 +148,7 @@ export class MqttService {
 
     if (user.perfil === 'ADMIN') {
       this.client.subscribe('+/smartclick/#', (error) => {
-        error && this.logger.error('MQTT subscribe error: ', error);
+        error && console.error('MQTT subscribe error: ', error);
       });
       return;
     }
@@ -174,7 +166,7 @@ export class MqttService {
         return `${device.mac.replaceAll(':', '-')}/smartclick/#`;
       }),
       (error) => {
-        error && this.logger.error('MQTT subscribe error: ', error);
+        error && console.error('MQTT subscribe error: ', error);
       },
     );
   }
@@ -209,7 +201,7 @@ export class MqttService {
         return unsubscribePaths.map((path) => `${baseTopic}${path}`);
       }),
       (error) => {
-        error && this.logger.error('MQTT unsubscribe error: ', error);
+        error && console.error('MQTT unsubscribe error: ', error);
       },
     );
   }
@@ -262,7 +254,7 @@ export class MqttService {
         // Inscreve-se nos tópicos
         this.client.subscribe(arraySubscribePaths, (error) => {
           if (error) {
-            this.logger.error('MQTT subscribe error: ', error);
+            console.error('MQTT subscribe error: ', error);
             this.client.removeListener('message', messageHandler); // Remove o listener em caso de erro
             return reject(error);
           }
@@ -272,7 +264,7 @@ export class MqttService {
 
     this.client.unsubscribe(arraySubscribePaths, (error) => {
       if (error) {
-        this.logger.error('MQTT unsubscribe error: ', error);
+        console.error('MQTT unsubscribe error: ', error);
       }
     });
 

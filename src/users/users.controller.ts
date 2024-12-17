@@ -34,17 +34,17 @@ import {
 import { CreateUserDto } from './dto/create-user.dto';
 import { UserEntity } from './entities/user.entity';
 import { ConfirmCodeDto } from './dto/confirm-code.dto';
-import { AuthGuard } from 'src/common/guards/auth.guard';
-import { JWTType } from 'src/types/jwt.types';
+import { JWTType } from '../types/jwt.types';
 import { UpdateUserDto } from './dto/udpate-user.dto';
 import { RecoverPasswordDto } from './dto/recover-password.dto';
-import { RolesGuard } from 'src/common/guards/roles.guard';
-import { Roles } from 'src/common/decorators/roles.decorator';
 import { AdminUpdateUserDto } from './dto/admin-update-user.dto';
 import { Cargo, Subgrupo } from '@prisma/client';
 import { CreateAdminDto } from './dto/create-admin.dto';
-import { ConsumerUnitEntity } from 'src/consumer-units/entities/consumer-unit.entity';
-import { ParseSubgrupoPipe } from 'src/common/pipes/ParseSubgrupoPipe.pipe';
+import { AuthGuard } from '../common/guards/auth.guard';
+import { RolesGuard } from '../common/guards/roles.guard';
+import { ConsumerUnitEntity } from '../consumer-units/entities/consumer-unit.entity';
+import { ParseSubgrupoPipe } from '../common/pipes/ParseSubgrupoPipe.pipe';
+import { Roles } from '../common/decorators/roles.decorator';
 
 @ApiTags('users')
 @Controller('users')

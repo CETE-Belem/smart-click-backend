@@ -13,8 +13,8 @@ import {
   ApiParam,
   ApiTags,
 } from '@nestjs/swagger';
-import { AuthGuard } from 'src/common/guards/auth.guard';
 import { SensorChartDataEntity } from './entities/sensor-chart-data.entity';
+import { AuthGuard } from '../common/guards/auth.guard';
 
 @ApiTags('sensor-data')
 @Controller('sensor-data')

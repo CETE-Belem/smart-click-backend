@@ -7,26 +7,26 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { PrismaService } from 'src/prisma/prisma.service';
-import { AuthService } from 'src/auth/auth.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UserEntity } from './entities/user.entity';
-import { generateSalt, hashPassword } from 'src/services/libs/bcrypt';
-import { TurnstileService } from 'src/services/turnstile/turnstile.service';
-import { generateConfirmationCode } from 'src/services/utils/confirmation-code.utils';
-import { generateRecoverCode } from 'src/services/utils/recover-code.utils';
-import ConfirmationCode from 'emails/confirmation-code';
-import RecoverCode from 'emails/recover-code';
-import { MailService } from 'src/mail/mail.service';
+import { generateSalt, hashPassword } from '../services/libs/bcrypt';
 import { ConfirmCodeDto } from './dto/confirm-code.dto';
-import { JWTType } from 'src/types/jwt.types';
+import { JWTType } from '../types/jwt.types';
 import { UpdateUserDto } from './dto/udpate-user.dto';
 import { RecoverPasswordDto } from './dto/recover-password.dto';
 import { AdminUpdateUserDto } from './dto/admin-update-user.dto';
 import { Cargo, Subgrupo } from '@prisma/client';
 import { CreateAdminDto } from './dto/create-admin.dto';
 import * as bcrypt from 'bcrypt';
-import { ConsumerUnitEntity } from 'src/consumer-units/entities/consumer-unit.entity';
+import { ConsumerUnitEntity } from '../consumer-units/entities/consumer-unit.entity';
+import { PrismaService } from '../prisma/prisma.service';
+import { AuthService } from '../auth/auth.service';
+import { TurnstileService } from '../services/turnstile/turnstile.service';
+import { generateConfirmationCode } from '../services/utils/confirmation-code.utils';
+import { generateRecoverCode } from '../services/utils/recover-code.utils';
+import ConfirmationCode from '../../emails/confirmation-code';
+import RecoverCode from '../../emails/recover-code';
+import { MailService } from '../mail/mail.service';
 
 @Injectable()
 export class UsersService {

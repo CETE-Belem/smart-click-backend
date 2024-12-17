@@ -12,7 +12,7 @@ import {
   getSchemaPath,
 } from '@nestjs/swagger';
 import { LoginDto } from './dto/login-dto';
-import { UserEntity } from 'src/users/entities/user.entity';
+import { UserEntity } from '../users/entities/user.entity';
 
 @ApiTags('auth')
 @Controller('auth')

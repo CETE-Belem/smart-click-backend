@@ -10,8 +10,8 @@ import { EquipmentsModule } from './equipments/equipments.module';
 import { MailModule } from './mail/mail.module';
 import { ConcessionaireModule } from './concessionaires/concessionaires.module';
 import { ConsumerUnitModule } from './consumer-units/consumer-units.module';
-import { WinstonModule } from 'nest-winston';
-import { winstonConfig } from './config/winston.config';
+// import { WinstonModule } from 'nest-winston';
+//import { winstonConfig } from './config/winston.config';
 import { RatesModule } from './rates/rates.module';
 import { LoggerInterceptor } from './common/interceptors/logger.interceptor';
 import { ConflictInterceptor } from './common/interceptors/conflict.interceptor';
@@ -25,7 +25,7 @@ import { MailService } from './mail/mail.service';
 
 @Module({
   imports: [
-    WinstonModule.forRoot(winstonConfig),
+    // WinstonModule.forRoot(winstonConfig),
     ScheduleModule.forRoot(),
     ThrottlerModule.forRoot([
       {

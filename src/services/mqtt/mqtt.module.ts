@@ -1,9 +1,9 @@
 import { Module, forwardRef } from '@nestjs/common';
-import { PrismaService } from 'src/prisma/prisma.service';
-import { WebSocketsModule } from 'src/gateways/websocket.module';
+import { PrismaService } from '../../prisma/prisma.service';
+import { WebSocketsModule } from '../../gateways/websocket.module';
 import { MqttService } from './mqtt.service';
-import { SensorDataService } from 'src/sensor-datas/sensor-datas.service';
-import { MailService } from 'src/mail/mail.service';
+import { SensorDataService } from '../../sensor-datas/sensor-datas.service';
+import { MailService } from '../../mail/mail.service';
 
 @Module({
   providers: [MqttService, PrismaService, SensorDataService, MailService],

@@ -4,10 +4,10 @@ import {
   maxNameLength,
   macLength,
   maxDescriptionLength,
-} from 'src/constants/equipment-fields';
-import { ConsumerUnitEntity } from 'src/consumer-units/entities/consumer-unit.entity';
-import { ConcessionaireEntity } from 'src/concessionaires/entities/concessionaire.entity';
+} from '../../constants/equipment-fields';
 import { Transform } from 'class-transformer';
+import { ConsumerUnitEntity } from '../../consumer-units/entities/consumer-unit.entity';
+import { ConcessionaireEntity } from '../../concessionaires/entities/concessionaire.entity';
 
 export class EquipmentEntity implements Equipamento {
   constructor(partial: Partial<EquipmentEntity>) {

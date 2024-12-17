@@ -10,8 +10,7 @@ import {
   Max,
   Min,
 } from 'class-validator';
-
-import { IsLesserOrEqualThan } from 'src/validators';
+import { IsLesserOrEqualThan } from '../../validators';
 
 export class CreateRateIntervalDto {
   @ApiProperty({

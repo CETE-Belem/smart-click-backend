@@ -2,12 +2,12 @@ import { Injectable, OnModuleInit, Logger, Inject } from '@nestjs/common';
 import { Cron } from '@nestjs/schedule';
 import { SensorDataService } from './sensor-datas/sensor-datas.service';
 import { PrismaService } from './prisma/prisma.service';
-import * as dayjs from 'dayjs';
+import dayjs from 'dayjs';
 
 @Injectable()
 export class AppService implements OnModuleInit {
   constructor(
-    @Inject('winston') private readonly logger: Logger,
+    // @Inject('winston') private readonly logger: Logger, // Removido para a vercel
     private readonly sensorDatasService: SensorDataService,
     private readonly prismaService: PrismaService,
   ) {}

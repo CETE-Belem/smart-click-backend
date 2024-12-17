@@ -3,7 +3,7 @@ import { IsOptional, IsString, MaxLength, MinLength } from 'class-validator';
 import {
   maxNameLength,
   maxDescriptionLength,
-} from 'src/constants/equipment-fields';
+} from '../../constants/equipment-fields';
 
 export class UserUpdateEquipmentDto {
   @ApiProperty({

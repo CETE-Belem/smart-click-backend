@@ -2,7 +2,7 @@ import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
 import { Observable } from 'rxjs';
 import { Socket } from 'socket.io';
 import { JwtService } from '@nestjs/jwt';
-import { env } from 'src/config/env.config';
+import { env } from '../../config/env.config';
 
 @Injectable()
 export class WsJWTGuard implements CanActivate {

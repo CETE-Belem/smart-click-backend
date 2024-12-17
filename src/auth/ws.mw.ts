@@ -1,5 +1,5 @@
 import { Socket } from 'socket.io';
-import { WsJWTGuard } from 'src/common/guards/ws.guard';
+import { WsJWTGuard } from '../common/guards/ws.guard';
 
 export type SocketIOMiddleWare = {
   (client: Socket, next: (err?: Error) => void);
