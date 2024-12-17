@@ -3,7 +3,7 @@ import { Subgrupo, Tarifa } from '@prisma/client';
 import { Decimal } from '@prisma/client/runtime/library';
 import { RateIntervalEntity } from './rate-interval.entity';
 import { Transform } from 'class-transformer';
-import { ConcessionaireEntity } from 'src/concessionaires/entities/concessionaire.entity';
+import { ConcessionaireEntity } from '../../concessionaires/entities/concessionaire.entity';
 
 export class RateEntity implements Tarifa {
   constructor(partial: Partial<RateEntity>) {

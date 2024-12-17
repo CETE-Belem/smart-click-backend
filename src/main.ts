@@ -2,16 +2,20 @@ import { NestFactory, Reflector } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { ValidationPipe, ClassSerializerInterceptor } from '@nestjs/common';
-import { WinstonModule } from 'nest-winston';
-import { winstonConfig } from './config/winston.config';
+// import { WinstonModule } from 'nest-winston';
+// import { winstonConfig } from './config/winston.config';
 import helmet from 'helmet';
 import { APIGuard } from './common/guards/api.guard';
-import * as cookieParser from 'cookie-parser';
+import cookieParser from 'cookie-parser';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule, {
-    logger: WinstonModule.createLogger(winstonConfig),
-  });
+  ////////////// REMOVENDO LOGS VERCEL //////////////////////
+  // const app = await NestFactory.create(AppModule, {
+  //   logger: WinstonModule.createLogger(winstonConfig),
+  // });
+  /////////////////////////////////////////////////////////
+
+  const app = await NestFactory.create(AppModule);
   app.enableCors();
   app.use(helmet());
   app.use(cookieParser());

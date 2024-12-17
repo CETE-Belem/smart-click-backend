@@ -7,13 +7,13 @@ import {
   MessageBody,
 } from '@nestjs/websockets';
 import { Socket } from 'socket.io';
-import { MqttService } from 'src/services/mqtt/mqtt.service';
 import { FrontWebSocketService } from './front-websocket.service';
 import { Logger } from 'winston';
 import { Inject } from '@nestjs/common';
-import { env } from 'src/config/env.config';
-import { SocketAuthMiddleware } from 'src/auth/ws.mw';
-import { PrismaService } from 'src/prisma/prisma.service';
+import { MqttService } from '../../services/mqtt/mqtt.service';
+import { env } from '../../config/env.config';
+import { SocketAuthMiddleware } from '../../auth/ws.mw';
+import { PrismaService } from '../../prisma/prisma.service';
 
 @WebSocketGateway({
   cors: {
@@ -29,18 +29,20 @@ export class FrontWebSocketGateway
     private readonly frontWebSocketService: FrontWebSocketService,
     private readonly mqttService: MqttService,
     private readonly prismService: PrismaService,
-    @Inject('winston') private logger: Logger,
+    // @Inject('winston') private logger: Logger,
   ) {}
 
   afterInit(client: Socket) {
     client.use(SocketAuthMiddleware() as any);
-    this.logger.info('Websocket initialized');
+    console.log('Websocket initialized');
+    // this.logger.info('Websocket initialized'); // Removido para a vercel
   }
 
   async handleConnection(client: Socket) {
     const userId = client.handshake.query.userId as string;
     if (!userId) return client.disconnect();
-    this.logger.info(`User ${userId} connected to ws`);
+    // this.logger.info(`User ${userId} connected to ws`); // Removido para a vercel
+    console.log("🚀 ~ handleConnection ~ `User ${userId} connected to ws`:", `User ${userId} connected to ws`)
     this.frontWebSocketService.associateSocketToUser(userId, client);
     await this.mqttService.subscribeToUserEquipments(userId);
   }

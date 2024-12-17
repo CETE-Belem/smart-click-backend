@@ -16,7 +16,7 @@ import {
   maxNameLength,
   macLength,
   maxDescriptionLength,
-} from 'src/constants/equipment-fields';
+} from '../../constants/equipment-fields';
 
 export class CreateEquipmentDto {
   @ApiProperty({

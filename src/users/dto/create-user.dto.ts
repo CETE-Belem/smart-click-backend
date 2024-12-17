@@ -14,7 +14,7 @@ import {
   maxPasswordLength,
   passwordRegex,
   maxEmailLength,
-} from 'src/constants/user-fields';
+} from '../../constants/user-fields';
 
 export class CreateUserDto {
   @ApiProperty({

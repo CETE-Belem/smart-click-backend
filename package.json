@@ -6,12 +6,12 @@
   "private": true,
   "license": "UNLICENSED",
   "scripts": {
-    "build": "nest build",
+    "build": "prisma generate && nest build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "start": "nest start",
     "start:dev": "env-cmd -f ./.env.development nest start --watch",
     "start:debug": "nest start --debug --watch",
-    "start:prod": "node dist/main",
+    "start:prod": "node dist/src/main",
     "lint": "eslint \"{src,apps,libs,test,prisma}/**/*.ts\" --fix",
     "test": "jest",
     "test:watch": "jest --watch",
@@ -22,7 +22,8 @@
     "unseed": "ts-node prisma/unseed.ts",
     "migration:create": "npx prisma migrate dev",
     "migrate": "npx prisma migrate deploy",
-    "seed": "ts-node prisma/seed.ts"
+    "seed": "ts-node prisma/seed.ts",
+    "postinstall": "prisma generate"
   },
   "prisma": {
     "seed": "ts-node prisma/seed.ts"

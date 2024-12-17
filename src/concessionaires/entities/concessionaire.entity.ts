@@ -4,7 +4,7 @@ import {
   maxNameLength,
   maxCityLength,
   maxUFLength,
-} from 'src/constants/concessionarie-fields';
+} from '../../constants/concessionarie-fields';
 
 export class ConcessionaireEntity implements Concessionaria {
   constructor(partial: Partial<ConcessionaireEntity>) {

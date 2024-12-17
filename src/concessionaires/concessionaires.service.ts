@@ -6,11 +6,12 @@ import {
 } from '@nestjs/common';
 import { CreateConcessionaireDto } from './dto/create-concessionaire.dto';
 import { UpdateConcessionaireDto } from './dto/update-concessionaire.dto';
-import { PrismaService } from 'src/prisma/prisma.service';
-import { JWTType } from 'src/types/jwt.types';
+import { JWTType } from '../types/jwt.types';
 import { ConcessionaireEntity } from './entities/concessionaire.entity';
-import { RateEntity } from 'src/rates/entities/rate.entity';
-import { ConsumerUnitEntity } from 'src/consumer-units/entities/consumer-unit.entity';
+import { RateEntity } from '../rates/entities/rate.entity';
+import { ConsumerUnitEntity } from '../consumer-units/entities/consumer-unit.entity';
+import { PrismaService } from '../prisma/prisma.service';
+
 
 @Injectable()
 export class ConcessionaireService {

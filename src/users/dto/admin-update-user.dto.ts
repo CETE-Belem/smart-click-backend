@@ -6,7 +6,7 @@ import {
   MaxLength,
   IsEnum,
 } from 'class-validator';
-import { maxEmailLength, maxNameLength } from 'src/constants/user-fields';
+import { maxEmailLength, maxNameLength } from '../../constants/user-fields';
 import { Cargo } from '@prisma/client';
 
 export class AdminUpdateUserDto {

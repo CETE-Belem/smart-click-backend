@@ -5,13 +5,13 @@ import {
 } from '@nestjs/common';
 import { CreateEquipmentDto } from './dto/create-equipment.dto';
 import { AdminUpdateEquipmentDto } from './dto/admin-update-equipment.dto';
-import { PrismaService } from 'src/prisma/prisma.service';
 import { EquipmentEntity } from './entities/equipment.entity';
-import { JWTType } from 'src/types/jwt.types';
+import { JWTType } from '../types/jwt.types';
 import { Cargo, Fases } from '@prisma/client';
 import { UserUpdateEquipmentDto } from './dto/user-update-equipment.dto';
 import * as ExcelJS from 'exceljs';
 import { Response } from 'express';
+import { PrismaService } from '../prisma/prisma.service';
 
 @Injectable()
 export class EquipmentsService {

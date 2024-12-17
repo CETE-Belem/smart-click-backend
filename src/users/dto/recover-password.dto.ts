@@ -11,7 +11,7 @@ import {
   maxPasswordLength,
   minPasswordLength,
   passwordRegex,
-} from 'src/constants/user-fields';
+} from '../../constants/user-fields';
 
 export class RecoverPasswordDto {
   @ApiProperty({

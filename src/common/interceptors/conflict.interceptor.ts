@@ -12,7 +12,8 @@ import { Logger } from 'winston';
 
 @Injectable()
 export class ConflictInterceptor implements NestInterceptor {
-  constructor(@Inject('winston') private logger: Logger) {}
+  // constructor(@Inject('winston') private logger: Logger) {}
+  constructor(){}
   intercept(
     context: ExecutionContext,
     next: CallHandler<any>,
@@ -20,11 +21,13 @@ export class ConflictInterceptor implements NestInterceptor {
     return next.handle().pipe(
       catchError((err) => {
         if (err instanceof ConflictError) {
-          this.logger.error(err.message);
+          // this.logger.error(err.message); // Removido para a Vercel
+          console.log("🚀 ~ ConflictInterceptor ~ catchError ~ err.message:", err.message)
           throw new ConflictException(err.message);
         } else {
           throw err;
         }
+          
       }),
     );
   }

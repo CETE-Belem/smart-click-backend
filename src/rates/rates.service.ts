@@ -4,11 +4,11 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { CreateRateDto } from './dto/create-rate.dto';
-import { PrismaService } from 'src/prisma/prisma.service';
 import { RateEntity } from './entities/rate.entity';
 import { CreateRateIntervalDto } from './dto/create-rate-interval.dto';
 import { UpdateRateIntervalDto } from './dto/update-rate-interval.dto';
 import { UpdateRateDto } from './dto/update-rate.dto';
+import { PrismaService } from '../prisma/prisma.service';
 
 @Injectable()
 export class RatesService {

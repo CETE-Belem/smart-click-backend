@@ -10,7 +10,7 @@ import {
   Text,
   Font,
 } from '@react-email/components';
-import * as dayjs from 'dayjs';
+import dayjs from 'dayjs';
 import * as React from 'react';
 
 export default function EnergyReport({

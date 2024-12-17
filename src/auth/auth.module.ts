@@ -2,11 +2,11 @@ import { forwardRef, Module } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { AuthController } from './auth.controller';
 import { JwtModule, JwtService } from '@nestjs/jwt';
-import { PrismaService } from 'src/prisma/prisma.service';
-import { TurnstileService } from 'src/services/turnstile/turnstile.service';
-import { UsersService } from 'src/users/users.service';
-import { UsersModule } from 'src/users/users.module';
-import { MailService } from 'src/mail/mail.service';
+import { PrismaService } from '../prisma/prisma.service';
+import { TurnstileService } from '../services/turnstile/turnstile.service';
+import { UsersService } from '../users/users.service';
+import { UsersModule } from '../users/users.module';
+import { MailService } from '../mail/mail.service';
 
 @Module({
   controllers: [AuthController],

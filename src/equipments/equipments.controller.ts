@@ -31,15 +31,15 @@ import {
   ApiTags,
   getSchemaPath,
 } from '@nestjs/swagger';
-import { AuthGuard } from 'src/common/guards/auth.guard';
-import { JWTType } from 'src/types/jwt.types';
+import { JWTType } from '../types/jwt.types';
 import { EquipmentEntity } from './entities/equipment.entity';
-import { ParseFaseMonitoradaPipe } from 'src/common/pipes/ParseFaseMonitoradaPipe.pipe';
 import { Fases } from '@prisma/client';
-import { Roles } from 'src/common/decorators/roles.decorator';
-import { RolesGuard } from 'src/common/guards/roles.guard';
 import { UserUpdateEquipmentDto } from './dto/user-update-equipment.dto';
 import { Response } from 'express';
+import { Roles } from '../common/decorators/roles.decorator';
+import { RolesGuard } from '../common/guards/roles.guard';
+import { ParseFaseMonitoradaPipe } from '../common/pipes/ParseFaseMonitoradaPipe.pipe';
+import { AuthGuard } from '../common/guards/auth.guard';
 
 @ApiTags('equipments')
 @UseGuards(AuthGuard, RolesGuard)

@@ -13,9 +13,6 @@ import {
 } from '@nestjs/common';
 import { RatesService } from './rates.service';
 import { CreateRateDto } from './dto/create-rate.dto';
-import { AuthGuard } from 'src/common/guards/auth.guard';
-import { RolesGuard } from 'src/common/guards/roles.guard';
-import { Roles } from 'src/common/decorators/roles.decorator';
 import {
   ApiBadRequestResponse,
   ApiBearerAuth,
@@ -26,6 +23,9 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { UpdateRateDto } from './dto/update-rate.dto';
+import { AuthGuard } from '../common/guards/auth.guard';
+import { Roles } from '../common/decorators/roles.decorator';
+import { RolesGuard } from '../common/guards/roles.guard';
 
 @ApiTags('rates')
 @Controller('rates')

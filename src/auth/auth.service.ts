@@ -4,14 +4,14 @@ import {
   Inject,
   forwardRef,
 } from '@nestjs/common';
-import { PrismaService } from 'src/prisma/prisma.service';
 import { LoginDto } from './dto/login-dto';
 import * as bcrypt from 'bcrypt';
-import { TurnstileService } from 'src/services/turnstile/turnstile.service';
 import { JwtService } from '@nestjs/jwt';
-import { UserEntity } from 'src/users/entities/user.entity';
 import { Usuario } from '@prisma/client';
-import { UsersService } from 'src/users/users.service';
+import { UsersService } from '../users/users.service';
+import { UserEntity } from '../users/entities/user.entity';
+import { TurnstileService } from '../services/turnstile/turnstile.service';
+import { PrismaService } from '../prisma/prisma.service';
 
 @Injectable()
 export class AuthService {

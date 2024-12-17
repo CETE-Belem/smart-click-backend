@@ -5,14 +5,14 @@ import {
   NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
-import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateConsumerUnitDto } from './dto/create-consumer-unit.dto';
 import { ConsumerUnitEntity } from './entities/consumer-unit.entity';
 import { UpdateConsumerUnitDto } from './dto/update-consumer-unit.dto';
-import { EquipmentEntity } from 'src/equipments/entities/equipment.entity';
 import { Fases, Subgrupo } from '@prisma/client';
 import { ConnectConsumerUnitDto } from './dto/connect-consumer-unit.dto';
-import { JWTType } from 'src/types/jwt.types';
+import { JWTType } from '../types/jwt.types';
+import { EquipmentEntity } from '../equipments/entities/equipment.entity';
+import { PrismaService } from '../prisma/prisma.service';
 
 @Injectable()
 export class ConsumerUnitService {

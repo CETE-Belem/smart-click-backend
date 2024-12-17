@@ -1,7 +1,7 @@
 import { Cargo, Usuario } from '@prisma/client';
 import { Exclude } from 'class-transformer';
 import { ApiProperty } from '@nestjs/swagger';
-import { maxEmailLength, maxNameLength } from 'src/constants/user-fields';
+import { maxEmailLength, maxNameLength } from '../../constants/user-fields';
 
 export class UserEntity implements Usuario {
   constructor(partial: Partial<UserEntity>) {

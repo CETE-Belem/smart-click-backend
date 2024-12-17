@@ -30,16 +30,17 @@ import {
   ApiBadRequestResponse,
   ApiQuery,
 } from '@nestjs/swagger';
-import { Roles } from 'src/common/decorators/roles.decorator';
-import { AuthGuard } from 'src/common/guards/auth.guard';
-import { RolesGuard } from 'src/common/guards/roles.guard';
-import { JWTType } from 'src/types/jwt.types';
+import { JWTType } from '../types/jwt.types';
 import { ConsumerUnitEntity } from './entities/consumer-unit.entity';
 import { UpdateConsumerUnitDto } from './dto/update-consumer-unit.dto';
 import { Fases, Subgrupo } from '@prisma/client';
-import { EquipmentEntity } from 'src/equipments/entities/equipment.entity';
-import { ParseSubgrupoPipe } from 'src/common/pipes/ParseSubgrupoPipe.pipe';
 import { ConnectConsumerUnitDto } from './dto/connect-consumer-unit.dto';
+import { Roles } from '../common/decorators/roles.decorator';
+import { AuthGuard } from '../common/guards/auth.guard';
+import { RolesGuard } from '../common/guards/roles.guard';
+import { EquipmentEntity } from '../equipments/entities/equipment.entity';
+import { ParseSubgrupoPipe } from '../common/pipes/ParseSubgrupoPipe.pipe';
+
 
 @ApiTags('consumer-units')
 @Controller('consumer-units')
